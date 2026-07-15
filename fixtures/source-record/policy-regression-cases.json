@@ -1,0 +1,86 @@
+{
+  "schema": "schemas/source-record.schema.json",
+  "as_of": "2026-07-15",
+  "cases": [
+    {
+      "case_id": "current-authoritative-final-policy",
+      "expect_effective_gate": "ALLOW",
+      "expect_policy_verdict": "PASS",
+      "expect_final_eligible": true,
+      "record": {
+        "source_id": "SRC-POLICY-CURRENT-001",
+        "title": "Current authoritative source",
+        "uri": "https://example.com/current",
+        "source_type": "primary",
+        "authority_tier": 1,
+        "authority_role": "authoritative",
+        "owner": {"name": "Policy Owner"},
+        "allowed_uses": ["decision_support"],
+        "provenance": {"registered_by":"Toolkit","registered_at":"2026-07-01T00:00:00Z","retrieved_at":"2026-07-15T00:00:00Z","content_sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+        "freshness": {"window_days":30,"last_checked":"2026-07-15","next_review":"2026-08-14","status":"current","material_change":false},
+        "decision_eligibility":"final",
+        "lifecycle_status":"approved"
+      }
+    },
+    {
+      "case_id": "expired-source-policy-blocked",
+      "expect_effective_gate": "HALT",
+      "expect_policy_verdict": "PASS",
+      "expect_final_eligible": false,
+      "record": {
+        "source_id": "SRC-POLICY-EXPIRED-001",
+        "title": "Expired authoritative source",
+        "uri": "https://example.com/expired",
+        "source_type": "internal",
+        "authority_tier": 1,
+        "authority_role": "authoritative",
+        "owner": {"name": "Policy Owner"},
+        "allowed_uses": ["historical_context"],
+        "provenance": {"registered_by":"Toolkit","registered_at":"2026-01-01T00:00:00Z","retrieved_at":"2026-01-01T00:00:00Z","content_sha256":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+        "freshness": {"window_days":30,"last_checked":"2026-01-01","next_review":"2026-01-31","status":"expired","material_change":false},
+        "decision_eligibility":"blocked",
+        "lifecycle_status":"approved"
+      }
+    },
+    {
+      "case_id": "incoherent-final-source-policy",
+      "expect_effective_gate": "HALT",
+      "expect_policy_verdict": "FAIL",
+      "expect_final_eligible": false,
+      "record": {
+        "source_id": "SRC-POLICY-INCOHERENT-001",
+        "title": "Incoherent final source",
+        "uri": "https://example.com/incoherent",
+        "source_type": "secondary",
+        "authority_tier": 1,
+        "authority_role": "corroborating",
+        "owner": {"name": "Unknown Publisher"},
+        "allowed_uses": ["decision_support"],
+        "provenance": {"registered_by":"Toolkit","registered_at":"2026-07-15T00:00:00Z","retrieved_at":"2026-07-15T00:00:00Z","content_sha256":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+        "freshness": {"window_days":30,"last_checked":"2026-07-15","next_review":"2026-08-14","status":"current","material_change":true},
+        "decision_eligibility":"final",
+        "lifecycle_status":"approved"
+      }
+    },
+    {
+      "case_id": "current-corroboration-review",
+      "expect_effective_gate": "REVIEW",
+      "expect_policy_verdict": "PASS",
+      "expect_final_eligible": false,
+      "record": {
+        "source_id": "SRC-POLICY-CORROBORATING-001",
+        "title": "Current corroborating source",
+        "uri": "https://example.com/corroborating",
+        "source_type": "secondary",
+        "authority_tier": 2,
+        "authority_role": "corroborating",
+        "owner": {"name": "Research Owner"},
+        "allowed_uses": ["corroboration"],
+        "provenance": {"registered_by":"Toolkit","registered_at":"2026-07-10T00:00:00Z","retrieved_at":"2026-07-15T00:00:00Z","content_sha256":"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+        "freshness": {"window_days":30,"last_checked":"2026-07-15","next_review":"2026-08-14","status":"current","material_change":false},
+        "decision_eligibility":"corroboration_required",
+        "lifecycle_status":"approved"
+      }
+    }
+  ]
+}
