@@ -1,0 +1,26 @@
+{
+  "workflow_id": "WFL-RESEARCH-BRIEF-001",
+  "workflow_key": "research_brief",
+  "version": "1.0.0",
+  "title": "Governed Research Brief",
+  "purpose": "Convert a scoped research request into a current, cited, decision-ready artifact.",
+  "owner": {"name":"Toolkit maintainer","authority":"owner"},
+  "status": "approved",
+  "intake_policy": {
+    "allowed_domains": ["toolkit_governance"],
+    "allowed_risk_levels": ["low", "moderate"],
+    "allowed_requester_authorities": ["owner", "delegate", "contributor"]
+  },
+  "skills": [
+    {"skill_id":"research-brief","required":true,"sequence":1,"purpose":"Structure the request into a governed research brief."},
+    {"skill_id":"source-triage","required":true,"sequence":2,"purpose":"Classify source authority, relevance, freshness, and allowed use."},
+    {"skill_id":"evaluate-output","required":true,"sequence":3,"purpose":"Evaluate the completed brief against explicit acceptance criteria."}
+  ],
+  "deliverables": [
+    {"artifact_type":"research_brief","formats":["markdown"],"acceptance_criteria":["Primary claims have citations","Assumptions and confidence are explicit","A decision or next action is stated"]}
+  ],
+  "evidence_policy": {"allowed_classes":["primary","secondary"],"citation_required":true,"freshness_required":true},
+  "action_policy": {"max_external_writes":"prohibited","approval_gate":"none","sensitive_data_ceiling":"none","allowed_actions":["read_public_sources"]},
+  "quality_gates": {"evaluator_required":true,"evaluator_ref":"evaluate-output","approval_required":false,"regression_required":false},
+  "approval": {"status":"approved","approver":"Drew Burt","approved_at":"2026-07-15T10:00:00Z"}
+}
