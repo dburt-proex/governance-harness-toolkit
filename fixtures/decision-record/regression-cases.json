@@ -1,0 +1,42 @@
+{
+  "schema": "schemas/decision-record.schema.json",
+  "evaluator": "evaluators/decision-record.js",
+  "cases": [
+    {
+      "case_id": "approved-evidenced-decision",
+      "expect_schema_valid": true,
+      "expect_verdict": "PASS",
+      "record_path": "examples/decision-record/approved-source-registry.json"
+    },
+    {
+      "case_id": "allow-with-expired-evidence",
+      "expect_schema_valid": true,
+      "expect_verdict": "FAIL",
+      "mutate_from": "examples/decision-record/approved-source-registry.json",
+      "mutations": [
+        { "path": "evidence.0.freshness_status", "value": "expired" }
+      ]
+    },
+    {
+      "case_id": "pending-human-review",
+      "expect_schema_valid": true,
+      "expect_verdict": "REVIEW",
+      "mutate_from": "examples/decision-record/approved-source-registry.json",
+      "mutations": [
+        { "path": "decision.state", "value": "REVIEW" },
+        { "path": "approval.status", "value": "pending" },
+        { "path": "lifecycle_status", "value": "proposed" }
+      ]
+    },
+    {
+      "case_id": "allow-with-unverified-critical-assumption",
+      "expect_schema_valid": true,
+      "expect_verdict": "REVIEW",
+      "mutate_from": "examples/decision-record/approved-source-registry.json",
+      "mutations": [
+        { "path": "assumptions.0.status", "value": "unverified" },
+        { "path": "assumptions.0.impact", "value": "critical" }
+      ]
+    }
+  ]
+}
