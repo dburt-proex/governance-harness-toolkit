@@ -1,0 +1,104 @@
+{
+  "evaluator": "evaluators/source-policy-coherence.js",
+  "cases": [
+    {
+      "case_id": "current-authoritative-final-allows",
+      "evaluation_date": "2026-07-15",
+      "expect_result": "PASS",
+      "expect_gate": "ALLOW",
+      "expect_final_eligible": true,
+      "record": {
+        "source_id": "SRC-OPENAI-DOCS-001",
+        "title": "Official product documentation",
+        "uri": "https://help.openai.com/en/articles/10169521-projects-in-chatgpt",
+        "source_type": "primary",
+        "authority_tier": 1,
+        "authority_role": "authoritative",
+        "owner": { "name": "OpenAI" },
+        "allowed_uses": ["product_behavior", "implementation_constraints"],
+        "provenance": {
+          "registered_by": "Toolkit",
+          "registered_at": "2026-07-15T00:00:00Z",
+          "retrieved_at": "2026-07-15T00:00:00Z",
+          "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "freshness": {
+          "window_days": 30,
+          "last_checked": "2026-07-15",
+          "next_review": "2026-08-14",
+          "status": "current",
+          "material_change": false
+        },
+        "decision_eligibility": "final",
+        "confidence": 0.95,
+        "lifecycle_status": "approved"
+      }
+    },
+    {
+      "case_id": "expired-source-blocked-halts",
+      "evaluation_date": "2026-07-15",
+      "expect_result": "PASS",
+      "expect_gate": "HALT",
+      "expect_final_eligible": false,
+      "record": {
+        "source_id": "SRC-POLICY-OLD-001",
+        "title": "Expired operating policy",
+        "uri": "https://example.com/policies/old",
+        "source_type": "internal",
+        "authority_tier": 1,
+        "authority_role": "authoritative",
+        "owner": { "name": "Policy Owner" },
+        "allowed_uses": ["historical_context"],
+        "provenance": {
+          "registered_by": "Toolkit",
+          "registered_at": "2026-01-01T00:00:00Z",
+          "retrieved_at": "2026-01-01T00:00:00Z",
+          "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "freshness": {
+          "window_days": 30,
+          "last_checked": "2026-01-01",
+          "next_review": "2026-01-31",
+          "status": "expired",
+          "material_change": false
+        },
+        "decision_eligibility": "blocked",
+        "confidence": 0.2,
+        "lifecycle_status": "approved"
+      }
+    },
+    {
+      "case_id": "stale-source-declared-current-is-incoherent",
+      "evaluation_date": "2026-07-15",
+      "expect_result": "FAIL",
+      "expect_gate": "HALT",
+      "expect_final_eligible": false,
+      "record": {
+        "source_id": "SRC-STALE-MISLABELED-001",
+        "title": "Stale source mislabeled as current",
+        "uri": "https://example.com/stale",
+        "source_type": "primary",
+        "authority_tier": 1,
+        "authority_role": "authoritative",
+        "owner": { "name": "Example Authority" },
+        "allowed_uses": ["policy_decision"],
+        "provenance": {
+          "registered_by": "Toolkit",
+          "registered_at": "2026-05-01T00:00:00Z",
+          "retrieved_at": "2026-05-01T00:00:00Z",
+          "content_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        },
+        "freshness": {
+          "window_days": 30,
+          "last_checked": "2026-05-01",
+          "next_review": "2026-05-31",
+          "status": "current",
+          "material_change": false
+        },
+        "decision_eligibility": "final",
+        "confidence": 0.9,
+        "lifecycle_status": "approved"
+      }
+    }
+  ]
+}
