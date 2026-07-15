@@ -12,7 +12,8 @@ Priority is evidence-weighted leverage, not feature count.
 | TK-006 | Build compounding learning loop | Convert failures and reviews into system improvements | review | Draft PR #5, weekly review example, evaluator, and 5 passing cases |
 | TK-007 | Implement source policy coherence evaluator | Close cross-field freshness and eligibility gaps that structural validation cannot detect | review | Draft PR #6, deterministic evaluator, and 4 policy regression cases |
 | TK-008 | Define durable build-run record | Make each automated increment recoverable and machine-checkable outside chat history | review | Draft PR #8, run-record schema, completed fixture, evaluator, and 5 passing cases |
-| TK-009 | Define governed workflow registry | Give intake routing canonical workflow, Skill, deliverable, gate, and ownership definitions | queued | Workflow-record schema plus valid and invalid routing fixtures |
+| TK-009 | Define governed workflow registry | Give intake routing canonical workflow, Skill, deliverable, gate, and ownership definitions | review | Draft PR #9, workflow schema, routing evaluator, approved example, and 5 passing cases |
+| TK-010 | Define governed Skill registry | Make reusable execution discoverable, versioned, owned, and compatibility-checked | queued | Skill-record schema plus available, missing, and incompatible regression cases |
 
 ## Selection rule
 
