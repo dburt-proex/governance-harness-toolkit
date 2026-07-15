@@ -1,5 +1,57 @@
 # Toolkit Build Ledger
 
+## Run 009
+
+- Date: 2026-07-15
+- Scope: Implement TK-009 as a governed workflow registry contract, routing evaluator, approved research workflow, and regression set
+- Evidence:
+  - governance/build-contract.md
+  - ops/backlog.md
+  - schemas/intake-record.schema.json
+  - fixtures/intake-record/regression-cases.json
+  - Acceptance requirement that intake routes each request into a known workflow
+- Change isolation:
+  - Branch: agent/tk-009-workflow-registry
+  - Draft pull request: https://github.com/dburt-proex/governance-harness-toolkit/pull/9
+- Proposed artifacts:
+  - schemas/workflow-record.schema.json
+  - evaluators/workflow-route.js
+  - examples/workflows/research-brief.json
+  - fixtures/workflow-record/regression-cases.json
+- Controls implemented:
+  - Canonical workflow identity, version, owner, lifecycle, and approval
+  - Intake risk, requester-authority, and domain policy
+  - Ordered required-Skill contract
+  - Deliverable type, format, and acceptance criteria
+  - Evidence class, citation, and freshness policy
+  - External-write, sensitive-data, and allowed-action boundaries
+  - Evaluator, approval, and regression quality gates
+  - Deterministic intake-to-workflow ALLOW, REVIEW, and HALT routing
+- Verification:
+  - Validator: Ajv 8, JSON Schema Draft 2020-12 with strict and format validation for workflow and intake records
+  - approved-research-route-allow: PASS, ALLOW
+  - missing-required-skill-halts: expected FAIL, HALT
+  - unsupported-output-halts: expected FAIL, HALT
+  - high-risk-research-reviews: PASS, REVIEW
+  - write-authority-exceeds-workflow: expected FAIL, HALT
+  - Direct evaluator check: PASS, ALLOW
+  - Result: 5/5 workflow routing cases passed
+  - Remote verification: 4/4 branch artifacts matched tested local artifacts
+- Failure handling:
+  - Initial strict parsing found a missing closing boundary in the action-policy conditional
+  - The schema was corrected and the complete suite passed afterward
+  - The valid conditional remains covered by strict schema compilation
+- Result: REVIEW, TK-009 implementation verified in draft PR #9
+- Confidence: High for deterministic routing compatibility; medium for registry and installed-Skill integration
+- Open risks:
+  - Draft PR #9 is not merged
+  - Only the research-brief workflow has a completed registry example
+  - Installed Skill identity and version are asserted rather than resolved
+  - Approval identity is asserted, not authenticated
+  - Workflow records are not yet persisted in a registry service
+- Next action: TK-010, define the governed Skill registry; TK-009 requires human review before merge
+- Approval state: Human review required to promote executable workflow routing to main
+
 ## Run 008
 
 - Date: 2026-07-15
