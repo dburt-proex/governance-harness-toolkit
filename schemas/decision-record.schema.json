@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dburt-proex.github.io/governance-harness-toolkit/schemas/decision-record.schema.json",
+  "title": "Governed Decision Record",
+  "description": "Canonical decision memo record for traceable evidence, alternatives, assumptions, risks, approvals, and review triggers.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "decision_id",
+    "intake_id",
+    "decided_at",
+    "owner",
+    "title",
+    "context",
+    "decision",
+    "alternatives",
+    "evidence",
+    "assumptions",
+    "risks",
+    "conditions",
+    "approval",
+    "confidence",
+    "confidence_basis",
+    "review",
+    "lifecycle_status"
+  ],
+  "properties": {
+    "decision_id": { "type": "string", "pattern": "^DEC-[A-Z0-9][A-Z0-9._-]{2,63}$" },
+    "intake_id": { "type": "string", "pattern": "^INT-[A-Z0-9][A-Z0-9._-]{2,63}$" },
+    "decided_at": { "type": "string", "format": "date-time" },
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "authority"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "authority": { "enum": ["owner", "delegate", "governance_reviewer"] }
+      }
+    },
+    "title": { "type": "string", "minLength": 5, "maxLength": 240 },
+    "context": { "type": "string", "minLength": 10, "maxLength": 4000 },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "statement", "rationale"],
+      "properties": {
+        "state": { "enum": ["ALLOW", "REVIEW", "HALT"] },
+        "statement": { "type": "string", "minLength": 5, "maxLength": 2000 },
+        "rationale": { "type": "string", "minLength": 10, "maxLength": 4000 }
+      }
+    },
+    "alternatives": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["alternative_id", "title", "disposition", "rationale"],
+        "properties": {
+          "alternative_id": { "type": "string", "pattern": "^ALT-[A-Z0-9][A-Z0-9._-]{1,63}$" },
+          "title": { "type": "string", "minLength": 3, "maxLength": 240 },
+          "disposition": { "enum": ["selected", "rejected", "deferred"] },
+          "rationale": { "type": "string", "minLength": 5, "maxLength": 2000 }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_id", "role", "claim", "freshness_status", "eligibility"],
+        "properties": {
+          "source_id": { "type": "string", "pattern": "^SRC-[A-Z0-9][A-Z0-9._-]{2,63}$" },
+          "role": { "enum": ["supporting", "conflicting", "contextual"] },
+          "claim": { "type": "string", "minLength": 5, "maxLength": 2000 },
+          "freshness_status": { "enum": ["current", "due", "expired", "unknown", "review_required"] },
+          "eligibility": { "enum": ["final", "corroboration_required", "context_only", "blocked"] }
+        }
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["assumption_id", "statement", "status", "impact"],
+        "properties": {
+          "assumption_id": { "type": "string", "pattern": "^ASM-[A-Z0-9][A-Z0-9._-]{1,63}$" },
+          "statement": { "type": "string", "minLength": 5, "maxLength": 2000 },
+          "status": { "enum": ["unverified", "verified", "rejected"] },
+          "impact": { "enum": ["low", "moderate", "high", "critical"] }
+        }
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["risk_id", "description", "likelihood", "impact", "mitigation", "status"],
+        "properties": {
+          "risk_id": { "type": "string", "pattern": "^RSK-[A-Z0-9][A-Z0-9._-]{1,63}$" },
+          "description": { "type": "string", "minLength": 5, "maxLength": 2000 },
+          "likelihood": { "enum": ["low", "moderate", "high"] },
+          "impact": { "enum": ["low", "moderate", "high", "critical"] },
+          "mitigation": { "type": "string", "minLength": 5, "maxLength": 2000 },
+          "status": { "enum": ["open", "mitigated", "accepted"] }
+        }
+      }
+    },
+    "conditions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 3, "maxLength": 1000 }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "status"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "status": { "enum": ["not_required", "pending", "approved", "rejected"] },
+        "approver": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "approved_at": { "type": "string", "format": "date-time" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "required": { "const": false } }, "required": ["required"] },
+          "then": { "properties": { "status": { "const": "not_required" } } }
+        },
+        {
+          "if": { "properties": { "status": { "const": "approved" } }, "required": ["status"] },
+          "then": {
+            "type": "object",
+            "properties": {
+              "approver": true,
+              "approved_at": true
+            },
+            "required": ["approver", "approved_at"]
+          }
+        }
+      ]
+    },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "confidence_basis": { "type": "string", "minLength": 5, "maxLength": 2000 },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["next_review", "triggers"],
+      "properties": {
+        "next_review": { "type": "string", "format": "date" },
+        "triggers": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 3, "maxLength": 1000 }
+        }
+      }
+    },
+    "lifecycle_status": { "enum": ["draft", "proposed", "approved", "rejected", "superseded"] }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "type": "object",
+            "properties": { "state": { "const": "REVIEW" } },
+            "required": ["state"]
+          }
+        },
+        "required": ["decision"]
+      },
+      "then": {
+        "properties": {
+          "approval": {
+            "type": "object",
+            "properties": {
+              "required": { "const": true },
+              "status": { "const": "pending" }
+            }
+          },
+          "lifecycle_status": { "enum": ["draft", "proposed"] }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "type": "object",
+            "properties": { "state": { "enum": ["ALLOW", "HALT"] } },
+            "required": ["state"]
+          }
+        },
+        "required": ["decision"]
+      },
+      "then": { "properties": { "lifecycle_status": { "const": "approved" } } }
+    }
+  ]
+}
