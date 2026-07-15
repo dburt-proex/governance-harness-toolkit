@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "RUN-007",
+  "occurred_at": "2026-07-15T08:14:49Z",
+  "work_item_id": "TK-007",
+  "scope": "Implement a deterministic source policy coherence evaluator and regression set.",
+  "evidence": [
+    {"ref":"governance/build-contract.md","kind":"contract","content_sha":"d829e6db98651b6c8d6b629e847beb63fe7aebba"},
+    {"ref":"ops/backlog.md","kind":"backlog","content_sha":"38da1c9726abf1a5732392241a86da4d11071eb4"},
+    {"ref":"schemas/source-record.schema.json","kind":"schema","content_sha":"edd8f9de5a7fd0e4990df5c0536e50ef4a1145d4"},
+    {"ref":"fixtures/source-record/regression-cases.json","kind":"fixture","content_sha":"79b363fa270123cbbf8c9574ccbcef01b07e93d8"},
+    {"ref":"https://github.com/dburt-proex/governance-harness-toolkit/pull/6","kind":"pull_request"}
+  ],
+  "change_isolation": {"branch":"agent/tk-007-source-policy","pull_request_url":"https://github.com/dburt-proex/governance-harness-toolkit/pull/6","draft":true,"merged":false},
+  "artifacts": [
+    {"path":"evaluators/source-policy.js","change_type":"created","commit_sha":"f98d715a502a933bf43f2d02d9bf079571551481"},
+    {"path":"fixtures/source-record/policy-regression-cases.json","change_type":"created","commit_sha":"5468f71deeaefb4515dda2b6822f6eb53293474b"}
+  ],
+  "controls_implemented": ["Reproducible as-of date evaluation","Freshness and authority coherence","Lifecycle and final-eligibility enforcement","Deterministic ALLOW, REVIEW, and HALT outcomes"],
+  "verification": {
+    "checks": [
+      {"name":"current-authoritative-final-policy","status":"PASS","evidence":"schema valid, policy PASS, gate ALLOW"},
+      {"name":"expired-source-policy-blocked","status":"PASS","evidence":"schema valid, policy PASS, gate HALT"},
+      {"name":"incoherent-final-source-policy","status":"PASS","evidence":"schema valid, policy FAIL, gate HALT as expected"},
+      {"name":"current-corroboration-review","status":"PASS","evidence":"schema valid, policy PASS, gate REVIEW"},
+      {"name":"remote-artifact-match","status":"PASS","evidence":"2 of 2 remote branch artifacts matched tested local content"}
+    ],
+    "passed_count": 5,
+    "failed_count": 0,
+    "skipped_count": 0
+  },
+  "failures": [
+    {"summary":"The temporary Ajv verifier was unavailable when validation began.","disposition":"corrected_implementation","owner":"Toolkit automation","next_action":"Restore isolated Ajv before running strict schema checks.","artifact_ref":"temporary validation environment"}
+  ],
+  "result": {"gate":"REVIEW","confidence":"high","rationale":"The implementation and fixtures passed, while executable policy remains pending human review."},
+  "unresolved_risks": [
+    {"summary":"Draft PR #6 is not merged.","owner":"Toolkit maintainer","next_action":"Review policy semantics and approve, revise, or reject PR #6."},
+    {"summary":"Source identity and ownership remain externally asserted.","owner":"Registry integration owner","next_action":"Add authenticated registry resolution in a later integration increment."}
+  ],
+  "next_queued_item": {"work_item_id":"TK-008","summary":"Define a durable machine-checkable build-run record."},
+  "approval_state": "pending"
+}
