@@ -1,0 +1,18 @@
+{
+  "action_id": "ACT-TK005-EXAMPLE",
+  "intake_id": "INT-TK005-BUILD",
+  "requested_at": "2026-07-15T06:15:00Z",
+  "requester": {"name": "Toolkit Build Loop", "authority": "system"},
+  "connector": {"name": "GitHub", "class": "repository", "environment": "staging"},
+  "operation": "create",
+  "target": "agent/tk-005-action-permissions:schemas/action-request.schema.json",
+  "data_sensitivity": "internal",
+  "reversibility": "reversible",
+  "external_effect": true,
+  "scope_authorized": true,
+  "risk_signals": {"production": false, "secret_access": false, "external_transmission": false, "bulk_operation": false, "identity_impact": false},
+  "human_approval": {"required": false, "status": "not_required"},
+  "declared_gate": "ALLOW",
+  "rationale": "Create a bounded review-branch artifact in the authorized canonical repository.",
+  "lifecycle_status": "approved"
+}
