@@ -1,5 +1,49 @@
 # Toolkit Build Ledger
 
+## Run 002
+
+- Date: 2026-07-15
+- Scope: Complete TK-002 by defining the governed intake record and routing regression cases
+- Evidence:
+  - governance/build-contract.md
+  - ops/backlog.md
+  - schemas/source-record.schema.json
+  - Acceptance requirement that a request enter through defined intake and route to a known workflow
+- Artifacts:
+  - schemas/intake-record.schema.json
+  - fixtures/intake-record/regression-cases.json
+  - ops/backlog.md
+  - ops/build-ledger.md
+- Controls implemented:
+  - Requester identity and authority classification
+  - Objective, domain, priority, risk, output, success, and failure fields
+  - Source-class, citation, and freshness requirements
+  - External-write, approval-gate, and sensitive-data policies
+  - Known workflow and required-Skill routing
+  - ALLOW, REVIEW, and HALT decision states
+  - Mandatory REVIEW or HALT for high and critical risk
+  - HALT lifecycle restricted to blocked or cancelled
+  - Authorized external writes prohibited when no approval gate exists
+- Verification:
+  - Validator: Ajv 8, JSON Schema Draft 2020-12 with strict and format validation
+  - governed-research-allow: PASS
+  - high-risk-write-review: PASS
+  - critical-request-cannot-allow: PASS
+  - missing-objective-rejected: PASS
+  - Result: 4/4 regression cases passed
+- Failure handling:
+  - Strict validation rejected an underspecified nested conditional object
+  - The routing condition was corrected with explicit object typing and the full suite was rerun
+- Result: PASS, TK-002 complete
+- Confidence: High for structural routing controls; medium for end-to-end execution readiness
+- Open risks:
+  - Execution-readiness logic exists only in the regression harness
+  - Requester identity and authority are asserted, not authenticated
+  - Workflow enum changes require explicit schema versioning
+  - Intake persistence and runtime routing are not implemented
+- Next action: TK-003, implement the decision memo record with a completed sample and evaluator
+- Approval state: Intake schema and fixtures approved for controlled use; runtime execution remains gated
+
 ## Run 001
 
 - Date: 2026-07-15
