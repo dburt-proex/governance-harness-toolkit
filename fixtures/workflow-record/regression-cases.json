@@ -1,0 +1,28 @@
+{
+  "workflow_schema": "schemas/workflow-record.schema.json",
+  "intake_schema": "schemas/intake-record.schema.json",
+  "workflow_example": "examples/workflows/research-brief.json",
+  "base_intake": {
+    "intake_id":"INT-WORKFLOW-001",
+    "submitted_at":"2026-07-15T10:00:00Z",
+    "requester":{"name":"Drew Burt","authority":"owner"},
+    "objective":"Determine the current constraints affecting the governed Toolkit build.",
+    "domain":"toolkit_governance",
+    "priority":"high",
+    "risk_level":"moderate",
+    "requested_outputs":[{"artifact_type":"research_brief","format":"markdown","acceptance_criteria":["Primary claims have citations","Assumptions are explicit"]}],
+    "success_criteria":["Decision-relevant constraints are documented"],
+    "failure_conditions":["Unsupported product claims enter the final brief"],
+    "source_policy":{"allowed_classes":["primary","secondary"],"citation_required":true,"freshness_required":true},
+    "action_policy":{"external_writes":"prohibited","approval_gate":"none","sensitive_data":"none","allowed_actions":["read_public_sources"]},
+    "routing":{"workflow":"research_brief","required_skills":["research-brief","source-triage","evaluate-output"],"decision_state":"ALLOW","rationale":"The request matches the approved read-only research workflow and its evidence controls."},
+    "lifecycle_status":"approved"
+  },
+  "cases": [
+    {"case_id":"approved-research-route-allow","operations":[],"expect_schema_valid":true,"expect_computed_gate":"ALLOW","expect_route_verdict":"PASS"},
+    {"case_id":"missing-required-skill-halts","operations":[{"op":"set","path":"/routing/required_skills","value":["research-brief","source-triage"]},{"op":"set","path":"/routing/decision_state","value":"HALT"},{"op":"set","path":"/lifecycle_status","value":"blocked"}],"expect_schema_valid":true,"expect_computed_gate":"HALT","expect_route_verdict":"FAIL"},
+    {"case_id":"unsupported-output-halts","operations":[{"op":"set","path":"/requested_outputs/0/artifact_type","value":"deployment"},{"op":"set","path":"/routing/decision_state","value":"HALT"},{"op":"set","path":"/lifecycle_status","value":"blocked"}],"expect_schema_valid":true,"expect_computed_gate":"HALT","expect_route_verdict":"FAIL"},
+    {"case_id":"high-risk-research-reviews","operations":[{"op":"set","path":"/risk_level","value":"high"},{"op":"set","path":"/routing/decision_state","value":"REVIEW"},{"op":"set","path":"/lifecycle_status","value":"triaged"}],"expect_schema_valid":true,"expect_computed_gate":"REVIEW","expect_route_verdict":"PASS"},
+    {"case_id":"write-authority-exceeds-workflow","operations":[{"op":"set","path":"/action_policy/external_writes","value":"review_required"},{"op":"set","path":"/action_policy/approval_gate","value":"before_any_external_action"},{"op":"set","path":"/action_policy/allowed_actions","value":["create_pull_request"]},{"op":"set","path":"/routing/decision_state","value":"HALT"},{"op":"set","path":"/lifecycle_status","value":"blocked"}],"expect_schema_valid":true,"expect_computed_gate":"HALT","expect_route_verdict":"FAIL"}
+  ]
+}
