@@ -1,5 +1,57 @@
 # Toolkit Build Ledger
 
+## Run 005
+
+- Date: 2026-07-15
+- Scope: Implement TK-005 as a governed action request, connector permission matrix, deterministic evaluator, controlled example, and regression set
+- Evidence:
+  - governance/build-contract.md
+  - ops/backlog.md
+  - schemas/intake-record.schema.json
+  - Acceptance requirement that connectors use least privilege and consequential actions stop for approval
+- Change isolation:
+  - Branch: agent/tk-005-action-permissions
+  - Draft pull request: https://github.com/dburt-proex/governance-harness-toolkit/pull/4
+- Proposed artifacts:
+  - schemas/action-request.schema.json
+  - policies/action-permission-matrix.json
+  - evaluators/action-permission.js
+  - examples/action-permission/scoped-branch-write.json
+  - fixtures/action-permission/regression-cases.json
+- Controls implemented:
+  - Ordered deny-first policy rules with default REVIEW
+  - ALLOW, REVIEW, and HALT policy gates
+  - Approval-aware effective execution state
+  - Scope, environment, sensitivity, reversibility, and risk-signal classification
+  - Hard HALT for secret exfiltration, permission changes, financial transactions, irreversible deletion, and bulk production mutation
+  - Human review for production deployment, external communication, production mutation, restricted reads, and unscoped external writes
+  - Declared-versus-computed gate consistency check
+  - Dependency-free evaluator CLI
+- Verification:
+  - Validator: Ajv 8, JSON Schema Draft 2020-12 with strict and format validation
+  - authorized internal read: PASS, ALLOW
+  - scoped reversible branch write: PASS, ALLOW
+  - production deploy pending approval: PASS, REVIEW
+  - mislabeled permission change: expected FAIL, detected HALT and declared-gate mismatch
+  - secret exfiltration: PASS, HALT
+  - Completed example: PASS, ALLOW
+  - Result: 5/5 regression cases passed
+- Failure handling:
+  - Strict validation rejected an approval conditional whose required fields were not declared in the conditional subschema
+  - The conditional was corrected and the complete suite was rerun successfully
+  - The strict compile check remains the regression guard
+- Result: REVIEW, TK-005 implementation verified in draft PR #4
+- Confidence: High for deterministic policy routing; medium for runtime enforcement readiness
+- Open risks:
+  - Draft PR #4 is not merged
+  - The evaluator expects the caller to perform JSON Schema validation first
+  - Connector identity, environment, and capability metadata are supplied rather than independently verified
+  - Approver identity is asserted, not authenticated
+  - The policy is not yet connected to live connector invocation
+  - Matrix coverage is finite; unmatched actions intentionally default to REVIEW
+- Next action: TK-006, build the compounding learning loop; TK-005 requires human review before merge
+- Approval state: Human review required to promote executable action policy to main
+
 ## Run 004
 
 - Date: 2026-07-15
