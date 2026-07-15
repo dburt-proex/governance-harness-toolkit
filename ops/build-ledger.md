@@ -1,5 +1,54 @@
 # Toolkit Build Ledger
 
+## Run 007
+
+- Date: 2026-07-15
+- Scope: Implement TK-007 as a deterministic source policy coherence evaluator and regression set
+- Evidence:
+  - governance/build-contract.md
+  - ops/backlog.md
+  - schemas/source-record.schema.json
+  - fixtures/source-record/regression-cases.json
+  - TK-001 open risk: cross-field date and eligibility coherence requires a policy evaluator
+- Change isolation:
+  - Branch: agent/tk-007-source-policy
+  - Draft pull request: https://github.com/dburt-proex/governance-harness-toolkit/pull/6
+- Proposed artifacts:
+  - evaluators/source-policy.js
+  - fixtures/source-record/policy-regression-cases.json
+- Controls implemented:
+  - Reproducible as-of date evaluation
+  - Computed freshness from last check, review date, and window
+  - Freshness status and date-order coherence
+  - Authority-tier and authority-role coherence
+  - Discovery-only boundary enforcement
+  - Lifecycle terminal-state blocking
+  - Final-eligibility requirements for approved primary/internal authoritative current evidence
+  - Deterministic ALLOW, REVIEW, and HALT outcomes
+  - Dependency-free evaluator CLI
+- Verification:
+  - Validator: Ajv 8, JSON Schema Draft 2020-12 with strict and format validation against the existing source schema
+  - current-authoritative-final-policy: PASS, ALLOW
+  - expired-source-policy-blocked: PASS, HALT
+  - incoherent-final-source-policy: expected FAIL, detected FAIL/HALT
+  - current-corroboration-review: PASS, REVIEW
+  - Result: 4/4 policy regression cases passed
+  - Remote verification: 2/2 branch artifacts matched tested local artifacts
+- Failure handling:
+  - The isolated Ajv verifier was unavailable at first because temporary dependencies had expired
+  - Ajv was restored without adding a repository dependency
+  - The full strict-validation suite then passed
+- Result: REVIEW, TK-007 implementation verified in draft PR #6
+- Confidence: High for deterministic cross-field policy checks; medium for runtime registry integration
+- Open risks:
+  - Draft PR #6 is not merged
+  - The evaluator expects schema validation before policy evaluation
+  - Source identity, ownership, and content hashes remain externally asserted
+  - Date policy uses the supplied as-of date and does not yet read a persistent registry
+  - Policy semantics may require owner review before adoption by downstream workflows
+- Next action: TK-008, define a durable machine-checkable build-run record; TK-007 requires human review before merge
+- Approval state: Human review required to promote executable source policy to main
+
 ## Run 006
 
 - Date: 2026-07-15
