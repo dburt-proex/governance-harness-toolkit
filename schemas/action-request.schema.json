@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://governance-harness-toolkit.local/schemas/action-request.schema.json",
+  "title": "Governed Action Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["action_id", "intake_id", "requested_at", "requester", "connector", "operation", "target", "data_sensitivity", "reversibility", "external_effect", "scope_authorized", "risk_signals", "human_approval", "declared_gate", "rationale", "lifecycle_status"],
+  "properties": {
+    "action_id": {"type": "string", "pattern": "^ACT-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "intake_id": {"type": "string", "pattern": "^INT-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "requested_at": {"type": "string", "format": "date-time"},
+    "requester": {
+      "type": "object", "additionalProperties": false, "required": ["name", "authority"],
+      "properties": {"name": {"type": "string", "minLength": 1}, "authority": {"enum": ["owner", "delegate", "system", "external"]}}
+    },
+    "connector": {
+      "type": "object", "additionalProperties": false, "required": ["name", "class", "environment"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "class": {"enum": ["repository", "knowledge_store", "communication", "crm", "deployment", "identity", "payment", "filesystem", "web"]},
+        "environment": {"enum": ["local", "development", "test", "staging", "production", "external"]}
+      }
+    },
+    "operation": {"enum": ["read", "create", "update", "delete", "publish", "deploy", "send", "permission_change", "financial_transaction"]},
+    "target": {"type": "string", "minLength": 1},
+    "data_sensitivity": {"enum": ["none", "public", "internal", "confidential", "restricted"]},
+    "reversibility": {"enum": ["reversible", "partially_reversible", "irreversible"]},
+    "external_effect": {"type": "boolean"},
+    "scope_authorized": {"type": "boolean"},
+    "risk_signals": {
+      "type": "object", "additionalProperties": false,
+      "required": ["production", "secret_access", "external_transmission", "bulk_operation", "identity_impact"],
+      "properties": {
+        "production": {"type": "boolean"}, "secret_access": {"type": "boolean"},
+        "external_transmission": {"type": "boolean"}, "bulk_operation": {"type": "boolean"},
+        "identity_impact": {"type": "boolean"}
+      }
+    },
+    "human_approval": {
+      "type": "object", "additionalProperties": false, "required": ["required", "status"],
+      "properties": {
+        "required": {"type": "boolean"},
+        "status": {"enum": ["not_required", "pending", "approved", "rejected"]},
+        "approver": {"type": "string", "minLength": 1},
+        "approved_at": {"type": "string", "format": "date-time"}
+      },
+      "allOf": [
+        {"if": {"properties": {"required": {"const": false}}, "required": ["required"]}, "then": {"properties": {"status": {"const": "not_required"}}}},
+        {"if": {"properties": {"status": {"const": "approved"}}, "required": ["status"]}, "then": {"properties": {"approver": {"type": "string", "minLength": 1}, "approved_at": {"type": "string", "format": "date-time"}}, "required": ["approver", "approved_at"]}}
+      ]
+    },
+    "declared_gate": {"enum": ["ALLOW", "REVIEW", "HALT"]},
+    "rationale": {"type": "string", "minLength": 10},
+    "lifecycle_status": {"enum": ["requested", "triaged", "approved", "blocked", "executed", "cancelled"]}
+  }
+}
