@@ -1,0 +1,62 @@
+{
+  "schema": "schemas/output-evaluation.schema.json",
+  "evaluator": "evaluators/output-evaluation.js",
+  "cases": [
+    {
+      "case_id": "approved-output-release",
+      "expect_schema_valid": true,
+      "expect_record_verdict": "PASS",
+      "expect_release_gate": "ALLOW",
+      "record_path": "examples/output-evaluation/approved-source-schema.json"
+    },
+    {
+      "case_id": "mandatory-failure-cannot-allow",
+      "expect_schema_valid": true,
+      "expect_record_verdict": "FAIL",
+      "expect_release_gate": "HALT",
+      "mutate_from": "examples/output-evaluation/approved-source-schema.json",
+      "mutations": [
+        { "path": "requirements.0.outcome", "value": "fail" }
+      ]
+    },
+    {
+      "case_id": "high-defect-routes-review",
+      "expect_schema_valid": true,
+      "expect_record_verdict": "PASS",
+      "expect_release_gate": "REVIEW",
+      "mutate_from": "examples/output-evaluation/approved-source-schema.json",
+      "mutations": [
+        {
+          "path": "defects",
+          "value": [
+            {
+              "defect_id": "DEF-HIGH-001",
+              "severity": "high",
+              "description": "A high-severity traceability gap remains open.",
+              "remediation": "Attach the missing source-to-claim mapping.",
+              "status": "open"
+            }
+          ]
+        },
+        { "path": "approval", "value": { "required": true, "status": "pending" } },
+        { "path": "gate.state", "value": "REVIEW" },
+        { "path": "gate.release_state", "value": "candidate" },
+        { "path": "lifecycle_status", "value": "proposed" }
+      ]
+    },
+    {
+      "case_id": "regression-failure-routes-halt",
+      "expect_schema_valid": true,
+      "expect_record_verdict": "PASS",
+      "expect_release_gate": "HALT",
+      "mutate_from": "examples/output-evaluation/approved-source-schema.json",
+      "mutations": [
+        { "path": "regression.passed", "value": false },
+        { "path": "regression.failed_cases", "value": ["expired-source-blocked"] },
+        { "path": "gate.state", "value": "HALT" },
+        { "path": "gate.release_state", "value": "rejected" },
+        { "path": "lifecycle_status", "value": "blocked" }
+      ]
+    }
+  ]
+}

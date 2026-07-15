@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dburt-proex.github.io/governance-harness-toolkit/schemas/output-evaluation.schema.json",
+  "title": "Governed Output Evaluation Record",
+  "description": "Canonical quality and release-gate record for a generated or implemented artifact.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "evaluation_id",
+    "intake_id",
+    "artifact",
+    "evaluated_at",
+    "evaluator",
+    "requirements",
+    "source_summary",
+    "defects",
+    "metrics",
+    "regression",
+    "approval",
+    "gate",
+    "next_action",
+    "lifecycle_status"
+  ],
+  "properties": {
+    "evaluation_id": { "type": "string", "pattern": "^EVA-[A-Z0-9][A-Z0-9._-]{2,63}$" },
+    "intake_id": { "type": "string", "pattern": "^INT-[A-Z0-9][A-Z0-9._-]{2,63}$" },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id", "artifact_type", "version", "uri", "content_sha256"],
+      "properties": {
+        "artifact_id": { "type": "string", "pattern": "^ART-[A-Z0-9][A-Z0-9._-]{2,63}$" },
+        "artifact_type": { "type": "string", "pattern": "^[a-z][a-z0-9_]{1,63}$" },
+        "version": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "uri": { "type": "string", "format": "uri" },
+        "content_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "evaluated_at": { "type": "string", "format": "date-time" },
+    "evaluator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type", "version"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "type": { "enum": ["system", "human", "hybrid"] },
+        "version": { "type": "string", "minLength": 1, "maxLength": 80 }
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["requirement_id", "description", "mandatory", "outcome", "evidence"],
+        "properties": {
+          "requirement_id": { "type": "string", "pattern": "^REQ-[A-Z0-9][A-Z0-9._-]{1,63}$" },
+          "description": { "type": "string", "minLength": 5, "maxLength": 1000 },
+          "mandatory": { "type": "boolean" },
+          "outcome": { "enum": ["pass", "fail", "review", "not_applicable"] },
+          "evidence": { "type": "string", "minLength": 3, "maxLength": 2000 }
+        }
+      }
+    },
+    "source_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "final_eligible", "stale_or_unknown"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "final_eligible": { "type": "integer", "minimum": 0 },
+        "stale_or_unknown": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "defects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["defect_id", "severity", "description", "remediation", "status"],
+        "properties": {
+          "defect_id": { "type": "string", "pattern": "^DEF-[A-Z0-9][A-Z0-9._-]{1,63}$" },
+          "severity": { "enum": ["low", "moderate", "high", "critical"] },
+          "description": { "type": "string", "minLength": 5, "maxLength": 2000 },
+          "remediation": { "type": "string", "minLength": 5, "maxLength": 2000 },
+          "status": { "enum": ["open", "resolved", "accepted"] }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["score", "threshold", "confidence"],
+      "properties": {
+        "score": { "type": "number", "minimum": 0, "maximum": 100 },
+        "threshold": { "type": "number", "minimum": 0, "maximum": 100 },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "regression": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["suite", "passed", "case_count", "failed_cases"],
+      "properties": {
+        "suite": { "type": "string", "minLength": 1, "maxLength": 240 },
+        "passed": { "type": "boolean" },
+        "case_count": { "type": "integer", "minimum": 0 },
+        "failed_cases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 240 }
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "status"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "status": { "enum": ["not_required", "pending", "approved", "rejected"] },
+        "approver": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "approved_at": { "type": "string", "format": "date-time" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "required": { "const": false } }, "required": ["required"] },
+          "then": { "properties": { "status": { "const": "not_required" } } }
+        },
+        {
+          "if": { "properties": { "status": { "const": "approved" } }, "required": ["status"] },
+          "then": {
+            "type": "object",
+            "properties": { "approver": true, "approved_at": true },
+            "required": ["approver", "approved_at"]
+          }
+        }
+      ]
+    },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "release_state", "rationale"],
+      "properties": {
+        "state": { "enum": ["ALLOW", "REVIEW", "HALT"] },
+        "release_state": { "enum": ["draft", "candidate", "approved", "rejected"] },
+        "rationale": { "type": "string", "minLength": 10, "maxLength": 2000 }
+      }
+    },
+    "next_action": { "type": "string", "minLength": 3, "maxLength": 1000 },
+    "lifecycle_status": { "enum": ["draft", "proposed", "approved", "blocked", "rejected", "superseded"] }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "gate": {
+            "type": "object",
+            "properties": { "state": { "const": "ALLOW" } },
+            "required": ["state"]
+          }
+        },
+        "required": ["gate"]
+      },
+      "then": {
+        "properties": {
+          "gate": {
+            "type": "object",
+            "properties": { "release_state": { "const": "approved" } }
+          },
+          "lifecycle_status": { "const": "approved" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "gate": {
+            "type": "object",
+            "properties": { "state": { "const": "REVIEW" } },
+            "required": ["state"]
+          }
+        },
+        "required": ["gate"]
+      },
+      "then": {
+        "properties": {
+          "gate": {
+            "type": "object",
+            "properties": { "release_state": { "enum": ["draft", "candidate"] } }
+          },
+          "lifecycle_status": { "enum": ["draft", "proposed"] }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "gate": {
+            "type": "object",
+            "properties": { "state": { "const": "HALT" } },
+            "required": ["state"]
+          }
+        },
+        "required": ["gate"]
+      },
+      "then": {
+        "properties": {
+          "gate": {
+            "type": "object",
+            "properties": { "release_state": { "const": "rejected" } }
+          },
+          "lifecycle_status": { "enum": ["blocked", "rejected"] }
+        }
+      }
+    }
+  ]
+}
