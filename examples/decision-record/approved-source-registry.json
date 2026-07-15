@@ -1,0 +1,68 @@
+{
+  "decision_id": "DEC-SOURCE-REGISTRY-001",
+  "intake_id": "INT-TOOLKIT-001",
+  "decided_at": "2026-07-15T03:00:00Z",
+  "owner": { "name": "Drew Burt", "authority": "owner" },
+  "title": "Adopt the governed source registry as a required Toolkit control",
+  "context": "The Toolkit requires explicit authority, provenance, freshness, and eligibility controls before evidence can support consequential outputs.",
+  "decision": {
+    "state": "ALLOW",
+    "statement": "Require governed source records for all evidence used in final decision outputs.",
+    "rationale": "The source registry directly reduces stale-evidence and unsupported-claim risk while providing reusable audit data for every workflow."
+  },
+  "alternatives": [
+    {
+      "alternative_id": "ALT-REGISTRY",
+      "title": "Adopt the governed registry",
+      "disposition": "selected",
+      "rationale": "Provides explicit controls with low operating cost and broad reuse."
+    },
+    {
+      "alternative_id": "ALT-CHAT-HISTORY",
+      "title": "Rely on chat history and model memory",
+      "disposition": "rejected",
+      "rationale": "Does not provide durable freshness, authority, or decision-eligibility evidence."
+    }
+  ],
+  "evidence": [
+    {
+      "source_id": "SRC-TOOLKIT-RESEARCH-001",
+      "role": "supporting",
+      "claim": "A durable source registry is required to prevent long-running work from silently degrading as sources age.",
+      "freshness_status": "current",
+      "eligibility": "final"
+    }
+  ],
+  "assumptions": [
+    {
+      "assumption_id": "ASM-REGISTRY-ADOPTION",
+      "statement": "Structured source records can be introduced before the persistence layer is complete.",
+      "status": "verified",
+      "impact": "moderate"
+    }
+  ],
+  "risks": [
+    {
+      "risk_id": "RSK-REGISTRY-FRICTION",
+      "description": "Manual registration may slow low-risk work.",
+      "likelihood": "moderate",
+      "impact": "moderate",
+      "mitigation": "Use minimal required fields and automate registration after schema stabilization.",
+      "status": "mitigated"
+    }
+  ],
+  "conditions": ["Expired or unknown sources cannot support final decisions"],
+  "approval": {
+    "required": true,
+    "status": "approved",
+    "approver": "Drew Burt",
+    "approved_at": "2026-07-15T03:00:00Z"
+  },
+  "confidence": 0.91,
+  "confidence_basis": "The control responds directly to documented failure modes and passed structural regression tests.",
+  "review": {
+    "next_review": "2026-08-15",
+    "triggers": ["Source schema changes", "A stale source reaches a final output", "Persistence implementation begins"]
+  },
+  "lifecycle_status": "approved"
+}
