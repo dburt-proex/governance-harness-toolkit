@@ -1,5 +1,57 @@
 # Toolkit Build Ledger
 
+## Run 006
+
+- Date: 2026-07-15
+- Scope: Implement TK-006 as a governed weekly learning review, deterministic evaluator, completed example, and regression set
+- Evidence:
+  - governance/build-contract.md
+  - ops/backlog.md
+  - ops/build-ledger.md Runs 003 and 005
+  - Acceptance requirement that failures and reviews change the backlog, rules, or test suite
+- Change isolation:
+  - Branch: agent/tk-006-learning-loop
+  - Draft pull request: https://github.com/dburt-proex/governance-harness-toolkit/pull/5
+- Proposed artifacts:
+  - schemas/learning-review.schema.json
+  - evaluators/learning-review.js
+  - examples/learning-review/weekly-review.json
+  - fixtures/learning-review/regression-cases.json
+- Controls implemented:
+  - Evidence-linked observation records
+  - Mandatory improvement type, artifact target, owner, next action, and due date
+  - ALLOW, REVIEW, and HALT learning gates
+  - High-severity regression-fixture requirement
+  - Verification evidence before implemented status is trusted
+  - Human approval before policy or Skill mutations may be treated as implemented
+  - Computed aggregate metrics and declared-versus-computed gate consistency
+  - Dependency-free evaluator CLI
+  - No autonomous mutation of policy, Skills, workflows, or live systems
+- Verification:
+  - Validator: Ajv 8, JSON Schema Draft 2020-12 with strict and format validation
+  - weekly proposal routes to review: PASS, REVIEW
+  - verified completed improvement: PASS, ALLOW
+  - high-severity learning without regression fixture: PASS, HALT
+  - incorrect aggregate metrics: expected FAIL, PASS
+  - unapproved implemented governance mutation: PASS, HALT
+  - Completed weekly example: PASS, REVIEW
+  - Result: 5/5 regression cases passed
+- Failure handling:
+  - The initial harness check could not find the transient Ajv dependency from the prior run
+  - Ajv was restored in isolated temporary storage without adding a repository dependency
+  - The complete strict-validation suite was rerun successfully
+- Result: REVIEW, TK-006 implementation verified in draft PR #5
+- Confidence: High for deterministic learning disposition; medium for source and identity integration
+- Open risks:
+  - Draft PR #5 is not merged
+  - The evaluator expects the caller to perform JSON Schema validation first
+  - Evidence references are asserted rather than resolved against canonical records
+  - Approver identity is asserted, not authenticated
+  - Due-date and recurrence detection are supplied rather than computed from a persistent store
+  - The loop proposes governed changes but intentionally does not apply them automatically
+- Next action: TK-007, implement source policy coherence evaluation; TK-006 requires human review before merge
+- Approval state: Human review required to promote executable learning controls to main
+
 ## Run 005
 
 - Date: 2026-07-15
