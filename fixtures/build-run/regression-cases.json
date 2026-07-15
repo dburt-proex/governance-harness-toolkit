@@ -1,0 +1,11 @@
+{
+  "schema": "schemas/build-run.schema.json",
+  "example": "examples/build-run/run-007.json",
+  "cases": [
+    {"case_id":"complete-review-run-valid","operations":[],"expect_schema_valid":true,"expect_record_verdict":"PASS"},
+    {"case_id":"missing-verification-invalid","operations":[{"op":"delete","path":"/verification"}],"expect_schema_valid":false},
+    {"case_id":"allow-with-failed-check-invalid","operations":[{"op":"set","path":"/verification/checks/0/status","value":"FAIL"},{"op":"set","path":"/verification/passed_count","value":4},{"op":"set","path":"/verification/failed_count","value":1},{"op":"set","path":"/result/gate","value":"ALLOW"},{"op":"set","path":"/approval_state","value":"approved"}],"expect_schema_valid":false},
+    {"case_id":"incorrect-check-counts-fail-evaluator","operations":[{"op":"set","path":"/verification/passed_count","value":4}],"expect_schema_valid":true,"expect_record_verdict":"FAIL"},
+    {"case_id":"unowned-failure-invalid","operations":[{"op":"set","path":"/failures/0/owner","value":""}],"expect_schema_valid":false}
+  ]
+}
