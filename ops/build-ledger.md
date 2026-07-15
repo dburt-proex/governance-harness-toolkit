@@ -1,5 +1,54 @@
 # Toolkit Build Ledger
 
+## Run 004
+
+- Date: 2026-07-15
+- Scope: Implement TK-004 as a governed output-evaluation record, deterministic release gate, completed example, and regression set
+- Evidence:
+  - governance/build-contract.md
+  - ops/backlog.md
+  - schemas/source-record.schema.json
+  - Acceptance requirement that artifacts pass an explicit quality and release gate before becoming trusted
+- Change isolation:
+  - Branch: agent/tk-004-output-evaluation
+  - Draft pull request: https://github.com/dburt-proex/governance-harness-toolkit/pull/3
+- Proposed artifacts:
+  - schemas/output-evaluation.schema.json
+  - evaluators/output-evaluation.js
+  - examples/output-evaluation/approved-source-schema.json
+  - fixtures/output-evaluation/regression-cases.json
+- Controls implemented:
+  - Mandatory requirement outcomes
+  - Final-eligible and stale-source counts
+  - Open critical and high defect routing
+  - Regression-suite gate
+  - Score, threshold, and confidence review rules
+  - Approval state handling
+  - Deterministic computed ALLOW, REVIEW, and HALT gate
+  - Declared-versus-computed gate consistency check
+  - Dependency-free evaluator CLI
+- Verification:
+  - Validator: Ajv 8, JSON Schema Draft 2020-12 with strict and format validation
+  - approved-output-release: PASS, ALLOW
+  - mandatory-failure-cannot-allow: PASS, detected HALT and declared-gate mismatch
+  - high-defect-routes-review: PASS, REVIEW
+  - regression-failure-routes-halt: PASS, HALT
+  - Evaluator CLI completed example: PASS, ALLOW
+  - Result: 4/4 regression cases passed
+- Failure handling:
+  - No product defects were encountered
+  - Ajv remained an isolated verification dependency and was not added to the repository
+- Result: REVIEW, TK-004 implementation verified in draft PR #3
+- Confidence: High for deterministic release routing; medium for integrated artifact verification
+- Open risks:
+  - Draft PR #3 is not merged
+  - The evaluator expects the caller to perform JSON Schema validation first
+  - Source-summary counts are supplied rather than resolved from the registry
+  - Score and confidence inputs are supplied rather than independently calibrated
+  - Example content hash is a synthetic test value
+- Next action: TK-005, define the action and connector permission matrix; TK-004 requires human review before merge
+- Approval state: Human review required to promote the executable release gate to main
+
 ## Run 003
 
 - Date: 2026-07-15
