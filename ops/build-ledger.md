@@ -1,5 +1,56 @@
 # Toolkit Build Ledger
 
+## Run 008
+
+- Date: 2026-07-15
+- Scope: Implement TK-008 as a durable machine-checkable build-run record, coherence evaluator, completed example, and regression set
+- Evidence:
+  - governance/build-contract.md
+  - ops/backlog.md
+  - ops/build-ledger.md Run 007
+  - Acceptance requirement that final artifacts and decisions remain recoverable outside chat
+- Change isolation:
+  - Branch: agent/tk-008-build-run-record
+  - Draft pull request: https://github.com/dburt-proex/governance-harness-toolkit/pull/8
+- Proposed artifacts:
+  - schemas/build-run.schema.json
+  - evaluators/build-run.js
+  - examples/build-run/run-007.json
+  - fixtures/build-run/regression-cases.json
+- Controls implemented:
+  - Evidence, scope, work-item, branch, pull-request, artifact, and commit traceability
+  - Explicit verification checks and aggregate counts
+  - Mandatory disposition, owner, and next action for each failure
+  - Owned unresolved risks and explicit approval state
+  - Mandatory next queued item
+  - Conditional prohibition on ALLOW when a check fails
+  - Conditional risk requirement for REVIEW and HALT
+  - Deterministic verification-count and gate coherence evaluator
+  - Completed machine-readable record for Run 007
+- Verification:
+  - Validator: Ajv 8, JSON Schema Draft 2020-12 with strict and format validation
+  - complete-review-run-valid: PASS
+  - missing-verification-invalid: PASS
+  - allow-with-failed-check-invalid: PASS
+  - incorrect-check-counts-fail-evaluator: PASS
+  - unowned-failure-invalid: PASS
+  - Evaluator CLI completed Run 007 record: PASS
+  - Result: 5/5 regression cases passed
+  - Remote verification: 4/4 branch artifacts matched tested local artifacts
+- Failure handling:
+  - No implementation or verification failures occurred
+  - Concurrent repository advancement was handled by re-reading canonical backlog and ledger before recording this run
+- Result: REVIEW, TK-008 implementation verified in draft PR #8
+- Confidence: High for structural run durability and deterministic count coherence; medium for automatic record generation
+- Open risks:
+  - Draft PR #8 is not merged
+  - Build runs are not yet emitted automatically from the automation loop
+  - Content SHAs and commit references are recorded but not re-resolved by the evaluator
+  - The evaluator expects JSON Schema validation before coherence evaluation
+  - Human identity and approval assertions are not authenticated
+- Next action: TK-009, define the governed workflow registry; TK-008 requires human review before merge
+- Approval state: Human review required to promote the executable build-run contract to main
+
 ## Run 007
 
 - Date: 2026-07-15
