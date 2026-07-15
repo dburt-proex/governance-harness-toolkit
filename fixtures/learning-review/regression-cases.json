@@ -1,0 +1,29 @@
+{
+  "cases": [
+    {
+      "name": "weekly proposal routes to review",
+      "review": {"review_id":"LRN-TEST-001","period_start":"2026-07-13T00:00:00Z","period_end":"2026-07-19T23:59:59Z","generated_at":"2026-07-15T07:12:00Z","evidence_runs":["Run 005"],"observations":[{"observation_id":"OBS-PROPOSAL-001","source_refs":["ops/build-ledger.md#run-005"],"category":"failure","severity":"medium","summary":"A recurring strict-schema issue needs a shared regression fixture.","recurrence_count":2,"improvement":{"type":"regression_fixture","artifact_target":"fixtures/schema-authoring/strict.json","owner":"Toolkit maintainer","next_action":"Create and run the shared strict-schema fixture.","due_at":"2026-07-22T17:00:00Z","status":"proposed","approval":{"required":false,"status":"not_required"}}}],"metrics":{"observation_count":1,"implemented_count":0,"open_blocker_count":0},"declared_gate":"REVIEW","next_review_at":"2026-07-22T07:00:00Z"},
+      "expected": {"computed_gate":"REVIEW","record_verdict":"PASS"}
+    },
+    {
+      "name": "verified completed improvement is allowed",
+      "review": {"review_id":"LRN-TEST-002","period_start":"2026-07-13T00:00:00Z","period_end":"2026-07-19T23:59:59Z","generated_at":"2026-07-15T07:12:00Z","evidence_runs":["Run 005"],"observations":[{"observation_id":"OBS-FIXED-001","source_refs":["ops/build-ledger.md#run-005"],"category":"failure","severity":"medium","summary":"The schema conditional defect was converted into a tested implementation fix.","recurrence_count":1,"improvement":{"type":"implementation_fix","artifact_target":"schemas/example.schema.json","owner":"Toolkit maintainer","next_action":"Monitor the strict compile regression on future schema changes.","due_at":"2026-07-22T17:00:00Z","status":"implemented","verification_ref":"test:strict-schema-conditional","approval":{"required":false,"status":"not_required"}}}],"metrics":{"observation_count":1,"implemented_count":1,"open_blocker_count":0},"declared_gate":"ALLOW","next_review_at":"2026-07-22T07:00:00Z"},
+      "expected": {"computed_gate":"ALLOW","record_verdict":"PASS"}
+    },
+    {
+      "name": "high severity learning without regression fixture halts",
+      "review": {"review_id":"LRN-TEST-003","period_start":"2026-07-13T00:00:00Z","period_end":"2026-07-19T23:59:59Z","generated_at":"2026-07-15T07:12:00Z","evidence_runs":["Run 005"],"observations":[{"observation_id":"OBS-HIGH-001","source_refs":["incident:001"],"category":"regression_failure","severity":"high","summary":"A consequential action bypassed its expected approval boundary during testing.","recurrence_count":1,"improvement":{"type":"implementation_fix","artifact_target":"evaluators/action-permission.js","owner":"Control owner","next_action":"Correct the boundary and add a dedicated regression case.","due_at":"2026-07-16T17:00:00Z","status":"proposed","approval":{"required":false,"status":"not_required"}}}],"metrics":{"observation_count":1,"implemented_count":0,"open_blocker_count":0},"declared_gate":"HALT","next_review_at":"2026-07-16T07:00:00Z"},
+      "expected": {"computed_gate":"HALT","record_verdict":"PASS"}
+    },
+    {
+      "name": "incorrect aggregate metrics fail the record",
+      "review": {"review_id":"LRN-TEST-004","period_start":"2026-07-13T00:00:00Z","period_end":"2026-07-19T23:59:59Z","generated_at":"2026-07-15T07:12:00Z","evidence_runs":["Run 005"],"observations":[{"observation_id":"OBS-METRIC-001","source_refs":["review:001"],"category":"human_review","severity":"low","summary":"A proposed documentation improvement remains queued for completion.","recurrence_count":1,"improvement":{"type":"backlog_item","artifact_target":"ops/backlog.md","owner":"Toolkit maintainer","next_action":"Add the approved documentation improvement to the backlog.","due_at":"2026-07-22T17:00:00Z","status":"proposed","approval":{"required":false,"status":"not_required"}}}],"metrics":{"observation_count":2,"implemented_count":0,"open_blocker_count":0},"declared_gate":"REVIEW","next_review_at":"2026-07-22T07:00:00Z"},
+      "expected": {"computed_gate":"REVIEW","record_verdict":"FAIL"}
+    },
+    {
+      "name": "unapproved implemented governance mutation halts",
+      "review": {"review_id":"LRN-TEST-005","period_start":"2026-07-13T00:00:00Z","period_end":"2026-07-19T23:59:59Z","generated_at":"2026-07-15T07:12:00Z","evidence_runs":["Run 005"],"observations":[{"observation_id":"OBS-POLICY-001","source_refs":["review:002"],"category":"policy_gap","severity":"medium","summary":"A proposed policy rule was marked implemented without human authorization.","recurrence_count":1,"improvement":{"type":"policy_rule","artifact_target":"policies/action-permission-matrix.json","owner":"Policy owner","next_action":"Return the mutation to review and obtain policy-owner approval.","due_at":"2026-07-16T17:00:00Z","status":"implemented","verification_ref":"test:policy-rule","approval":{"required":true,"status":"pending"}}}],"metrics":{"observation_count":1,"implemented_count":1,"open_blocker_count":0},"declared_gate":"HALT","next_review_at":"2026-07-16T07:00:00Z"},
+      "expected": {"computed_gate":"HALT","record_verdict":"PASS"}
+    }
+  ]
+}

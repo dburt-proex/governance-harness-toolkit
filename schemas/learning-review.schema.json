@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://governance-harness-toolkit.local/schemas/learning-review.schema.json",
+  "title": "Governed Learning Review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["review_id", "period_start", "period_end", "generated_at", "evidence_runs", "observations", "metrics", "declared_gate", "next_review_at"],
+  "properties": {
+    "review_id": {"type": "string", "pattern": "^LRN-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "period_start": {"type": "string", "format": "date-time"},
+    "period_end": {"type": "string", "format": "date-time"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "evidence_runs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^Run [0-9]{3}$"}},
+    "observations": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["observation_id", "source_refs", "category", "severity", "summary", "recurrence_count", "improvement"],
+        "properties": {
+          "observation_id": {"type": "string", "pattern": "^OBS-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+          "source_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "category": {"enum": ["failure", "human_review", "regression_failure", "policy_gap", "manual_insight"]},
+          "severity": {"enum": ["low", "medium", "high", "critical"]},
+          "summary": {"type": "string", "minLength": 20},
+          "recurrence_count": {"type": "integer", "minimum": 1},
+          "improvement": {
+            "type": "object", "additionalProperties": false,
+            "required": ["type", "artifact_target", "owner", "next_action", "due_at", "status", "approval"],
+            "properties": {
+              "type": {"enum": ["implementation_fix", "regression_fixture", "policy_rule", "skill_update", "backlog_item", "owned_blocker"]},
+              "artifact_target": {"type": "string", "minLength": 1},
+              "owner": {"type": "string", "minLength": 1},
+              "next_action": {"type": "string", "minLength": 10},
+              "due_at": {"type": "string", "format": "date-time"},
+              "status": {"enum": ["proposed", "approved", "implemented", "blocked", "rejected"]},
+              "regression_fixture_ref": {"type": "string", "minLength": 1},
+              "verification_ref": {"type": "string", "minLength": 1},
+              "approval": {
+                "type": "object", "additionalProperties": false, "required": ["required", "status"],
+                "properties": {
+                  "required": {"type": "boolean"},
+                  "status": {"enum": ["not_required", "pending", "approved", "rejected"]},
+                  "approver": {"type": "string", "minLength": 1},
+                  "approved_at": {"type": "string", "format": "date-time"}
+                },
+                "allOf": [
+                  {"if": {"properties": {"required": {"const": false}}, "required": ["required"]}, "then": {"properties": {"status": {"const": "not_required"}}}},
+                  {"if": {"properties": {"status": {"const": "approved"}}, "required": ["status"]}, "then": {"properties": {"approver": {"type": "string", "minLength": 1}, "approved_at": {"type": "string", "format": "date-time"}}, "required": ["approver", "approved_at"]}}
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object", "additionalProperties": false,
+      "required": ["observation_count", "implemented_count", "open_blocker_count"],
+      "properties": {
+        "observation_count": {"type": "integer", "minimum": 0},
+        "implemented_count": {"type": "integer", "minimum": 0},
+        "open_blocker_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "declared_gate": {"enum": ["ALLOW", "REVIEW", "HALT"]},
+    "next_review_at": {"type": "string", "format": "date-time"}
+  }
+}
