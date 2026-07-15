@@ -10,7 +10,8 @@ Priority is evidence-weighted leverage, not feature count.
 | TK-004 | Implement output evaluation record | Create a release gate before trust or publication | review | Draft PR #3, completed sample, evaluator, and 4 passing cases |
 | TK-005 | Define action and connector permission matrix | Keep consequential actions controlled | review | Draft PR #4, permission matrix, evaluator, and 5 passing cases |
 | TK-006 | Build compounding learning loop | Convert failures and reviews into system improvements | review | Draft PR #5, weekly review example, evaluator, and 5 passing cases |
-| TK-007 | Implement source policy coherence evaluator | Close cross-field freshness and eligibility gaps that structural validation cannot detect | queued | Deterministic evaluator plus current, expired, and incoherent regression cases |
+| TK-007 | Implement source policy coherence evaluator | Close cross-field freshness and eligibility gaps that structural validation cannot detect | review | Draft PR #6, deterministic evaluator, and 4 policy regression cases |
+| TK-008 | Define durable build-run record | Make each automated increment recoverable and machine-checkable outside chat history | queued | Run-record schema, completed fixture, and strict validation cases |
 
 ## Selection rule
 
