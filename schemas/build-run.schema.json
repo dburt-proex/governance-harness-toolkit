@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dburt-proex.github.io/governance-harness-toolkit/schemas/build-run.schema.json",
+  "title": "Governed Build Run Record",
+  "description": "Durable, machine-checkable record of one bounded Toolkit build increment.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "occurred_at", "work_item_id", "scope", "evidence", "change_isolation", "artifacts", "controls_implemented", "verification", "failures", "result", "unresolved_risks", "next_queued_item", "approval_state"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "run_id": {"type": "string", "pattern": "^RUN-[0-9]{3}$"},
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "work_item_id": {"type": "string", "pattern": "^TK-[0-9]{3}$"},
+    "scope": {"type": "string", "minLength": 20, "maxLength": 1000},
+    "evidence": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["ref", "kind"],
+        "properties": {
+          "ref": {"type": "string", "minLength": 1},
+          "kind": {"enum": ["contract", "backlog", "schema", "fixture", "ledger", "pull_request", "test_result", "external"]},
+          "content_sha": {"type": "string", "pattern": "^[a-f0-9]{40,64}$"}
+        }
+      }
+    },
+    "change_isolation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["branch", "pull_request_url", "draft", "merged"],
+      "properties": {
+        "branch": {"type": "string", "pattern": "^agent/[a-z0-9][a-z0-9._/-]{2,127}$"},
+        "pull_request_url": {"type": "string", "format": "uri", "pattern": "^https://github\\.com/[^/]+/[^/]+/pull/[0-9]+$"},
+        "draft": {"type": "boolean"},
+        "merged": {"const": false}
+      }
+    },
+    "artifacts": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["path", "change_type", "commit_sha"],
+        "properties": {
+          "path": {"type": "string", "pattern": "^[^/].+"},
+          "change_type": {"enum": ["created", "updated"]},
+          "commit_sha": {"type": "string", "pattern": "^[a-f0-9]{40}$"}
+        }
+      }
+    },
+    "controls_implemented": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 5}},
+    "verification": {
+      "type": "object", "additionalProperties": false,
+      "required": ["checks", "passed_count", "failed_count", "skipped_count"],
+      "properties": {
+        "checks": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["name", "status", "evidence"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "status": {"enum": ["PASS", "FAIL", "SKIP"]},
+              "evidence": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "passed_count": {"type": "integer", "minimum": 0},
+        "failed_count": {"type": "integer", "minimum": 0},
+        "skipped_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "failures": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["summary", "disposition", "owner", "next_action"],
+        "properties": {
+          "summary": {"type": "string", "minLength": 10},
+          "disposition": {"enum": ["corrected_implementation", "regression_fixture", "owned_blocker"]},
+          "owner": {"type": "string", "minLength": 1},
+          "next_action": {"type": "string", "minLength": 10},
+          "artifact_ref": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "result": {
+      "type": "object", "additionalProperties": false,
+      "required": ["gate", "confidence", "rationale"],
+      "properties": {
+        "gate": {"enum": ["ALLOW", "REVIEW", "HALT"]},
+        "confidence": {"enum": ["low", "medium", "high"]},
+        "rationale": {"type": "string", "minLength": 20}
+      }
+    },
+    "unresolved_risks": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["summary", "owner", "next_action"],
+        "properties": {
+          "summary": {"type": "string", "minLength": 10},
+          "owner": {"type": "string", "minLength": 1},
+          "next_action": {"type": "string", "minLength": 10}
+        }
+      }
+    },
+    "next_queued_item": {
+      "type": "object", "additionalProperties": false, "required": ["work_item_id", "summary"],
+      "properties": {
+        "work_item_id": {"type": "string", "pattern": "^TK-[0-9]{3}$"},
+        "summary": {"type": "string", "minLength": 10}
+      }
+    },
+    "approval_state": {"enum": ["not_required", "pending", "approved", "rejected"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"verification": {"type": "object", "properties": {"checks": {"type": "array", "contains": {"type": "object", "properties": {"status": {"const": "FAIL"}}, "required": ["status"]}}}, "required": ["checks"]}}, "required": ["verification"]},
+      "then": {"properties": {"result": {"type": "object", "properties": {"gate": {"enum": ["REVIEW", "HALT"]}}, "required": ["gate"]}}}
+    },
+    {
+      "if": {"properties": {"result": {"type": "object", "properties": {"gate": {"const": "ALLOW"}}, "required": ["gate"]}}, "required": ["result"]},
+      "then": {"properties": {"verification": {"type": "object", "properties": {"passed_count": {"type": "integer", "minimum": 1}, "failed_count": {"const": 0}}, "required": ["passed_count", "failed_count"]}, "approval_state": {"enum": ["not_required", "approved"]}}}
+    },
+    {
+      "if": {"properties": {"result": {"type": "object", "properties": {"gate": {"enum": ["REVIEW", "HALT"]}}, "required": ["gate"]}}, "required": ["result"]},
+      "then": {"properties": {"unresolved_risks": {"type": "array", "minItems": 1}}}
+    }
+  ]
+}
