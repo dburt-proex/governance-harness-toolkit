@@ -1,0 +1,46 @@
+{
+  "evaluation_id": "EVA-SOURCE-SCHEMA-001",
+  "intake_id": "INT-TOOLKIT-001",
+  "artifact": {
+    "artifact_id": "ART-SOURCE-SCHEMA-001",
+    "artifact_type": "json_schema",
+    "version": "1.0.0",
+    "uri": "https://github.com/dburt-proex/governance-harness-toolkit/blob/main/schemas/source-record.schema.json",
+    "content_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+  },
+  "evaluated_at": "2026-07-15T05:00:00Z",
+  "evaluator": { "name": "Toolkit Output Gate", "type": "system", "version": "1.0.0" },
+  "requirements": [
+    {
+      "requirement_id": "REQ-STRUCTURE",
+      "description": "The artifact conforms to strict JSON Schema Draft 2020-12 validation.",
+      "mandatory": true,
+      "outcome": "pass",
+      "evidence": "Ajv strict and format validation completed successfully."
+    },
+    {
+      "requirement_id": "REQ-FRESHNESS",
+      "description": "The artifact represents authority, provenance, freshness, and eligibility controls.",
+      "mandatory": true,
+      "outcome": "pass",
+      "evidence": "Required fields and regression cases cover the governed evidence lifecycle."
+    }
+  ],
+  "source_summary": { "total": 2, "final_eligible": 2, "stale_or_unknown": 0 },
+  "defects": [],
+  "metrics": { "score": 96, "threshold": 85, "confidence": 0.94 },
+  "regression": {
+    "suite": "source-record regression cases",
+    "passed": true,
+    "case_count": 3,
+    "failed_cases": []
+  },
+  "approval": { "required": false, "status": "not_required" },
+  "gate": {
+    "state": "ALLOW",
+    "release_state": "approved",
+    "rationale": "Mandatory requirements and regression cases pass with current final-eligible evidence and no open defects."
+  },
+  "next_action": "Register the schema as an approved controlled artifact.",
+  "lifecycle_status": "approved"
+}
