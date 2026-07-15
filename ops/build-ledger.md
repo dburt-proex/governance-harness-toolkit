@@ -1,5 +1,53 @@
 # Toolkit Build Ledger
 
+## Run 003
+
+- Date: 2026-07-15
+- Scope: Implement TK-003 as a governed decision record, deterministic evaluator, completed example, and regression set
+- Evidence:
+  - governance/build-contract.md
+  - ops/backlog.md
+  - schemas/source-record.schema.json
+  - schemas/intake-record.schema.json
+  - Acceptance requirement that decisions preserve evidence, alternatives, assumptions, risks, ownership, and approvals
+- Change isolation:
+  - Branch: agent/tk-003-decision-record
+  - Draft pull request: https://github.com/dburt-proex/governance-harness-toolkit/pull/2
+- Proposed artifacts:
+  - schemas/decision-record.schema.json
+  - evaluators/decision-record.js
+  - examples/decision-record/approved-source-registry.json
+  - fixtures/decision-record/regression-cases.json
+- Controls implemented:
+  - ALLOW, REVIEW, and HALT decision states
+  - Evidence freshness and eligibility checks
+  - Exactly one selected alternative
+  - Material assumption and open-risk escalation
+  - Approval-state enforcement
+  - Confidence basis and review triggers
+  - Dependency-free evaluator CLI with PASS, REVIEW, and FAIL outputs
+- Verification:
+  - Validator: Ajv 8, JSON Schema Draft 2020-12 with strict and format validation
+  - approved-evidenced-decision: PASS
+  - allow-with-expired-evidence: expected FAIL, PASS
+  - pending-human-review: expected REVIEW, PASS
+  - allow-with-unverified-critical-assumption: expected REVIEW, PASS
+  - Evaluator CLI completed example: PASS
+  - Result: 4/4 regression cases passed
+- Failure handling:
+  - The temporary Ajv dependency did not persist across runs and was restored without adding a repository dependency
+  - Strict validation rejected an approval conditional whose required fields were not declared in conditional scope
+  - The conditional was corrected and the complete suite was rerun successfully
+- Result: REVIEW, TK-003 implementation verified in draft PR #2
+- Confidence: High for deterministic decision evaluation; medium for integration readiness
+- Open risks:
+  - Draft PR #2 is not merged
+  - The evaluator expects the caller to perform JSON Schema validation first
+  - Evidence source IDs are not yet resolved against the source registry at runtime
+  - Approver identity is asserted, not authenticated
+- Next action: TK-004 may proceed independently; TK-003 requires human review before merge
+- Approval state: Human review required to promote the executable evaluator to main
+
 ## Run 002
 
 - Date: 2026-07-15
