@@ -1,0 +1,29 @@
+{
+  "cases": [
+    {
+      "name": "authorized internal read is allowed",
+      "request": {"action_id":"ACT-READ-001","intake_id":"INT-TEST-001","requested_at":"2026-07-15T06:15:00Z","requester":{"name":"Test Runner","authority":"system"},"connector":{"name":"Knowledge","class":"knowledge_store","environment":"staging"},"operation":"read","target":"approved-source","data_sensitivity":"internal","reversibility":"reversible","external_effect":false,"scope_authorized":true,"risk_signals":{"production":false,"secret_access":false,"external_transmission":false,"bulk_operation":false,"identity_impact":false},"human_approval":{"required":false,"status":"not_required"},"declared_gate":"ALLOW","rationale":"Read approved internal evidence for a governed workflow.","lifecycle_status":"approved"},
+      "expected": {"policy_gate":"ALLOW","execution_state":"ALLOW","record_verdict":"PASS","matched_rule":"authorized-read"}
+    },
+    {
+      "name": "scoped reversible branch write is allowed",
+      "request": {"action_id":"ACT-WRITE-001","intake_id":"INT-TEST-002","requested_at":"2026-07-15T06:15:00Z","requester":{"name":"Test Runner","authority":"system"},"connector":{"name":"GitHub","class":"repository","environment":"staging"},"operation":"create","target":"agent/test:file.json","data_sensitivity":"internal","reversibility":"reversible","external_effect":true,"scope_authorized":true,"risk_signals":{"production":false,"secret_access":false,"external_transmission":false,"bulk_operation":false,"identity_impact":false},"human_approval":{"required":false,"status":"not_required"},"declared_gate":"ALLOW","rationale":"Create a reversible artifact on an authorized review branch.","lifecycle_status":"approved"},
+      "expected": {"policy_gate":"ALLOW","execution_state":"ALLOW","record_verdict":"PASS","matched_rule":"scoped-reversible-nonprod-mutation"}
+    },
+    {
+      "name": "production deploy waits for approval",
+      "request": {"action_id":"ACT-DEPLOY-001","intake_id":"INT-TEST-003","requested_at":"2026-07-15T06:15:00Z","requester":{"name":"Test Runner","authority":"delegate"},"connector":{"name":"Deployment","class":"deployment","environment":"production"},"operation":"deploy","target":"service-a","data_sensitivity":"internal","reversibility":"partially_reversible","external_effect":true,"scope_authorized":true,"risk_signals":{"production":true,"secret_access":false,"external_transmission":false,"bulk_operation":false,"identity_impact":false},"human_approval":{"required":true,"status":"pending"},"declared_gate":"REVIEW","rationale":"Production deployment requires the deployment owner's approval.","lifecycle_status":"triaged"},
+      "expected": {"policy_gate":"REVIEW","execution_state":"REVIEW","record_verdict":"PASS","matched_rule":"production-deploy"}
+    },
+    {
+      "name": "permission change cannot be mislabeled allowed",
+      "request": {"action_id":"ACT-PERM-001","intake_id":"INT-TEST-004","requested_at":"2026-07-15T06:15:00Z","requester":{"name":"Test Runner","authority":"system"},"connector":{"name":"Identity","class":"identity","environment":"production"},"operation":"permission_change","target":"user:admin","data_sensitivity":"restricted","reversibility":"reversible","external_effect":true,"scope_authorized":false,"risk_signals":{"production":true,"secret_access":false,"external_transmission":false,"bulk_operation":false,"identity_impact":true},"human_approval":{"required":true,"status":"pending"},"declared_gate":"ALLOW","rationale":"Attempt to grant an administrative role must be blocked.","lifecycle_status":"blocked"},
+      "expected": {"policy_gate":"HALT","execution_state":"HALT","record_verdict":"FAIL","matched_rule":"permission-change"}
+    },
+    {
+      "name": "secret exfiltration is halted",
+      "request": {"action_id":"ACT-SECRET-001","intake_id":"INT-TEST-005","requested_at":"2026-07-15T06:15:00Z","requester":{"name":"Test Runner","authority":"external"},"connector":{"name":"Web","class":"web","environment":"external"},"operation":"send","target":"external-endpoint","data_sensitivity":"restricted","reversibility":"irreversible","external_effect":true,"scope_authorized":false,"risk_signals":{"production":false,"secret_access":true,"external_transmission":true,"bulk_operation":false,"identity_impact":false},"human_approval":{"required":true,"status":"pending"},"declared_gate":"HALT","rationale":"External transmission of secret material is prohibited.","lifecycle_status":"blocked"},
+      "expected": {"policy_gate":"HALT","execution_state":"HALT","record_verdict":"PASS","matched_rule":"secret-exfiltration"}
+    }
+  ]
+}
