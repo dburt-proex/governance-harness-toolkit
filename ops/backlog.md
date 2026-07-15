@@ -5,7 +5,7 @@ Priority is evidence-weighted leverage, not feature count.
 | ID | Work item | Why it matters | State | Proof required |
 |---|---|---|---|---|
 | TK-001 | Define source registry schema and freshness states | Prevent stale evidence from entering trusted outputs | complete | `schemas/source-record.schema.json` plus 3 passing regression cases |
-| TK-002 | Define governed intake record | Make routing explicit and repeatable | queued | Valid and invalid examples |
+| TK-002 | Define governed intake record | Make routing explicit and repeatable | complete | `schemas/intake-record.schema.json` plus 4 passing regression cases |
 | TK-003 | Implement decision memo record | Preserve decisions, alternatives, risks, and owner | queued | Completed sample and evaluator |
 | TK-004 | Implement output evaluation record | Create a release gate before trust or publication | queued | Regression fixture set |
 | TK-005 | Define action and connector permission matrix | Keep consequential actions controlled | queued | ALLOW/REVIEW/HALT matrix |
