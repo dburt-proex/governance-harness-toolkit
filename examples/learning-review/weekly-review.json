@@ -1,0 +1,29 @@
+{
+  "review_id": "LRN-2026-W29",
+  "period_start": "2026-07-13T00:00:00Z",
+  "period_end": "2026-07-19T23:59:59Z",
+  "generated_at": "2026-07-15T07:12:00Z",
+  "evidence_runs": ["Run 003", "Run 005"],
+  "observations": [
+    {
+      "observation_id": "OBS-STRICT-CONDITIONAL",
+      "source_refs": ["ops/build-ledger.md#run-003", "ops/build-ledger.md#run-005"],
+      "category": "failure",
+      "severity": "medium",
+      "summary": "Strict schema validation twice found required fields declared outside their conditional subschema.",
+      "recurrence_count": 2,
+      "improvement": {
+        "type": "regression_fixture",
+        "artifact_target": "fixtures/schema-authoring/strict-conditionals.json",
+        "owner": "Toolkit maintainer",
+        "next_action": "Add a shared strict-compile fixture before the next schema increment.",
+        "due_at": "2026-07-22T17:00:00Z",
+        "status": "proposed",
+        "approval": {"required": false, "status": "not_required"}
+      }
+    }
+  ],
+  "metrics": {"observation_count": 1, "implemented_count": 0, "open_blocker_count": 0},
+  "declared_gate": "REVIEW",
+  "next_review_at": "2026-07-22T07:00:00Z"
+}
