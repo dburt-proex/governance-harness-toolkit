@@ -1,0 +1,19 @@
+{
+  "policy_id": "POL-ACTION-PERMISSIONS-1",
+  "version": "1.0.0",
+  "default_gate": "REVIEW",
+  "rules": [
+    {"rule_id": "secret-exfiltration", "priority": 100, "when": {"risk_all": ["secret_access", "external_transmission"]}, "gate": "HALT", "required_controls": ["security-owner-review", "incident-assessment"], "rationale": "Secrets may not be transmitted externally."},
+    {"rule_id": "financial-transaction", "priority": 98, "when": {"operation": ["financial_transaction"]}, "gate": "HALT", "required_controls": ["human-execution"], "rationale": "Automated financial transactions are outside delegated authority."},
+    {"rule_id": "permission-change", "priority": 96, "when": {"operation": ["permission_change"]}, "gate": "HALT", "required_controls": ["identity-owner-approval", "human-execution"], "rationale": "Permission grants require a separate identity-control workflow."},
+    {"rule_id": "irreversible-delete", "priority": 94, "when": {"operation": ["delete"], "reversibility": ["irreversible"]}, "gate": "HALT", "required_controls": ["data-owner-approval", "verified-backup"], "rationale": "Irreversible deletion is not authorized for automated execution."},
+    {"rule_id": "bulk-production-mutation", "priority": 92, "when": {"environment": ["production"], "operation": ["create", "update", "delete"], "risk_any": ["bulk_operation"]}, "gate": "HALT", "required_controls": ["change-window", "rollback-plan", "human-execution"], "rationale": "Bulk production mutation exceeds unattended execution authority."},
+    {"rule_id": "production-deploy", "priority": 80, "when": {"environment": ["production"], "operation": ["deploy"]}, "gate": "REVIEW", "required_controls": ["deployment-owner-approval", "rollback-plan"], "rationale": "Production deployment requires explicit approval."},
+    {"rule_id": "external-communication", "priority": 78, "when": {"operation": ["send", "publish"], "external_effect": [true]}, "gate": "REVIEW", "required_controls": ["content-owner-approval", "recipient-verification"], "rationale": "External communication requires a human release decision."},
+    {"rule_id": "production-mutation", "priority": 75, "when": {"environment": ["production"], "operation": ["create", "update", "delete"]}, "gate": "REVIEW", "required_controls": ["system-owner-approval", "rollback-plan"], "rationale": "Production state changes require explicit approval."},
+    {"rule_id": "restricted-read", "priority": 70, "when": {"operation": ["read"], "data_sensitivity": ["restricted"]}, "gate": "REVIEW", "required_controls": ["data-owner-approval", "access-log"], "rationale": "Restricted data access requires owner review."},
+    {"rule_id": "unscoped-external-write", "priority": 65, "when": {"operation": ["create", "update", "delete"], "external_effect": [true], "scope_authorized": [false]}, "gate": "REVIEW", "required_controls": ["scope-owner-approval"], "rationale": "Writes outside an authorized scope require review."},
+    {"rule_id": "scoped-reversible-nonprod-mutation", "priority": 50, "when": {"environment": ["development", "test", "staging"], "operation": ["create", "update"], "reversibility": ["reversible"], "scope_authorized": [true]}, "gate": "ALLOW", "required_controls": ["audit-log", "bounded-target"], "rationale": "Scoped, reversible non-production changes may proceed."},
+    {"rule_id": "authorized-read", "priority": 40, "when": {"operation": ["read"], "scope_authorized": [true]}, "gate": "ALLOW", "required_controls": ["audit-log"], "rationale": "Authorized reads may proceed unless a higher-priority rule applies."}
+  ]
+}
