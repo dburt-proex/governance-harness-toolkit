@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dburt-proex.github.io/governance-harness-toolkit/schemas/workflow-record.schema.json",
+  "title": "Governed Workflow Record",
+  "description": "Canonical routing contract for a governed Toolkit workflow.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["workflow_id", "workflow_key", "version", "title", "purpose", "owner", "status", "intake_policy", "skills", "deliverables", "evidence_policy", "action_policy", "quality_gates", "approval"],
+  "properties": {
+    "workflow_id": {"type": "string", "pattern": "^WFL-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "workflow_key": {"enum": ["research_brief", "source_triage", "decision_memo", "system_spec", "evaluate_output", "package_publish", "recap_to_knowledge", "controlled_build", "manual_review"]},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "title": {"type": "string", "minLength": 3, "maxLength": 160},
+    "purpose": {"type": "string", "minLength": 20, "maxLength": 1000},
+    "owner": {
+      "type": "object", "additionalProperties": false, "required": ["name", "authority"],
+      "properties": {"name": {"type": "string", "minLength": 1}, "authority": {"enum": ["owner", "delegate", "system"]}}
+    },
+    "status": {"enum": ["proposed", "approved", "deprecated", "retired"]},
+    "intake_policy": {
+      "type": "object", "additionalProperties": false, "required": ["allowed_risk_levels", "allowed_requester_authorities"],
+      "properties": {
+        "allowed_domains": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]{1,63}$"}},
+        "allowed_risk_levels": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["low", "moderate", "high", "critical"]}},
+        "allowed_requester_authorities": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["owner", "delegate", "contributor", "external"]}}
+      }
+    },
+    "skills": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["skill_id", "required", "sequence", "purpose"],
+        "properties": {
+          "skill_id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,63}$"},
+          "required": {"type": "boolean"},
+          "sequence": {"type": "integer", "minimum": 1},
+          "purpose": {"type": "string", "minLength": 10, "maxLength": 500}
+        }
+      }
+    },
+    "deliverables": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["artifact_type", "formats", "acceptance_criteria"],
+        "properties": {
+          "artifact_type": {"type": "string", "pattern": "^[a-z][a-z0-9_]{1,63}$"},
+          "formats": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 80}},
+          "acceptance_criteria": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 3, "maxLength": 500}}
+        }
+      }
+    },
+    "evidence_policy": {
+      "type": "object", "additionalProperties": false, "required": ["allowed_classes", "citation_required", "freshness_required"],
+      "properties": {
+        "allowed_classes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["primary", "secondary", "internal", "contextual", "discovery"]}},
+        "citation_required": {"type": "boolean"},
+        "freshness_required": {"type": "boolean"}
+      }
+    },
+    "action_policy": {
+      "type": "object", "additionalProperties": false, "required": ["max_external_writes", "approval_gate", "sensitive_data_ceiling", "allowed_actions"],
+      "properties": {
+        "max_external_writes": {"enum": ["prohibited", "review_required", "authorized"]},
+        "approval_gate": {"enum": ["none", "before_sensitive_action", "before_any_external_action"]},
+        "sensitive_data_ceiling": {"enum": ["none", "internal", "confidential", "restricted"]},
+        "allowed_actions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]{1,63}$"}}
+      },
+      "allOf": [
+        {"if": {"properties": {"max_external_writes": {"enum": ["review_required", "authorized"]}}, "required": ["max_external_writes"]}, "then": {"properties": {"approval_gate": {"not": {"const": "none"}}}}}
+      ]
+    },
+    "quality_gates": {
+      "type": "object", "additionalProperties": false, "required": ["evaluator_required", "evaluator_ref", "approval_required", "regression_required"],
+      "properties": {
+        "evaluator_required": {"type": "boolean"},
+        "evaluator_ref": {"type": "string", "minLength": 1},
+        "approval_required": {"type": "boolean"},
+        "regression_required": {"type": "boolean"}
+      }
+    },
+    "approval": {
+      "type": "object", "additionalProperties": false, "required": ["status"],
+      "properties": {
+        "status": {"enum": ["pending", "approved", "rejected"]},
+        "approver": {"type": "string", "minLength": 1},
+        "approved_at": {"type": "string", "format": "date-time"}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "approved"}}, "required": ["status"]},
+      "then": {"properties": {"approval": {"type": "object", "properties": {"status": {"const": "approved"}, "approver": {"type": "string", "minLength": 1}, "approved_at": {"type": "string", "format": "date-time"}}, "required": ["status", "approver", "approved_at"]}}}
+    }
+  ]
+}
