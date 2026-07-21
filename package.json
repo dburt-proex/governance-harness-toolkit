@@ -1,0 +1,13 @@
+{
+  "name": "governance-harness-toolkit",
+  "version": "1.0.0",
+  "description": "Regression suite for schema validation and evaluator consistency checks",
+  "scripts": {
+    "test": "node run-regression.js",
+    "test:ci": "node run-regression.js --json"
+  },
+  "dependencies": {
+    "ajv": "8.17.1",
+    "ajv-formats": "3.0.1"
+  }
+}
