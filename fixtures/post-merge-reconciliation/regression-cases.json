@@ -1,0 +1,34 @@
+{
+  "cases": [
+    {
+      "case_id": "merged-records-with-explicit-evidence-gap-open-blocker",
+      "declared_gate": "BLOCKER",
+      "items": [
+        {"work_item":"TK-003","backlog":{"state":"merged","promotion_evidence":"MISSING"},"ledger":{"state":"merged","promotion_evidence":"MISSING"},"pull_request":{"state":"merged","promotion_evidence":"MISSING"}},
+        {"work_item":"TK-004","backlog":{"state":"merged","promotion_evidence":"MISSING"},"ledger":{"state":"merged","promotion_evidence":"MISSING"},"pull_request":{"state":"merged","promotion_evidence":"MISSING"}},
+        {"work_item":"TK-005","backlog":{"state":"merged","promotion_evidence":"MISSING"},"ledger":{"state":"merged","promotion_evidence":"MISSING"},"pull_request":{"state":"merged","promotion_evidence":"MISSING"}},
+        {"work_item":"TK-006","backlog":{"state":"merged","promotion_evidence":"MISSING"},"ledger":{"state":"merged","promotion_evidence":"MISSING"},"pull_request":{"state":"merged","promotion_evidence":"MISSING"}},
+        {"work_item":"TK-007","backlog":{"state":"merged","promotion_evidence":"MISSING"},"ledger":{"state":"merged","promotion_evidence":"MISSING"},"pull_request":{"state":"merged","promotion_evidence":"MISSING"}},
+        {"work_item":"TK-008","backlog":{"state":"merged","promotion_evidence":"MISSING"},"ledger":{"state":"merged","promotion_evidence":"MISSING"},"pull_request":{"state":"merged","promotion_evidence":"MISSING"}},
+        {"work_item":"TK-009","backlog":{"state":"merged","promotion_evidence":"MISSING"},"ledger":{"state":"merged","promotion_evidence":"MISSING"},"pull_request":{"state":"merged","promotion_evidence":"MISSING"}}
+      ],
+      "expected": {"computed_gate":"BLOCKER","record_verdict":"PASS","mismatch_count":0,"blocker_count":7}
+    },
+    {
+      "case_id": "stale-backlog-and-ledger-state-fails",
+      "declared_gate": "BLOCKER",
+      "items": [
+        {"work_item":"TK-003","backlog":{"state":"review","promotion_evidence":"MISSING"},"ledger":{"state":"review","promotion_evidence":"MISSING"},"pull_request":{"state":"merged","promotion_evidence":"MISSING"}}
+      ],
+      "expected": {"computed_gate":"HALT","record_verdict":"FAIL","mismatch_count":1,"blocker_count":0}
+    },
+    {
+      "case_id": "promotion-evidence-disagreement-fails",
+      "declared_gate": "BLOCKER",
+      "items": [
+        {"work_item":"TK-003","backlog":{"state":"merged","promotion_evidence":"MISSING"},"ledger":{"state":"merged","promotion_evidence":"APPROVED"},"pull_request":{"state":"merged","promotion_evidence":"MISSING"}}
+      ],
+      "expected": {"computed_gate":"HALT","record_verdict":"FAIL","mismatch_count":1,"blocker_count":0}
+    }
+  ]
+}
