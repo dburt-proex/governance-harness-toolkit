@@ -11,6 +11,7 @@ const { evaluate: evalActionPermission } = require('./evaluators/action-permissi
 const { evaluateDecision } = require('./evaluators/decision-record.js');
 const { evaluate: evalLearningReview } = require('./evaluators/learning-review.js');
 const { evaluateOutput } = require('./evaluators/output-evaluation.js');
+const { evaluate: evalPostMergeReconciliation } = require('./evaluators/post-merge-reconciliation.js');
 const { evaluate: evalSourcePolicy } = require('./evaluators/source-policy.js');
 const { evaluate: evalWorkflowRoute } = require('./evaluators/workflow-route.js');
 
@@ -211,6 +212,21 @@ function runLearningReviewTests() {
   }
 }
 
+// Post-merge reconciliation evaluator tests
+function runPostMergeReconciliationTests() {
+  log('=== Post-Merge Reconciliation Evaluator Tests ===');
+  const fixtures = loadJson('fixtures/post-merge-reconciliation/regression-cases.json');
+
+  for (const tc of fixtures.cases) {
+    const result = evalPostMergeReconciliation(tc);
+    const passed = result.computed_gate === tc.expected.computed_gate &&
+      result.record_verdict === tc.expected.record_verdict &&
+      result.mismatches.length === tc.expected.mismatch_count &&
+      result.blockers.length === tc.expected.blocker_count;
+    recordResult('post-merge-reconciliation', tc.case_id, passed, passed ? null : { expected: tc.expected, got: result });
+  }
+}
+
 // Output evaluation evaluator tests
 function runOutputEvaluationTests() {
   log('=== Output Evaluation Evaluator Tests ===');
@@ -354,6 +370,7 @@ function main() {
   runActionPermissionTests();
   runDecisionRecordTests();
   runLearningReviewTests();
+  runPostMergeReconciliationTests();
   runOutputEvaluationTests();
   runSourcePolicyTests();
   runWorkflowRouteTests();
