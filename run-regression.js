@@ -98,14 +98,18 @@ function runSchemaTests() {
 
   for (const schemaPath of schemas) {
     const schema = loadJson(schemaPath);
-    // Check that schema is valid JSON and has required fields
     let passed = true;
     let details = null;
     if (!schema || typeof schema !== 'object') {
       passed = false;
       details = ['Schema is not a valid object'];
-    } else if (!schema.$schema && !schema.$id) {
-      // Allow schemas without $schema or $id (some don't have them)
+    } else {
+      try {
+        createAjv().compile(schema);
+      } catch (err) {
+        passed = false;
+        details = [err.message];
+      }
     }
     recordResult('schema', path.basename(schemaPath), passed, details);
   }
