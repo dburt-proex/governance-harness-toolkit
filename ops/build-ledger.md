@@ -1,5 +1,31 @@
 # Toolkit Build Ledger
 
+## Run 010
+
+- Date: 2026-08-05
+- Scope: Reconcile TK-003 through TK-009 with merged `main` state and add a post-merge reconciliation gate.
+- Evidence:
+  - GitHub PRs #2, #3, #4, #5, #6, #8, and #9 are merged into `main`.
+  - Submitted-review queries for each PR returned no promotion approval records.
+  - Reconstructed main regression suite passed 39/39 cases on 2026-07-20.
+- Reconciled promotion state:
+
+  | Work item | PR | Merge state | Promotion approval evidence | Decision |
+  |---|---:|---|---|---|
+  | TK-003 | #2 | merged 2026-07-15 | MISSING: no submitted review | BLOCKER |
+  | TK-004 | #3 | merged 2026-07-15 | MISSING: no submitted review | BLOCKER |
+  | TK-005 | #4 | merged 2026-07-15 | MISSING: no submitted review | BLOCKER |
+  | TK-006 | #5 | merged 2026-07-15 | MISSING: no submitted review | BLOCKER |
+  | TK-007 | #6 | merged 2026-07-15 | MISSING: no submitted review | BLOCKER |
+  | TK-008 | #8 | merged 2026-07-15 | MISSING: no submitted review | BLOCKER |
+  | TK-009 | #9 | merged 2026-07-18 at `99d73424a25eeeec3fa08174867c364bcd0f697a` | MISSING: no submitted review | BLOCKER |
+
+- Result: Canonical merge state is reconciled; governed promotion remains blocked pending durable approval evidence or an explicit owner evidence-gap disposition.
+- Controls implemented:
+  - `evaluators/post-merge-reconciliation.js` halts on backlog, ledger, pull-request, or promotion-evidence disagreement.
+  - `fixtures/post-merge-reconciliation/regression-cases.json` retains the prior stale-state mismatch and approval-evidence mismatch as regression cases.
+- Next action: dburt-proex must append durable approval evidence or an explicit evidence-gap disposition for each blocker before treating these increments as governed complete.
+
 ## Run 009
 
 - Date: 2026-07-15
