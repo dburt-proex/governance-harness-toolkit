@@ -30,6 +30,33 @@ const REQUIRED_AUTHORITIES = [
   'deploy'
 ];
 
+const INPUT_INVARIANTS = {
+  pull_request_title: { trust: 'untrusted', verification_required: false },
+  pull_request_body: { trust: 'untrusted', verification_required: false },
+  comment: { trust: 'untrusted', verification_required: false },
+  issue: { trust: 'untrusted', verification_required: false },
+  commit_message: { trust: 'untrusted', verification_required: false },
+  repository_file: { trust: 'conditional', verification_required: true },
+  configuration_file: { trust: 'conditional', verification_required: true },
+  generated_artifact: { trust: 'conditional', verification_required: true },
+  dependency_metadata: { trust: 'conditional', verification_required: true },
+  workflow_output: { trust: 'conditional', verification_required: true },
+  external_web_content: { trust: 'untrusted', verification_required: true }
+};
+
+const AUTHORITY_INVARIANTS = {
+  read: { effect: 'non_mutating', approval: 'policy' },
+  search: { effect: 'non_mutating', approval: 'policy' },
+  execute: { effect: 'consequential', approval: 'deterministic_or_human' },
+  edit: { effect: 'consequential_write', approval: 'deterministic_or_human' },
+  github_write: { effect: 'consequential_write', approval: 'deterministic_or_human' },
+  network: { effect: 'external_effect', approval: 'deterministic_or_human' },
+  credential: { effect: 'protected_boundary', approval: 'human_only' },
+  permission: { effect: 'protected_boundary', approval: 'human_only' },
+  merge: { effect: 'protected_boundary', approval: 'human_only' },
+  deploy: { effect: 'protected_boundary', approval: 'human_only' }
+};
+
 const GATE_RANK = { ALLOW: 0, REVIEW: 1, HALT: 2 };
 const FULL_COMMIT_SHA = /^[0-9a-f]{40}$/i;
 
@@ -43,13 +70,41 @@ function validatePolicy(policy) {
   if (policy.default_gate !== 'REVIEW') errors.push('default_gate must be REVIEW');
 
   const inputs = indexBy(policy.input_trust_classes, 'class');
+  const inputNames = (policy.input_trust_classes || []).map((item) => item.class);
+  if (new Set(inputNames).size !== inputNames.length) errors.push('input trust classes must be unique');
+  for (const name of inputNames) {
+    if (!REQUIRED_INPUT_CLASSES.includes(name)) errors.push(`unsupported input trust class: ${name}`);
+  }
   for (const name of REQUIRED_INPUT_CLASSES) {
-    if (!inputs.has(name)) errors.push(`missing input trust class: ${name}`);
+    const input = inputs.get(name);
+    if (!input) {
+      errors.push(`missing input trust class: ${name}`);
+      continue;
+    }
+    const expected = INPUT_INVARIANTS[name];
+    if (input.trust !== expected.trust) errors.push(`${name}.trust must be ${expected.trust}`);
+    if (input.verification_required !== expected.verification_required) {
+      errors.push(`${name}.verification_required must be ${expected.verification_required}`);
+    }
+    if (input.may_authorize !== false) errors.push(`${name}.may_authorize must be false`);
   }
 
   const authorities = indexBy(policy.authorities, 'authority');
+  const authorityNames = (policy.authorities || []).map((item) => item.authority);
+  if (new Set(authorityNames).size !== authorityNames.length) errors.push('authority definitions must be unique');
+  for (const name of authorityNames) {
+    if (!REQUIRED_AUTHORITIES.includes(name)) errors.push(`unsupported authority definition: ${name}`);
+  }
   for (const name of REQUIRED_AUTHORITIES) {
-    if (!authorities.has(name)) errors.push(`missing authority definition: ${name}`);
+    const authority = authorities.get(name);
+    if (!authority) {
+      errors.push(`missing authority definition: ${name}`);
+      continue;
+    }
+    const expected = AUTHORITY_INVARIANTS[name];
+    if (authority.effect !== expected.effect) errors.push(`${name}.effect must be ${expected.effect}`);
+    if (authority.approval !== expected.approval) errors.push(`${name}.approval must be ${expected.approval}`);
+    if (authority.scope_required !== true) errors.push(`${name}.scope_required must be true`);
   }
 
   if (policy.deterministic_gate?.authority !== 'DiffWall') errors.push('DiffWall must remain the deterministic gate authority');
@@ -136,6 +191,17 @@ function evaluate(policy, request) {
 
   if (event.name === 'pull_request' && (actor.fork || actor.class === 'external_contributor') && workflow.write_permissions) {
     add('HALT', 'unsafe_external_pull_request_permissions', 'external pull_request execution must not receive write permissions');
+  }
+
+  const workflowAuthorityRequirements = [
+    ['checks_out_untrusted_ref', 'read'],
+    ['executes_untrusted_code', 'execute'],
+    ['write_permissions', 'github_write']
+  ];
+  for (const [flag, authority] of workflowAuthorityRequirements) {
+    if (workflow[flag] && request.authority?.[authority]?.requested !== true) {
+      add('HALT', 'undeclared_workflow_authority', `${flag} requires an explicit ${authority} authority grant`);
+    }
   }
 
   const authorityDefinitions = indexBy(policy.authorities, 'authority');

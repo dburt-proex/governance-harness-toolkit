@@ -82,6 +82,38 @@
       "expect_conformance_verdict": "PASS"
     },
     {
+      "case_id": "ordinary-pr-execution-without-execute-grant-halts",
+      "operations": [
+        {"op": "set", "path": "/workflow/executes_untrusted_code", "value": true},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "undeclared_workflow_authority"
+    },
+    {
+      "case_id": "ordinary-pr-execution-with-scoped-execute-grant-allows",
+      "operations": [
+        {"op": "set", "path": "/workflow/executes_untrusted_code", "value": true},
+        {"op": "set", "path": "/authority/execute", "value": {"requested": true, "scope_authorized": true}}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "ALLOW",
+      "expect_conformance_verdict": "PASS"
+    },
+    {
+      "case_id": "workflow-write-permissions-without-github-write-grant-halt",
+      "operations": [
+        {"op": "set", "path": "/workflow/write_permissions", "value": true},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "undeclared_workflow_authority"
+    },
+    {
       "case_id": "human-approved-protected-agent-edit-allows",
       "operations": [
         {"op": "set", "path": "/authority/edit", "value": {"requested": true, "scope_authorized": true}},

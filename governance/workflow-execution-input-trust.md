@@ -52,6 +52,8 @@ Authority is explicit, scoped, and non-transitive. There is no wildcard grant.
 
 A grant for one authority never implies another. In particular, read/search does not imply execute; edit does not imply GitHub-write; GitHub-write does not imply merge; and merge does not imply deploy.
 
+Declared workflow behavior and granted authority must agree. Checking out an untrusted ref requires read authority, executing untrusted code requires execute authority, and a workflow with write permissions requires GitHub-write authority. A behavior without its explicit grant is HALT.
+
 ## Writes, protected paths, and gates
 
 Edits and GitHub writes must be staged on a bounded review branch, remain reversible, and retain the target, diff, tests, exact commit, and promotion decision. Changes to workflows, agent profiles, repository instructions, governance policy, schemas, rules, or dependency manifests require an explicit human gate.
@@ -72,6 +74,8 @@ An approved human gate is not a bare status flag: its conformance record must re
 The high-assurance expectation is an immutable full 40-character commit SHA for every third-party Action. A readable version comment may accompany the SHA. Mutable tags and branches route to REVIEW unless the machine policy contains an exact exception with an owner, security rationale, compensating control, and review date.
 
 The canonical policy has no pinning exceptions at version 1.0.0. Repository-specific exceptions must be recorded locally; they do not become fleet defaults.
+
+The canonical trust and authority semantics are invariants, not repository-tunable defaults. Duplicate definitions or changes to an input's trust/authorization boundary or an authority's effect, scope requirement, or approval class invalidate the policy and fail closed to HALT.
 
 ## Failure and evidence behavior
 

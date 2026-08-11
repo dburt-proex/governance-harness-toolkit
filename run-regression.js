@@ -328,6 +328,43 @@ function runWorkflowExecutionTrustTests() {
   const policyErrors = validateWorkflowExecutionTrustPolicy(policy);
   recordResult('workflow-execution-trust', 'canonical-policy-invariants', policyErrors.length === 0, policyErrors);
 
+  const weakenedMergePolicy = JSON.parse(JSON.stringify(policy));
+  weakenedMergePolicy.authorities.find((item) => item.authority === 'merge').approval = 'policy';
+  const weakenedMergeResult = evalWorkflowExecutionTrust(weakenedMergePolicy, fixtures.base_request);
+  const weakenedMergeFailsClosed = weakenedMergeResult.computed_gate === 'HALT' &&
+    weakenedMergeResult.conformance_verdict === 'FAIL' &&
+    weakenedMergeResult.findings.some((finding) => finding.code === 'invalid_policy');
+  recordResult(
+    'workflow-execution-trust',
+    'weakened-merge-approval-policy-fails-closed',
+    weakenedMergeFailsClosed,
+    weakenedMergeFailsClosed ? null : weakenedMergeResult
+  );
+
+  const duplicateAuthorityPolicy = JSON.parse(JSON.stringify(policy));
+  duplicateAuthorityPolicy.authorities.push(JSON.parse(JSON.stringify(
+    duplicateAuthorityPolicy.authorities.find((item) => item.authority === 'merge')
+  )));
+  const duplicateAuthorityErrors = validateWorkflowExecutionTrustPolicy(duplicateAuthorityPolicy);
+  const duplicateAuthorityRejected = duplicateAuthorityErrors.includes('authority definitions must be unique');
+  recordResult(
+    'workflow-execution-trust',
+    'duplicate-authority-policy-is-invalid',
+    duplicateAuthorityRejected,
+    duplicateAuthorityRejected ? null : duplicateAuthorityErrors
+  );
+
+  const selfAuthorizingInputPolicy = JSON.parse(JSON.stringify(policy));
+  selfAuthorizingInputPolicy.input_trust_classes.find((item) => item.class === 'pull_request_body').may_authorize = true;
+  const selfAuthorizingInputErrors = validateWorkflowExecutionTrustPolicy(selfAuthorizingInputPolicy);
+  const selfAuthorizingInputRejected = selfAuthorizingInputErrors.includes('pull_request_body.may_authorize must be false');
+  recordResult(
+    'workflow-execution-trust',
+    'self-authorizing-input-policy-is-invalid',
+    selfAuthorizingInputRejected,
+    selfAuthorizingInputRejected ? null : selfAuthorizingInputErrors
+  );
+
   const diffwallConfig = fs.readFileSync(path.join(__dirname, 'rules/default.yml'), 'utf8');
   const configProtected = [
     '".github/agents/**"',
