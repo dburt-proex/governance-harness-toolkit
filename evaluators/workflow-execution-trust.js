@@ -140,6 +140,7 @@ function evaluate(policy, request) {
 
   const authorityDefinitions = indexBy(policy.authorities, 'authority');
   const requestedAuthorities = [];
+  const humanApprovalStatus = request.gates.human_approval.status;
   for (const name of REQUIRED_AUTHORITIES) {
     const grant = request.authority?.[name];
     if (!grant?.requested) continue;
@@ -151,13 +152,13 @@ function evaluate(policy, request) {
     }
 
     if (definition.approval === 'human_only') {
-      if (request.gates.human_approval === 'rejected') {
+      if (humanApprovalStatus === 'rejected') {
         add('HALT', 'human_gate_rejected', `${name} authority was rejected by the human gate`);
-      } else if (request.gates.human_approval !== 'approved') {
+      } else if (humanApprovalStatus !== 'approved') {
         add('REVIEW', 'human_gate_required', `${name} authority requires human approval`);
       }
     } else if (definition.approval === 'deterministic_or_human' &&
-      !request.gates.deterministic_approval && request.gates.human_approval !== 'approved') {
+      !request.gates.deterministic_approval && humanApprovalStatus !== 'approved') {
       add('REVIEW', 'consequential_gate_required', `${name} authority requires deterministic or human approval`);
     }
   }
@@ -168,7 +169,7 @@ function evaluate(policy, request) {
   }
 
   const protectedTargets = (request.targets || []).filter((target) => isProtected(target, policy.protected_paths || []));
-  if (branchWriteRequested && protectedTargets.length && request.gates.human_approval !== 'approved') {
+  if (branchWriteRequested && protectedTargets.length && humanApprovalStatus !== 'approved') {
     add('REVIEW', 'protected_path_human_gate', `protected paths require human approval: ${protectedTargets.join(', ')}`);
   }
 
@@ -200,7 +201,7 @@ function evaluate(policy, request) {
   if (!request.gates.evidence_retained) {
     add('REVIEW', 'evidence_retention_missing', 'execution and decision evidence must be retained');
   }
-  if (request.gates.human_approval === 'rejected') {
+  if (humanApprovalStatus === 'rejected') {
     add('HALT', 'human_approval_rejected', 'a rejected human gate cannot be bypassed');
   }
 

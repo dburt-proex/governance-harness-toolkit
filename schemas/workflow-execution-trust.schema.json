@@ -161,7 +161,7 @@
         "trusted_context_present": {"type": "boolean"},
         "diffwall_evidence": {"enum": ["MISSING", "ALLOW", "REVIEW", "HALT"]},
         "deterministic_approval": {"type": "boolean"},
-        "human_approval": {"enum": ["not_required", "pending", "approved", "rejected"]},
+        "human_approval": {"$ref": "#/$defs/humanApproval"},
         "staged_write": {"type": "boolean"},
         "evidence_retained": {"type": "boolean"},
         "model_override_requested": {"type": "boolean"}
@@ -205,6 +205,27 @@
         "requested": {"type": "boolean"},
         "scope_authorized": {"type": "boolean"}
       }
+    },
+    "humanApproval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {"enum": ["not_required", "pending", "approved", "rejected"]},
+        "approver": {"type": "string", "minLength": 3, "maxLength": 200},
+        "evidence_ref": {"type": "string", "format": "uri"}
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"status": {"const": "approved"}},
+            "required": ["status"]
+          },
+          "then": {
+            "required": ["approver", "evidence_ref"]
+          }
+        }
+      ]
     }
   }
 }

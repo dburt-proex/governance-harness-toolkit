@@ -50,7 +50,7 @@
     "trusted_context_present": true,
     "diffwall_evidence": "ALLOW",
     "deterministic_approval": true,
-    "human_approval": "not_required",
+    "human_approval": {"status": "not_required"},
     "staged_write": true,
     "evidence_retained": true,
     "model_override_requested": false

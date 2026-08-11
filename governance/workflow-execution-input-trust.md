@@ -65,6 +65,8 @@ DiffWall remains the deterministic change-risk authority:
 
 Consequential writes require a deterministic approval or an explicit human approval before execution. Credential, permission, merge, and deployment boundaries always require human approval.
 
+An approved human gate is not a bare status flag: its conformance record must retain the approver identity and a durable evidence reference. A claim of approval without both fields is schema-invalid.
+
 ## Third-party Actions
 
 The high-assurance expectation is an immutable full 40-character commit SHA for every third-party Action. A readable version comment may accompany the SHA. Mutable tags and branches route to REVIEW unless the machine policy contains an exact exception with an owner, security rationale, compensating control, and review date.

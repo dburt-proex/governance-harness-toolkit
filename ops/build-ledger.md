@@ -25,7 +25,7 @@
 - Verification:
   - `npm ci --cache /tmp/ght-npm-cache-20260811`: PASS
   - Pre-change `npm test`: 50/50 PASS
-  - `npm test` and `npm run test:ci`: 76/76 PASS
+  - `npm test` and `npm run test:ci`: 77/77 PASS
   - Completed conformance example: PASS / ALLOW
   - JSON parsing and `git diff --check`: PASS
   - Repository conformance guards confirm the DiffWall policy is loaded, governance inputs are protected, and all third-party Actions use immutable SHAs
@@ -35,6 +35,7 @@
 - Failure handling:
   - The first PR checks passed against GitHub's synthetic merge ref rather than the authoritative head SHA.
   - Both workflows were changed to checkout the immutable PR head explicitly, and the behavior was added to the regression suite before rerunning the gates.
+  - Governed review found that a human-approval status alone was insufficient durable evidence; approved records now require both an approver identity and an evidence reference, with a negative schema fixture.
 - Confidence: High for deterministic policy routing and repository conformance; medium for caller-supplied actor, scope, and evidence identity until runtime integration authenticates them.
 - Open risks:
   - The evaluator expects schema validation before policy evaluation.

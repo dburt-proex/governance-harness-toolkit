@@ -48,7 +48,7 @@
       "trusted_context_present": true,
       "diffwall_evidence": "ALLOW",
       "deterministic_approval": true,
-      "human_approval": "not_required",
+      "human_approval": {"status": "not_required"},
       "staged_write": false,
       "evidence_retained": true,
       "model_override_requested": false
@@ -87,7 +87,7 @@
         {"op": "set", "path": "/authority/edit", "value": {"requested": true, "scope_authorized": true}},
         {"op": "set", "path": "/targets", "value": [".github/agents/repo-steward.agent.md"]},
         {"op": "set", "path": "/gates/staged_write", "value": true},
-        {"op": "set", "path": "/gates/human_approval", "value": "approved"}
+        {"op": "set", "path": "/gates/human_approval", "value": {"status": "approved", "approver": "operator:dburt-proex", "evidence_ref": "https://example.invalid/reviews/approved-001"}}
       ],
       "expect_schema_valid": true,
       "expect_computed_gate": "ALLOW",
@@ -171,7 +171,7 @@
         {"op": "set", "path": "/authority/edit", "value": {"requested": true, "scope_authorized": true}},
         {"op": "set", "path": "/targets", "value": [".github/workflows/ci.yml"]},
         {"op": "set", "path": "/gates/staged_write", "value": true},
-        {"op": "set", "path": "/gates/human_approval", "value": "pending"},
+        {"op": "set", "path": "/gates/human_approval", "value": {"status": "pending"}},
         {"op": "set", "path": "/declared_gate", "value": "REVIEW"}
       ],
       "expect_schema_valid": true,
@@ -185,7 +185,7 @@
         {"op": "set", "path": "/authority/edit", "value": {"requested": true, "scope_authorized": true}},
         {"op": "set", "path": "/targets", "value": ["CLAUDE.md"]},
         {"op": "set", "path": "/gates/staged_write", "value": true},
-        {"op": "set", "path": "/gates/human_approval", "value": "pending"},
+        {"op": "set", "path": "/gates/human_approval", "value": {"status": "pending"}},
         {"op": "set", "path": "/declared_gate", "value": "REVIEW"}
       ],
       "expect_schema_valid": true,
@@ -277,13 +277,20 @@
       "operations": [
         {"op": "set", "path": "/authority/merge", "value": {"requested": true, "scope_authorized": true}},
         {"op": "set", "path": "/targets", "value": ["refs/heads/main"]},
-        {"op": "set", "path": "/gates/human_approval", "value": "pending"},
+        {"op": "set", "path": "/gates/human_approval", "value": {"status": "pending"}},
         {"op": "set", "path": "/declared_gate", "value": "REVIEW"}
       ],
       "expect_schema_valid": true,
       "expect_computed_gate": "REVIEW",
       "expect_conformance_verdict": "PASS",
       "expect_finding": "human_gate_required"
+    },
+    {
+      "case_id": "approval-without-approver-evidence-is-schema-invalid",
+      "operations": [
+        {"op": "set", "path": "/gates/human_approval", "value": {"status": "approved"}}
+      ],
+      "expect_schema_valid": false
     },
     {
       "case_id": "wildcard-authority-is-schema-invalid",
