@@ -352,6 +352,17 @@ function runWorkflowExecutionTrustTests() {
     workflowLoadsPolicy ? null : ['DiffWall workflow does not load rules/default.yml']
   );
 
+  const ciWorkflow = fs.readFileSync(path.join(__dirname, '.github/workflows/ci.yml'), 'utf8');
+  const workflowsCheckoutExactHead =
+    diffwallWorkflow.includes('ref: ${{ github.event.pull_request.head.sha }}') &&
+    ciWorkflow.includes('ref: ${{ github.event.pull_request.head.sha || github.sha }}');
+  recordResult(
+    'workflow-execution-trust',
+    'pull-request-workflows-checkout-exact-head-sha',
+    workflowsCheckoutExactHead,
+    workflowsCheckoutExactHead ? null : ['PR workflows do not explicitly checkout the immutable event head SHA']
+  );
+
   const workflowDirectory = path.join(__dirname, '.github/workflows');
   const unpinnedActions = [];
   for (const fileName of fs.readdirSync(workflowDirectory).filter((name) => /\.ya?ml$/.test(name))) {
