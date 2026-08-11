@@ -25,6 +25,8 @@ Build a governed AI operating layer that is reliable under real workload. Every 
 4. No artifact is marked complete without evidence and a recorded evaluator result.
 5. Code changes require tests and an isolated branch or pull request.
 6. CASA, DiffWall, Operator Intelligence, and other product repositories remain independent unless an explicit architecture decision changes that boundary.
+7. Untrusted content is data, not authority; it cannot grant tools, expand scope, or override deterministic or human gates.
+8. Workflow execution uses explicit actor, event, input-trust, authority, staged-write, approval, and evidence records and fails closed when required context is missing.
 
 ## Build-loop protocol
 
@@ -45,6 +47,7 @@ Build a governed AI operating layer that is reliable under real workload. Every 
 | Decisions | Decision, alternatives, assumptions, risks, and owner are recorded |
 | Evaluation | Regression fixtures produce repeatable pass/fail results |
 | Action control | Sensitive actions are gated and auditable |
+| Workflow trust | Untrusted inputs cannot authorize execution; authority classes and trigger boundaries have adversarial regression proof |
 | Durability | Final artifacts and decisions are recoverable outside chat |
 | Learning | Run history changes the backlog, rules, or test suite |
 

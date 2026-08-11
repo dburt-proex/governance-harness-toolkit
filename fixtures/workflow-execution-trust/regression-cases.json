@@ -1,0 +1,335 @@
+{
+  "schema": "schemas/workflow-execution-trust.schema.json",
+  "policy": "policies/workflow-execution-input-trust.json",
+  "base_request": {
+    "request_id": "WXT-BASE-001",
+    "actor": {
+      "class": "maintainer",
+      "authorized": true,
+      "fork": false
+    },
+    "event": {
+      "name": "pull_request",
+      "dispatch_authorized": false
+    },
+    "inputs": [
+      {
+        "class": "pull_request_title",
+        "treated_as_authoritative_instruction": false,
+        "verified": false
+      }
+    ],
+    "authority": {
+      "read": {"requested": true, "scope_authorized": true},
+      "search": {"requested": false, "scope_authorized": false},
+      "execute": {"requested": false, "scope_authorized": false},
+      "edit": {"requested": false, "scope_authorized": false},
+      "github_write": {"requested": false, "scope_authorized": false},
+      "network": {"requested": false, "scope_authorized": false},
+      "credential": {"requested": false, "scope_authorized": false},
+      "permission": {"requested": false, "scope_authorized": false},
+      "merge": {"requested": false, "scope_authorized": false},
+      "deploy": {"requested": false, "scope_authorized": false}
+    },
+    "workflow": {
+      "uses_pull_request_target": false,
+      "checks_out_untrusted_ref": false,
+      "executes_untrusted_code": false,
+      "write_permissions": false,
+      "third_party_actions": [
+        {
+          "uses": "actions/checkout",
+          "ref": "11d5960a326750d5838078e36cf38b85af677262"
+        }
+      ]
+    },
+    "targets": ["README.md"],
+    "gates": {
+      "trusted_context_present": true,
+      "diffwall_evidence": "ALLOW",
+      "deterministic_approval": true,
+      "human_approval": {"status": "not_required"},
+      "staged_write": false,
+      "evidence_retained": true,
+      "model_override_requested": false
+    },
+    "evidence": {
+      "commit_sha": "fc1e7ca95bba3787992d381e85f71f5cbe0be771",
+      "diffwall_run_url": "https://github.com/example/repository/actions/runs/1001",
+      "workflow_run_urls": ["https://github.com/example/repository/actions/runs/1002"],
+      "checks": ["deterministic regression suite passed"],
+      "decision_ref": "WXT-BASE-001 decision"
+    },
+    "declared_gate": "ALLOW"
+  },
+  "cases": [
+    {
+      "case_id": "authorized-read-only-pr-allows",
+      "operations": [],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "ALLOW",
+      "expect_conformance_verdict": "PASS"
+    },
+    {
+      "case_id": "scoped-staged-edit-with-deterministic-gate-allows",
+      "operations": [
+        {"op": "set", "path": "/authority/edit", "value": {"requested": true, "scope_authorized": true}},
+        {"op": "set", "path": "/targets", "value": ["evaluators/example.js"]},
+        {"op": "set", "path": "/gates/staged_write", "value": true}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "ALLOW",
+      "expect_conformance_verdict": "PASS"
+    },
+    {
+      "case_id": "ordinary-pr-execution-without-execute-grant-halts",
+      "operations": [
+        {"op": "set", "path": "/workflow/executes_untrusted_code", "value": true},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "undeclared_workflow_authority"
+    },
+    {
+      "case_id": "ordinary-pr-execution-with-scoped-execute-grant-allows",
+      "operations": [
+        {"op": "set", "path": "/workflow/executes_untrusted_code", "value": true},
+        {"op": "set", "path": "/authority/execute", "value": {"requested": true, "scope_authorized": true}}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "ALLOW",
+      "expect_conformance_verdict": "PASS"
+    },
+    {
+      "case_id": "workflow-write-permissions-without-github-write-grant-halt",
+      "operations": [
+        {"op": "set", "path": "/workflow/write_permissions", "value": true},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "undeclared_workflow_authority"
+    },
+    {
+      "case_id": "human-approved-protected-agent-edit-allows",
+      "operations": [
+        {"op": "set", "path": "/authority/edit", "value": {"requested": true, "scope_authorized": true}},
+        {"op": "set", "path": "/targets", "value": [".github/agents/repo-steward.agent.md"]},
+        {"op": "set", "path": "/gates/staged_write", "value": true},
+        {"op": "set", "path": "/gates/human_approval", "value": {"status": "approved", "approver": "operator:dburt-proex", "evidence_ref": "https://example.invalid/reviews/approved-001"}}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "ALLOW",
+      "expect_conformance_verdict": "PASS"
+    },
+    {
+      "case_id": "malicious-pr-body-cannot-authorize",
+      "operations": [
+        {"op": "set", "path": "/inputs", "value": [{"class": "pull_request_body", "treated_as_authoritative_instruction": true, "verified": false}]},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "untrusted_input_as_authority"
+    },
+    {
+      "case_id": "malicious-repository-instruction-cannot-expand-authority",
+      "operations": [
+        {"op": "set", "path": "/inputs", "value": [{"class": "repository_file", "treated_as_authoritative_instruction": true, "verified": false}]},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "untrusted_input_as_authority"
+    },
+    {
+      "case_id": "unsafe-pull-request-target-halts",
+      "operations": [
+        {"op": "set", "path": "/actor", "value": {"class": "external_contributor", "authorized": false, "fork": true}},
+        {"op": "set", "path": "/event/name", "value": "pull_request_target"},
+        {"op": "set", "path": "/workflow/uses_pull_request_target", "value": true},
+        {"op": "set", "path": "/workflow/checks_out_untrusted_ref", "value": true},
+        {"op": "set", "path": "/workflow/executes_untrusted_code", "value": true},
+        {"op": "set", "path": "/workflow/write_permissions", "value": true},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "unsafe_pull_request_target_execution"
+    },
+    {
+      "case_id": "metadata-only-pull-request-target-allows",
+      "operations": [
+        {"op": "set", "path": "/actor", "value": {"class": "external_contributor", "authorized": false, "fork": true}},
+        {"op": "set", "path": "/event/name", "value": "pull_request_target"},
+        {"op": "set", "path": "/workflow/uses_pull_request_target", "value": true}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "ALLOW",
+      "expect_conformance_verdict": "PASS"
+    },
+    {
+      "case_id": "unauthorized-workflow-dispatch-halts",
+      "operations": [
+        {"op": "set", "path": "/actor", "value": {"class": "internal_contributor", "authorized": false, "fork": false}},
+        {"op": "set", "path": "/event/name", "value": "workflow_dispatch"},
+        {"op": "set", "path": "/event/dispatch_authorized", "value": false},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "unauthorized_workflow_dispatch"
+    },
+    {
+      "case_id": "authorized-workflow-dispatch-allows",
+      "operations": [
+        {"op": "set", "path": "/event/name", "value": "workflow_dispatch"},
+        {"op": "set", "path": "/event/dispatch_authorized", "value": true}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "ALLOW",
+      "expect_conformance_verdict": "PASS"
+    },
+    {
+      "case_id": "protected-workflow-edit-needs-human-gate",
+      "operations": [
+        {"op": "set", "path": "/authority/edit", "value": {"requested": true, "scope_authorized": true}},
+        {"op": "set", "path": "/targets", "value": [".github/workflows/ci.yml"]},
+        {"op": "set", "path": "/gates/staged_write", "value": true},
+        {"op": "set", "path": "/gates/human_approval", "value": {"status": "pending"}},
+        {"op": "set", "path": "/declared_gate", "value": "REVIEW"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "REVIEW",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "protected_path_human_gate"
+    },
+    {
+      "case_id": "root-claude-instruction-edit-needs-human-gate",
+      "operations": [
+        {"op": "set", "path": "/authority/edit", "value": {"requested": true, "scope_authorized": true}},
+        {"op": "set", "path": "/targets", "value": ["CLAUDE.md"]},
+        {"op": "set", "path": "/gates/staged_write", "value": true},
+        {"op": "set", "path": "/gates/human_approval", "value": {"status": "pending"}},
+        {"op": "set", "path": "/declared_gate", "value": "REVIEW"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "REVIEW",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "protected_path_human_gate"
+    },
+    {
+      "case_id": "missing-diffwall-evidence-reviews",
+      "operations": [
+        {"op": "set", "path": "/gates/diffwall_evidence", "value": "MISSING"},
+        {"op": "set", "path": "/evidence/diffwall_run_url", "value": null},
+        {"op": "set", "path": "/declared_gate", "value": "REVIEW"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "REVIEW",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "missing_diffwall_evidence"
+    },
+    {
+      "case_id": "model-cannot-override-diffwall-halt",
+      "operations": [
+        {"op": "set", "path": "/gates/diffwall_evidence", "value": "HALT"},
+        {"op": "set", "path": "/gates/model_override_requested", "value": true},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "model_override_prohibited"
+    },
+    {
+      "case_id": "unpinned-third-party-action-reviews",
+      "operations": [
+        {"op": "set", "path": "/workflow/third_party_actions", "value": [{"uses": "actions/checkout", "ref": "v4"}]},
+        {"op": "set", "path": "/declared_gate", "value": "REVIEW"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "REVIEW",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "third_party_action_not_pinned"
+    },
+    {
+      "case_id": "unverified-workflow-output-reviews",
+      "operations": [
+        {"op": "set", "path": "/inputs", "value": [{"class": "workflow_output", "treated_as_authoritative_instruction": false, "verified": false}]},
+        {"op": "set", "path": "/declared_gate", "value": "REVIEW"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "REVIEW",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "input_verification_missing"
+    },
+    {
+      "case_id": "missing-trusted-context-reviews",
+      "operations": [
+        {"op": "set", "path": "/gates/trusted_context_present", "value": false},
+        {"op": "set", "path": "/declared_gate", "value": "REVIEW"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "REVIEW",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "trusted_context_missing"
+    },
+    {
+      "case_id": "missing-evidence-retention-reviews",
+      "operations": [
+        {"op": "set", "path": "/gates/evidence_retained", "value": false},
+        {"op": "set", "path": "/declared_gate", "value": "REVIEW"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "REVIEW",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "evidence_retention_missing"
+    },
+    {
+      "case_id": "unscoped-network-authority-halts",
+      "operations": [
+        {"op": "set", "path": "/authority/network", "value": {"requested": true, "scope_authorized": false}},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "unauthorized_authority"
+    },
+    {
+      "case_id": "merge-authority-waits-for-human-approval",
+      "operations": [
+        {"op": "set", "path": "/authority/merge", "value": {"requested": true, "scope_authorized": true}},
+        {"op": "set", "path": "/targets", "value": ["refs/heads/main"]},
+        {"op": "set", "path": "/gates/human_approval", "value": {"status": "pending"}},
+        {"op": "set", "path": "/declared_gate", "value": "REVIEW"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "REVIEW",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "human_gate_required"
+    },
+    {
+      "case_id": "approval-without-approver-evidence-is-schema-invalid",
+      "operations": [
+        {"op": "set", "path": "/gates/human_approval", "value": {"status": "approved"}}
+      ],
+      "expect_schema_valid": false
+    },
+    {
+      "case_id": "wildcard-authority-is-schema-invalid",
+      "operations": [
+        {"op": "set", "path": "/authority/all", "value": {"requested": true, "scope_authorized": true}}
+      ],
+      "expect_schema_valid": false
+    }
+  ]
+}

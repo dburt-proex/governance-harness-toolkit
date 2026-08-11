@@ -1,5 +1,50 @@
 # Toolkit Build Ledger
 
+## Run 011
+
+- Date: 2026-08-11
+- Directive: `EXEC-FLEET-TRUST-HARDENING-2026-08-11`
+- Scope: Add the canonical Workflow Execution and Input Trust contract, deterministic evaluator, adversarial conformance suite, repository-agent guidance, protected DiffWall policy, and immutable Action pins without propagating changes to consumer repositories.
+- Evidence:
+  - Baseline `main`: `fc1e7ca95bba3787992d381e85f71f5cbe0be771`
+  - Directive 4 fleet receipt and retained findings on PR #15
+  - Existing action-permission, workflow-route, source-policy, and post-merge reconciliation contracts
+  - Existing 50/50 deterministic regression baseline
+- Change isolation:
+  - Branch: `agent/workflow-input-trust-hardening-2026-08-11`
+  - Target repository only: `dburt-proex/governance-harness-toolkit`
+- Controls implemented:
+  - Eleven explicit input trust classes; processed content cannot grant authority
+  - Separate read, search, execute, edit, GitHub-write, network, credential, permission, merge, and deploy grants
+  - Actor, fork, `pull_request_target`, and `workflow_dispatch` boundaries
+  - Staged-write and protected-path human gates
+  - DiffWall REVIEW/HALT preservation and fail-closed missing-evidence behavior
+  - Immutable full-commit SHA expectation for third-party Actions with no canonical exceptions
+  - Exact commit, workflow-run, check, and decision evidence retention
+  - Repository-local DiffWall protection for agent profiles, root instructions, policies, schemas, rules, and workflows
+- Verification:
+  - `npm ci --cache /tmp/ght-npm-cache-20260811`: PASS
+  - Pre-change `npm test`: 50/50 PASS
+  - `npm test` and `npm run test:ci`: 83/83 PASS
+  - Completed conformance example: PASS / ALLOW
+  - JSON parsing and `git diff --check`: PASS
+  - Repository conformance guards confirm the DiffWall policy is loaded, governance inputs are protected, and all third-party Actions use immutable SHAs
+  - PR workflow conformance guard requires explicit checkout of the immutable event head SHA; native push CI falls back to `github.sha`
+  - Required adversarial cases for malicious PR text, malicious repository instructions, unsafe `pull_request_target`, unauthorized dispatch, protected-file modification, missing DiffWall evidence, and model override of HALT: PASS
+- Result: REVIEW pending exact-head GitHub CI, DiffWall evidence, governed `SOLO_OPERATOR_OVERRIDE` review, merge, and post-merge verification.
+- Failure handling:
+  - The first PR checks passed against GitHub's synthetic merge ref rather than the authoritative head SHA.
+  - Both workflows were changed to checkout the immutable PR head explicitly, and the behavior was added to the regression suite before rerunning the gates.
+  - Governed review found that a human-approval status alone was insufficient durable evidence; approved records now require both an approver identity and an evidence reference, with a negative schema fixture.
+  - GitHub review found undeclared ordinary-PR execution and weakenable authority-definition semantics; workflow behavior now requires its explicit grant, and canonical input/authority invariants plus uniqueness are validated fail-closed with positive and negative regressions.
+- Confidence: High for deterministic policy routing and repository conformance; medium for caller-supplied actor, scope, and evidence identity until runtime integration authenticates them.
+- Open risks:
+  - The evaluator expects schema validation before policy evaluation.
+  - Actor authorization, authority scope, Action identity, and evidence URLs are asserted by the caller.
+  - Consumer propagation is intentionally excluded by this directive; downstream adoption requires a separate governed rollout.
+- Next action: publish the branch, open the bounded PR, close exact-head gates, conduct governed solo-operator review, merge, verify post-merge CI, and append the durable GitHub closeout receipt.
+- Approval state: Independent second-human review is explicitly waived only under `SOLO_OPERATOR_OVERRIDE`; deterministic evidence and exact-SHA review remain mandatory.
+
 ## Run 010
 
 - Date: 2026-08-05

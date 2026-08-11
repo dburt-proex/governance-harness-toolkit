@@ -17,19 +17,21 @@ jobs:
     name: Deterministic change-risk gate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: 20
 
       - name: Run DiffWall
-        uses: dburt-proex/diffwall/action@v0.2.0
+        uses: dburt-proex/diffwall/action@fbd3e6a4f66752a7d0dd7af1042d8b0b9f6ff399 # v0.2.0
         with:
           base: ${{ github.event.pull_request.base.sha }}
           head: HEAD
+          config: rules/default.yml
           format: markdown
           fail_on_halt: true
           github_token: ${{ github.token }}

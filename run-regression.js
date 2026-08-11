@@ -14,6 +14,11 @@ const { evaluateOutput } = require('./evaluators/output-evaluation.js');
 const { evaluate: evalPostMergeReconciliation } = require('./evaluators/post-merge-reconciliation.js');
 const { evaluate: evalSourcePolicy } = require('./evaluators/source-policy.js');
 const { evaluate: evalWorkflowRoute } = require('./evaluators/workflow-route.js');
+const {
+  evaluate: evalWorkflowExecutionTrust,
+  validatePolicy: validateWorkflowExecutionTrustPolicy,
+  FULL_COMMIT_SHA
+} = require('./evaluators/workflow-execution-trust.js');
 
 function createAjv() {
   const ajv = new Ajv({ allErrors: true, verbose: true, strict: false, validateSchema: false });
@@ -93,6 +98,7 @@ function runSchemaTests() {
     'schemas/learning-review.schema.json',
     'schemas/output-evaluation.schema.json',
     'schemas/source-record.schema.json',
+    'schemas/workflow-execution-trust.schema.json',
     'schemas/workflow-record.schema.json'
   ];
 
@@ -314,6 +320,134 @@ function runWorkflowRouteTests() {
   }
 }
 
+// Workflow execution and input trust tests
+function runWorkflowExecutionTrustTests() {
+  log('=== Workflow Execution and Input Trust Tests ===');
+  const fixtures = loadJson('fixtures/workflow-execution-trust/regression-cases.json');
+  const policy = loadJson(fixtures.policy);
+  const policyErrors = validateWorkflowExecutionTrustPolicy(policy);
+  recordResult('workflow-execution-trust', 'canonical-policy-invariants', policyErrors.length === 0, policyErrors);
+
+  const weakenedMergePolicy = JSON.parse(JSON.stringify(policy));
+  weakenedMergePolicy.authorities.find((item) => item.authority === 'merge').approval = 'policy';
+  const weakenedMergeResult = evalWorkflowExecutionTrust(weakenedMergePolicy, fixtures.base_request);
+  const weakenedMergeFailsClosed = weakenedMergeResult.computed_gate === 'HALT' &&
+    weakenedMergeResult.conformance_verdict === 'FAIL' &&
+    weakenedMergeResult.findings.some((finding) => finding.code === 'invalid_policy');
+  recordResult(
+    'workflow-execution-trust',
+    'weakened-merge-approval-policy-fails-closed',
+    weakenedMergeFailsClosed,
+    weakenedMergeFailsClosed ? null : weakenedMergeResult
+  );
+
+  const duplicateAuthorityPolicy = JSON.parse(JSON.stringify(policy));
+  duplicateAuthorityPolicy.authorities.push(JSON.parse(JSON.stringify(
+    duplicateAuthorityPolicy.authorities.find((item) => item.authority === 'merge')
+  )));
+  const duplicateAuthorityErrors = validateWorkflowExecutionTrustPolicy(duplicateAuthorityPolicy);
+  const duplicateAuthorityRejected = duplicateAuthorityErrors.includes('authority definitions must be unique');
+  recordResult(
+    'workflow-execution-trust',
+    'duplicate-authority-policy-is-invalid',
+    duplicateAuthorityRejected,
+    duplicateAuthorityRejected ? null : duplicateAuthorityErrors
+  );
+
+  const selfAuthorizingInputPolicy = JSON.parse(JSON.stringify(policy));
+  selfAuthorizingInputPolicy.input_trust_classes.find((item) => item.class === 'pull_request_body').may_authorize = true;
+  const selfAuthorizingInputErrors = validateWorkflowExecutionTrustPolicy(selfAuthorizingInputPolicy);
+  const selfAuthorizingInputRejected = selfAuthorizingInputErrors.includes('pull_request_body.may_authorize must be false');
+  recordResult(
+    'workflow-execution-trust',
+    'self-authorizing-input-policy-is-invalid',
+    selfAuthorizingInputRejected,
+    selfAuthorizingInputRejected ? null : selfAuthorizingInputErrors
+  );
+
+  const diffwallConfig = fs.readFileSync(path.join(__dirname, 'rules/default.yml'), 'utf8');
+  const configProtected = [
+    '".github/agents/**"',
+    '"CLAUDE.md"',
+    '"AGENTS.md"',
+    '"policies/**"',
+    '"schemas/**"'
+  ].every((entry) => diffwallConfig.includes(entry)) && !diffwallConfig.includes('- "*.md"');
+  recordResult(
+    'workflow-execution-trust',
+    'repository-diffwall-policy-protects-governance-inputs',
+    configProtected,
+    configProtected ? null : ['rules/default.yml does not protect every required governance input or still ignores all root Markdown']
+  );
+
+  const diffwallWorkflow = fs.readFileSync(path.join(__dirname, '.github/workflows/diffwall.yml'), 'utf8');
+  const workflowLoadsPolicy = diffwallWorkflow.includes('config: rules/default.yml');
+  recordResult(
+    'workflow-execution-trust',
+    'diffwall-workflow-loads-repository-policy',
+    workflowLoadsPolicy,
+    workflowLoadsPolicy ? null : ['DiffWall workflow does not load rules/default.yml']
+  );
+
+  const ciWorkflow = fs.readFileSync(path.join(__dirname, '.github/workflows/ci.yml'), 'utf8');
+  const workflowsCheckoutExactHead =
+    diffwallWorkflow.includes('ref: ${{ github.event.pull_request.head.sha }}') &&
+    ciWorkflow.includes('ref: ${{ github.event.pull_request.head.sha || github.sha }}');
+  recordResult(
+    'workflow-execution-trust',
+    'pull-request-workflows-checkout-exact-head-sha',
+    workflowsCheckoutExactHead,
+    workflowsCheckoutExactHead ? null : ['PR workflows do not explicitly checkout the immutable event head SHA']
+  );
+
+  const workflowDirectory = path.join(__dirname, '.github/workflows');
+  const unpinnedActions = [];
+  for (const fileName of fs.readdirSync(workflowDirectory).filter((name) => /\.ya?ml$/.test(name))) {
+    const raw = fs.readFileSync(path.join(workflowDirectory, fileName), 'utf8');
+    for (const match of raw.matchAll(/uses:\s*([^\s#]+)/g)) {
+      const spec = match[1];
+      if (spec.startsWith('./')) continue;
+      const separator = spec.lastIndexOf('@');
+      const ref = separator === -1 ? '' : spec.slice(separator + 1);
+      if (!FULL_COMMIT_SHA.test(ref)) unpinnedActions.push(`${fileName}: ${spec}`);
+    }
+  }
+  recordResult(
+    'workflow-execution-trust',
+    'repository-third-party-actions-use-immutable-shas',
+    unpinnedActions.length === 0,
+    unpinnedActions
+  );
+
+  for (const tc of fixtures.cases) {
+    let request = JSON.parse(JSON.stringify(fixtures.base_request));
+    request = applyPatch(request, tc.operations || []);
+    const { valid, errors } = validateSchema(fixtures.schema, request);
+
+    if (tc.expect_schema_valid === false) {
+      recordResult('workflow-execution-trust', tc.case_id, !valid, valid ? ['schema unexpectedly accepted the request'] : null);
+      continue;
+    }
+    if (!valid) {
+      recordResult('workflow-execution-trust', tc.case_id, false, errors);
+      continue;
+    }
+
+    const result = evalWorkflowExecutionTrust(policy, request);
+    let passed = result.computed_gate === tc.expect_computed_gate &&
+      result.conformance_verdict === tc.expect_conformance_verdict;
+    if (passed && tc.expect_finding) {
+      passed = result.findings.some((finding) => finding.code === tc.expect_finding);
+    }
+    recordResult('workflow-execution-trust', tc.case_id, passed, passed ? null : {
+      expected_gate: tc.expect_computed_gate,
+      expected_verdict: tc.expect_conformance_verdict,
+      expected_finding: tc.expect_finding,
+      got: result
+    });
+  }
+}
+
 // Source record schema tests
 function runSourceRecordTests() {
   log('=== Source Record Schema Tests ===');
@@ -374,6 +508,7 @@ function main() {
   runOutputEvaluationTests();
   runSourcePolicyTests();
   runWorkflowRouteTests();
+  runWorkflowExecutionTrustTests();
   runSourceRecordTests();
   runIntakeRecordTests();
 
