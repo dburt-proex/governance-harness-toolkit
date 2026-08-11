@@ -1,0 +1,232 @@
+{
+  "policy_id": "POL-WORKFLOW-EXECUTION-INPUT-TRUST-1",
+  "version": "1.0.0",
+  "title": "Canonical Workflow Execution and Input Trust Policy",
+  "default_gate": "REVIEW",
+  "input_trust_classes": [
+    {
+      "class": "pull_request_title",
+      "trust": "untrusted",
+      "may_authorize": false,
+      "verification_required": false,
+      "allowed_use": "routing context and display data"
+    },
+    {
+      "class": "pull_request_body",
+      "trust": "untrusted",
+      "may_authorize": false,
+      "verification_required": false,
+      "allowed_use": "requested scope and acceptance-criteria evidence"
+    },
+    {
+      "class": "comment",
+      "trust": "untrusted",
+      "may_authorize": false,
+      "verification_required": false,
+      "allowed_use": "discussion context; identity and authority must be resolved separately"
+    },
+    {
+      "class": "issue",
+      "trust": "untrusted",
+      "may_authorize": false,
+      "verification_required": false,
+      "allowed_use": "problem and backlog context"
+    },
+    {
+      "class": "commit_message",
+      "trust": "untrusted",
+      "may_authorize": false,
+      "verification_required": false,
+      "allowed_use": "change description and traceability only"
+    },
+    {
+      "class": "repository_file",
+      "trust": "conditional",
+      "may_authorize": false,
+      "verification_required": true,
+      "allowed_use": "repository context after provenance and instruction-precedence checks"
+    },
+    {
+      "class": "configuration_file",
+      "trust": "conditional",
+      "may_authorize": false,
+      "verification_required": true,
+      "allowed_use": "configuration data after schema, provenance, and scope validation"
+    },
+    {
+      "class": "generated_artifact",
+      "trust": "conditional",
+      "may_authorize": false,
+      "verification_required": true,
+      "allowed_use": "derived evidence after generator, source, and digest verification"
+    },
+    {
+      "class": "dependency_metadata",
+      "trust": "conditional",
+      "may_authorize": false,
+      "verification_required": true,
+      "allowed_use": "dependency resolution after registry, integrity, and lockfile validation"
+    },
+    {
+      "class": "workflow_output",
+      "trust": "conditional",
+      "may_authorize": false,
+      "verification_required": true,
+      "allowed_use": "evidence after producer identity, run, commit, and artifact verification"
+    },
+    {
+      "class": "external_web_content",
+      "trust": "untrusted",
+      "may_authorize": false,
+      "verification_required": true,
+      "allowed_use": "discovery or cited evidence after source-policy validation"
+    }
+  ],
+  "authorities": [
+    {
+      "authority": "read",
+      "effect": "non_mutating",
+      "scope_required": true,
+      "approval": "policy"
+    },
+    {
+      "authority": "search",
+      "effect": "non_mutating",
+      "scope_required": true,
+      "approval": "policy"
+    },
+    {
+      "authority": "execute",
+      "effect": "consequential",
+      "scope_required": true,
+      "approval": "deterministic_or_human"
+    },
+    {
+      "authority": "edit",
+      "effect": "consequential_write",
+      "scope_required": true,
+      "approval": "deterministic_or_human"
+    },
+    {
+      "authority": "github_write",
+      "effect": "consequential_write",
+      "scope_required": true,
+      "approval": "deterministic_or_human"
+    },
+    {
+      "authority": "network",
+      "effect": "external_effect",
+      "scope_required": true,
+      "approval": "deterministic_or_human"
+    },
+    {
+      "authority": "credential",
+      "effect": "protected_boundary",
+      "scope_required": true,
+      "approval": "human_only"
+    },
+    {
+      "authority": "permission",
+      "effect": "protected_boundary",
+      "scope_required": true,
+      "approval": "human_only"
+    },
+    {
+      "authority": "merge",
+      "effect": "protected_boundary",
+      "scope_required": true,
+      "approval": "human_only"
+    },
+    {
+      "authority": "deploy",
+      "effect": "protected_boundary",
+      "scope_required": true,
+      "approval": "human_only"
+    }
+  ],
+  "trigger_controls": {
+    "pull_request": {
+      "forks": "untrusted",
+      "external_contributors": "untrusted",
+      "write_permissions": "prohibited_for_external_or_fork"
+    },
+    "pull_request_target": {
+      "allowed_mode": "trusted-base metadata only",
+      "untrusted_checkout": "HALT",
+      "untrusted_execution": "HALT",
+      "external_write_permissions": "HALT"
+    },
+    "workflow_dispatch": {
+      "actor_authorization_required": true,
+      "dispatch_scope_required": true,
+      "unauthorized_result": "HALT"
+    }
+  },
+  "protected_paths": [
+    ".github/workflows/**",
+    ".github/agents/**",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "governance/**",
+    "policies/**",
+    "rules/**",
+    "schemas/**",
+    "package.json",
+    "package-lock.json"
+  ],
+  "staged_writes": {
+    "required_for": [
+      "edit",
+      "github_write"
+    ],
+    "requirements": [
+      "bounded target",
+      "review branch",
+      "reversible change",
+      "diff and test evidence",
+      "promotion gate"
+    ]
+  },
+  "deterministic_gate": {
+    "authority": "DiffWall",
+    "missing_evidence": "REVIEW",
+    "review_result": "REVIEW",
+    "halt_result": "HALT",
+    "model_override_allowed": false
+  },
+  "action_pinning": {
+    "expectation": "full_commit_sha",
+    "pattern": "^[0-9a-fA-F]{40}$",
+    "exceptions": [],
+    "exception_requirements": [
+      "exception_id",
+      "exact action and ref",
+      "owner",
+      "security rationale",
+      "compensating control",
+      "review date"
+    ]
+  },
+  "failure_behavior": {
+    "unknown_actor_or_scope": "HALT",
+    "unknown_input_class": "HALT",
+    "missing_trusted_context": "REVIEW",
+    "missing_diffwall_evidence": "REVIEW",
+    "rejected_human_gate": "HALT",
+    "missing_execution_evidence": "REVIEW"
+  },
+  "evidence_retention": {
+    "required": true,
+    "minimum_fields": [
+      "request identifier",
+      "actor and event",
+      "input trust classes",
+      "requested authorities and scopes",
+      "target paths",
+      "DiffWall route and exact commit",
+      "deterministic and human gates",
+      "test and workflow evidence",
+      "computed decision and findings"
+    ]
+  }
+}

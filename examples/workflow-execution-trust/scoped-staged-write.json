@@ -1,0 +1,66 @@
+{
+  "request_id": "WXT-EXAMPLE-001",
+  "actor": {
+    "class": "maintainer",
+    "authorized": true,
+    "fork": false
+  },
+  "event": {
+    "name": "pull_request",
+    "dispatch_authorized": false
+  },
+  "inputs": [
+    {
+      "class": "pull_request_body",
+      "treated_as_authoritative_instruction": false,
+      "verified": false
+    },
+    {
+      "class": "repository_file",
+      "treated_as_authoritative_instruction": false,
+      "verified": true
+    }
+  ],
+  "authority": {
+    "read": {"requested": true, "scope_authorized": true},
+    "search": {"requested": true, "scope_authorized": true},
+    "execute": {"requested": true, "scope_authorized": true},
+    "edit": {"requested": true, "scope_authorized": true},
+    "github_write": {"requested": false, "scope_authorized": false},
+    "network": {"requested": false, "scope_authorized": false},
+    "credential": {"requested": false, "scope_authorized": false},
+    "permission": {"requested": false, "scope_authorized": false},
+    "merge": {"requested": false, "scope_authorized": false},
+    "deploy": {"requested": false, "scope_authorized": false}
+  },
+  "workflow": {
+    "uses_pull_request_target": false,
+    "checks_out_untrusted_ref": false,
+    "executes_untrusted_code": false,
+    "write_permissions": false,
+    "third_party_actions": [
+      {
+        "uses": "actions/checkout",
+        "ref": "11d5960a326750d5838078e36cf38b85af677262"
+      }
+    ]
+  },
+  "targets": ["evaluators/workflow-execution-trust.js"],
+  "gates": {
+    "trusted_context_present": true,
+    "diffwall_evidence": "ALLOW",
+    "deterministic_approval": true,
+    "human_approval": "not_required",
+    "staged_write": true,
+    "evidence_retained": true,
+    "model_override_requested": false
+  },
+  "evidence": {
+    "commit_sha": "fc1e7ca95bba3787992d381e85f71f5cbe0be771",
+    "diffwall_run_url": "https://github.com/example/repository/actions/runs/1001",
+    "workflow_run_urls": ["https://github.com/example/repository/actions/runs/1002"],
+    "checks": ["schema validation and regression suite passed"],
+    "decision_ref": "WXT-EXAMPLE-001 decision"
+  },
+  "declared_gate": "ALLOW"
+}

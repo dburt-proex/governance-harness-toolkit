@@ -1,0 +1,33 @@
+# Governance Harness Toolkit policy. DiffWall inherits its canonical thresholds
+# and halt patterns; this file narrows only ignored paths and expands protected
+# governance surfaces for this repository.
+ignorePaths:
+  - "docs/**"
+  - "README.md"
+
+protectedPaths:
+  - ".github/workflows/**"
+  - ".github/agents/**"
+  - "AGENTS.md"
+  - "CLAUDE.md"
+  - "governance/**"
+  - "policies/**"
+  - "rules/**"
+  - "schemas/**"
+  - "evaluators/**"
+  - "run-regression.js"
+  - "package.json"
+  - "package-lock.json"
+  - "pnpm-lock.yaml"
+  - "yarn.lock"
+  - "requirements.txt"
+  - "pyproject.toml"
+  - "go.mod"
+  - "go.sum"
+  - "src/auth/**"
+  - "src/security/**"
+  - "auth/**"
+  - "security/**"
+  - "billing/**"
+  - "db/migrations/**"
+  - "migrations/**"
