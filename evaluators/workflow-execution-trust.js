@@ -61,7 +61,7 @@ const GATE_RANK = { ALLOW: 0, REVIEW: 1, HALT: 2 };
 const FULL_COMMIT_SHA = /^[0-9a-f]{40}$/i;
 
 function indexBy(items, key) {
-  return new Map((items || []).map((item) => [item[key], item]));
+  return new Map((Array.isArray(items) ? items : []).map((item) => [item[key], item]));
 }
 
 function validatePolicy(policy) {
@@ -69,8 +69,9 @@ function validatePolicy(policy) {
   if (!policy || typeof policy !== 'object') return ['policy must be an object'];
   if (policy.default_gate !== 'REVIEW') errors.push('default_gate must be REVIEW');
 
+  if (!Array.isArray(policy.input_trust_classes)) errors.push('input_trust_classes must be an array');
   const inputs = indexBy(policy.input_trust_classes, 'class');
-  const inputNames = (policy.input_trust_classes || []).map((item) => item.class);
+  const inputNames = (Array.isArray(policy.input_trust_classes) ? policy.input_trust_classes : []).map((item) => item.class);
   if (new Set(inputNames).size !== inputNames.length) errors.push('input trust classes must be unique');
   for (const name of inputNames) {
     if (!REQUIRED_INPUT_CLASSES.includes(name)) errors.push(`unsupported input trust class: ${name}`);
@@ -89,8 +90,9 @@ function validatePolicy(policy) {
     if (input.may_authorize !== false) errors.push(`${name}.may_authorize must be false`);
   }
 
+  if (!Array.isArray(policy.authorities)) errors.push('authorities must be an array');
   const authorities = indexBy(policy.authorities, 'authority');
-  const authorityNames = (policy.authorities || []).map((item) => item.authority);
+  const authorityNames = (Array.isArray(policy.authorities) ? policy.authorities : []).map((item) => item.authority);
   if (new Set(authorityNames).size !== authorityNames.length) errors.push('authority definitions must be unique');
   for (const name of authorityNames) {
     if (!REQUIRED_AUTHORITIES.includes(name)) errors.push(`unsupported authority definition: ${name}`);
@@ -112,8 +114,10 @@ function validatePolicy(policy) {
   if (policy.deterministic_gate?.halt_result !== 'HALT') errors.push('DiffWall HALT must remain HALT');
   if (policy.deterministic_gate?.model_override_allowed !== false) errors.push('model override of DiffWall must be prohibited');
   if (policy.action_pinning?.expectation !== 'full_commit_sha') errors.push('third-party Actions must expect full commit SHA pins');
+  const exceptions = policy.action_pinning?.exceptions;
+  if (!Array.isArray(exceptions)) errors.push('action_pinning.exceptions must be an array');
   const exceptionIds = new Set();
-  for (const exception of policy.action_pinning?.exceptions || []) {
+  for (const exception of Array.isArray(exceptions) ? exceptions : []) {
     const required = ['exception_id', 'uses', 'ref', 'owner', 'security_rationale', 'compensating_control', 'review_date'];
     for (const field of required) {
       if (typeof exception[field] !== 'string' || exception[field].trim() === '') {
@@ -137,7 +141,7 @@ function isProtected(path, patterns) {
 }
 
 function matchingPinException(policy, action) {
-  return (policy.action_pinning.exceptions || []).find((exception) =>
+  return (Array.isArray(policy.action_pinning?.exceptions) ? policy.action_pinning.exceptions : []).find((exception) =>
     exception.exception_id === action.exception_id &&
     exception.uses === action.uses &&
     exception.ref === action.ref

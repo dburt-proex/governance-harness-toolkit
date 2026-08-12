@@ -365,6 +365,22 @@ function runWorkflowExecutionTrustTests() {
     selfAuthorizingInputRejected ? null : selfAuthorizingInputErrors
   );
 
+  const malformedCollectionsPolicy = JSON.parse(JSON.stringify(policy));
+  malformedCollectionsPolicy.input_trust_classes = {};
+  malformedCollectionsPolicy.authorities = {};
+  malformedCollectionsPolicy.action_pinning.exceptions = {};
+  const malformedCollectionsErrors = validateWorkflowExecutionTrustPolicy(malformedCollectionsPolicy);
+  const malformedCollectionsRejected =
+    malformedCollectionsErrors.includes('input_trust_classes must be an array') &&
+    malformedCollectionsErrors.includes('authorities must be an array') &&
+    malformedCollectionsErrors.includes('action_pinning.exceptions must be an array');
+  recordResult(
+    'workflow-execution-trust',
+    'malformed-policy-collections-fail-closed',
+    malformedCollectionsRejected,
+    malformedCollectionsRejected ? null : malformedCollectionsErrors
+  );
+
   const diffwallConfig = fs.readFileSync(path.join(__dirname, 'rules/default.yml'), 'utf8');
   const configProtected = [
     '".github/agents/**"',
