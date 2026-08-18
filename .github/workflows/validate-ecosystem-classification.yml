@@ -1,0 +1,34 @@
+name: Validate Ecosystem Classification
+on:
+  pull_request:
+    paths: ["ECOSYSTEM.json", ".github/workflows/validate-ecosystem-classification.yml"]
+  push:
+    branches: [main]
+    paths: ["ECOSYSTEM.json", ".github/workflows/validate-ecosystem-classification.yml"]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compare local marker to canonical registry
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          marker=json.load(open('ECOSYSTEM.json',encoding='utf-8'))
+          with urllib.request.urlopen('https://raw.githubusercontent.com/dburt-proex/operator-intelligence/main/ecosystem/registry.json',timeout=15) as r: registry=json.load(r)
+          repo=os.environ['GITHUB_REPOSITORY']
+          if marker.get('repository')!=repo: raise SystemExit('repository mismatch')
+          canonical=next((x for x in registry['repositories'] if x['repo']==repo),None)
+          if canonical is None: raise SystemExit(f'{repo} absent from canonical registry')
+          for field in ('classification','authority_for','may_define_new_primitives'):
+              if marker.get(field)!=canonical.get(field): raise SystemExit(f'{field} mismatch: local={marker.get(field)!r} canonical={canonical.get(field)!r}')
+          if canonical['classification'] in {'LEGACY','ARCHIVED'}: raise SystemExit(f'{repo} is frozen as {canonical["classification"]}')
+          print(f'PASS: {repo} => {canonical["classification"]}')
+          PY
