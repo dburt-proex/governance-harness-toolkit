@@ -1,0 +1,8 @@
+{
+  "registry": "dburt-proex/operator-intelligence:ecosystem/registry.json",
+  "registry_version": "1.0.0",
+  "repository": "dburt-proex/governance-harness-toolkit",
+  "classification": "CORE",
+  "authority_for": ["reusable_governance_contracts"],
+  "may_define_new_primitives": true
+}
