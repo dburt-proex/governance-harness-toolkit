@@ -16,6 +16,7 @@ Priority is evidence-weighted leverage, not feature count.
 | TK-011 | Reconcile merged work records and add a post-merge state gate | Prevent canonical backlog, ledger, PR, and approval evidence from disagreeing | queued | Issue #10 resolved, TK-003 through TK-009 reconciled, approval gaps explicit, and a state-mismatch regression guard |
 | TK-012 | Add a repository-native regression runner and CI gate | Make quality verification reproducible without rebuilding an ad hoc harness | queued | Issue #11 resolved, pinned test command, 39-case baseline, non-zero failure behavior, and CI evidence |
 | TK-010 | Define governed Skill registry | Make reusable execution discoverable, versioned, owned, and compatibility-checked | queued | Skill-record schema plus available, missing, and incompatible regression cases |
+| TK-013 | Define Agent Plugins 1.0 + MCP Governance Compatibility Pack | Make plugin packages and MCP tool inventories version-pinned, least-privilege, auditable, and release-gated | in_review | Contract, closed schema, invariant policy, evaluator, completed example, adversarial fixtures, repository-native passing suite, DiffWall/CI evidence, and human promotion decision |
 
 ## Selection rule
 

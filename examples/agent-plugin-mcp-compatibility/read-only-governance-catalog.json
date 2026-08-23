@@ -1,0 +1,125 @@
+{
+  "profile_id": "APM-READ-ONLY-001",
+  "profile_version": "1.0.0",
+  "upstream": {
+    "agent_plugins": {
+      "profile": "toolkit-agent-plugins-1.0",
+      "documentation_snapshot": "2026-08-23",
+      "source_url": "https://developers.openai.com/plugins/build/plugins"
+    },
+    "mcp": {
+      "protocol_version": "2026-07-28",
+      "source_url": "https://modelcontextprotocol.io/specification/2026-07-28"
+    }
+  },
+  "package": {
+    "name": "governance-catalog",
+    "version": "1.0.0",
+    "purpose": "Retrieve approved public governance-control definitions without changing external state.",
+    "manifest_path": ".codex-plugin/plugin.json",
+    "component_paths": [
+      "./.mcp.json",
+      "./skills/"
+    ],
+    "has_skills": true,
+    "has_mcp_server": true,
+    "has_apps": false,
+    "has_hooks": false
+  },
+  "server": {
+    "server_id": "governance-catalog",
+    "transport": "streamable_http",
+    "endpoint": "https://mcp.example.invalid/mcp",
+    "authentication": {
+      "mode": "none",
+      "scopes": [],
+      "scopes_enforced_each_call": false,
+      "audience_validated": false,
+      "token_passthrough": false
+    },
+    "input_validation": true,
+    "output_sanitization": true,
+    "rate_limit": true,
+    "timeout_ms": 10000,
+    "egress_allowlist": []
+  },
+  "tools": [
+    {
+      "name": "get_governance_control",
+      "description": "Retrieve one approved public governance-control definition by its stable identifier.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "control_id": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9._-]{2,63}$"
+          }
+        },
+        "required": ["control_id"],
+        "additionalProperties": false
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "control_id": {"type": "string"},
+          "title": {"type": "string"},
+          "gate": {"enum": ["ALLOW", "REVIEW", "HALT"]},
+          "source_ref": {"type": "string", "format": "uri"}
+        },
+        "required": ["control_id", "title", "gate", "source_ref"],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "behavior": {
+        "operation": "read",
+        "external_effect": false,
+        "side_effects_declared": true,
+        "reversibility": "not_applicable",
+        "idempotency": "idempotent",
+        "data_sensitivity": "public",
+        "required_authority": "read"
+      },
+      "enforcement": {
+        "scope_authorized": true,
+        "approval_mode": "auto",
+        "audit_logged": true,
+        "confirmation_required": false,
+        "enabled_by_default": true
+      }
+    }
+  ],
+  "controls": {
+    "least_privilege_reviewed": true,
+    "user_consent_required": true,
+    "structured_results_validated": true,
+    "pii_redacted_logs": true,
+    "raw_prompt_logging": false,
+    "retention_documented": true,
+    "correlation_ids": true,
+    "persists_user_data": false,
+    "deletion_supported": false,
+    "egress_enforced": true,
+    "tool_inventory_verified": true
+  },
+  "evidence": {
+    "manifest_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "discovery_snapshot_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+    "source_refs": [
+      "https://developers.openai.com/plugins/build/plugins",
+      "https://developers.openai.com/plugins/app-guidelines",
+      "https://modelcontextprotocol.io/specification/2026-07-28/server/tools"
+    ],
+    "test_cases": [
+      "valid read-only call returns outputSchema-conformant structured content",
+      "unknown input field is rejected server-side",
+      "audit event retains correlation ID without raw prompt or PII"
+    ],
+    "recorded_at": "2026-08-23T00:00:00Z",
+    "decision_ref": "Agent Plugins 1.0 and MCP governance compatibility proof"
+  },
+  "declared_gate": "ALLOW"
+}

@@ -1,0 +1,200 @@
+{
+  "schema": "schemas/agent-plugin-mcp-compatibility.schema.json",
+  "policy": "policies/agent-plugin-mcp-governance.json",
+  "example": "examples/agent-plugin-mcp-compatibility/read-only-governance-catalog.json",
+  "cases": [
+    {
+      "case_id": "read-only-governance-catalog-allows",
+      "operations": [],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "ALLOW",
+      "expect_conformance_verdict": "PASS"
+    },
+    {
+      "case_id": "governed-write-tool-routes-to-release-review",
+      "operations": [
+        {"op": "set", "path": "/tools/0/name", "value": "update_governance_note"},
+        {"op": "set", "path": "/tools/0/description", "value": "Update one bounded governance note after explicit user confirmation."},
+        {"op": "set", "path": "/tools/0/annotations", "value": {"readOnlyHint": false, "destructiveHint": false, "openWorldHint": true}},
+        {"op": "set", "path": "/tools/0/behavior", "value": {"operation": "update", "external_effect": true, "side_effects_declared": true, "reversibility": "reversible", "idempotency": "idempotency_key", "data_sensitivity": "internal", "required_authority": "edit"}},
+        {"op": "set", "path": "/tools/0/enforcement", "value": {"scope_authorized": true, "approval_mode": "prompt", "audit_logged": true, "confirmation_required": true, "enabled_by_default": false}},
+        {"op": "set", "path": "/server/authentication", "value": {"mode": "oauth_2_1", "scopes": ["governance-notes:write"], "scopes_enforced_each_call": true, "audience_validated": true, "token_passthrough": false}},
+        {"op": "set", "path": "/server/egress_allowlist", "value": ["https://notes.example.invalid"]},
+        {"op": "set", "path": "/declared_gate", "value": "REVIEW"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "REVIEW",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "consequential_tool_release_review"
+    },
+    {
+      "case_id": "missing-required-annotation-is-schema-invalid",
+      "operations": [
+        {"op": "delete", "path": "/tools/0/annotations/openWorldHint"}
+      ],
+      "expect_schema_valid": false
+    },
+    {
+      "case_id": "write-tool-mislabeled-read-only-halts",
+      "operations": [
+        {"op": "set", "path": "/tools/0/behavior/operation", "value": "update"},
+        {"op": "set", "path": "/tools/0/behavior/reversibility", "value": "reversible"},
+        {"op": "set", "path": "/tools/0/behavior/required_authority", "value": "edit"},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "write_annotation_mismatch"
+    },
+    {
+      "case_id": "broad-conversation-input-halts",
+      "operations": [
+        {"op": "set", "path": "/tools/0/input_schema/properties/chat_transcript", "value": {"type": "string"}},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "prohibited_broad_or_secret_input"
+    },
+    {
+      "case_id": "token-passthrough-halts",
+      "operations": [
+        {"op": "set", "path": "/server/authentication/token_passthrough", "value": true},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "token_passthrough_prohibited"
+    },
+    {
+      "case_id": "hidden-side-effect-halts",
+      "operations": [
+        {"op": "set", "path": "/tools/0/behavior/side_effects_declared", "value": false},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "hidden_side_effects"
+    },
+    {
+      "case_id": "mcp-protocol-drift-halts",
+      "operations": [
+        {"op": "set", "path": "/upstream/mcp/protocol_version", "value": "2025-11-25"},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "mcp_version_mismatch"
+    },
+    {
+      "case_id": "plugin-component-path-escape-halts",
+      "operations": [
+        {"op": "set", "path": "/package/component_paths", "value": ["../shared/.mcp.json"]},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "component_path_escape"
+    },
+    {
+      "case_id": "windows-style-component-path-escape-halts",
+      "operations": [
+        {"op": "set", "path": "/package/component_paths", "value": ["./skills\\..\\..\\secret"]},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "component_path_escape"
+    },
+    {
+      "case_id": "plugin-hooks-require-release-review",
+      "operations": [
+        {"op": "set", "path": "/package/has_hooks", "value": true},
+        {"op": "set", "path": "/package/component_paths", "value": ["./.mcp.json", "./skills/", "./hooks/hooks.json"]},
+        {"op": "set", "path": "/declared_gate", "value": "REVIEW"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "REVIEW",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "plugin_hooks_require_trust_review"
+    },
+    {
+      "case_id": "missing-output-schema-reviews",
+      "operations": [
+        {"op": "set", "path": "/tools/0/output_schema", "value": null},
+        {"op": "set", "path": "/declared_gate", "value": "REVIEW"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "REVIEW",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "output_schema_missing"
+    },
+    {
+      "case_id": "stdio-server-requires-local-execution-review",
+      "operations": [
+        {"op": "set", "path": "/server/transport", "value": "stdio"},
+        {"op": "set", "path": "/server/endpoint", "value": null},
+        {"op": "set", "path": "/server/authentication/mode", "value": "environment"},
+        {"op": "set", "path": "/declared_gate", "value": "REVIEW"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "REVIEW",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "local_server_execution_review"
+    },
+    {
+      "case_id": "sensitive-x-mcp-header-halts",
+      "operations": [
+        {"op": "set", "path": "/tools/0/input_schema/properties/access_token", "value": {"type": "string", "x-mcp-header": "Access-Token"}},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "sensitive_mcp_header"
+    },
+    {
+      "case_id": "irreversible-delete-without-confirmation-halts",
+      "operations": [
+        {"op": "set", "path": "/tools/0/annotations", "value": {"readOnlyHint": false, "destructiveHint": true, "openWorldHint": true}},
+        {"op": "set", "path": "/tools/0/behavior", "value": {"operation": "delete", "external_effect": true, "side_effects_declared": true, "reversibility": "irreversible", "idempotency": "required_confirmation", "data_sensitivity": "internal", "required_authority": "edit"}},
+        {"op": "set", "path": "/tools/0/enforcement", "value": {"scope_authorized": true, "approval_mode": "prompt", "audit_logged": true, "confirmation_required": false, "enabled_by_default": false}},
+        {"op": "set", "path": "/server/authentication", "value": {"mode": "oauth_2_1", "scopes": ["records:delete"], "scopes_enforced_each_call": true, "audience_validated": true, "token_passthrough": false}},
+        {"op": "set", "path": "/server/egress_allowlist", "value": ["https://records.example.invalid"]},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "irreversible_confirmation_missing"
+    },
+    {
+      "case_id": "unauthenticated-restricted-read-halts",
+      "operations": [
+        {"op": "set", "path": "/tools/0/behavior/data_sensitivity", "value": "restricted"},
+        {"op": "set", "path": "/declared_gate", "value": "HALT"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT",
+      "expect_conformance_verdict": "PASS",
+      "expect_finding": "unauthenticated_sensitive_or_consequential_server"
+    },
+    {
+      "case_id": "declared-allow-cannot-downgrade-review",
+      "operations": [
+        {"op": "set", "path": "/package/has_hooks", "value": true}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "REVIEW",
+      "expect_conformance_verdict": "FAIL",
+      "expect_finding": "plugin_hooks_require_trust_review"
+    }
+  ]
+}
