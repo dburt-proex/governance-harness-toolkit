@@ -19,6 +19,10 @@ const {
   validatePolicy: validateWorkflowExecutionTrustPolicy,
   FULL_COMMIT_SHA
 } = require('./evaluators/workflow-execution-trust.js');
+const {
+  evaluate: evalAgentPluginMcpCompatibility,
+  validatePolicy: validateAgentPluginMcpPolicy
+} = require('./evaluators/agent-plugin-mcp-compatibility.js');
 
 function createAjv() {
   const ajv = new Ajv({ allErrors: true, verbose: true, strict: false, validateSchema: false });
@@ -92,6 +96,7 @@ function runSchemaTests() {
   log('=== Schema Validation Tests ===');
   const schemas = [
     'schemas/action-request.schema.json',
+    'schemas/agent-plugin-mcp-compatibility.schema.json',
     'schemas/build-run.schema.json',
     'schemas/decision-record.schema.json',
     'schemas/intake-record.schema.json',
@@ -118,6 +123,88 @@ function runSchemaTests() {
       }
     }
     recordResult('schema', path.basename(schemaPath), passed, details);
+  }
+}
+
+// Agent Plugins 1.0 and MCP governance compatibility tests
+function runAgentPluginMcpCompatibilityTests() {
+  log('=== Agent Plugins 1.0 and MCP Governance Compatibility Tests ===');
+  const fixtures = loadJson('fixtures/agent-plugin-mcp-compatibility/regression-cases.json');
+  const policy = loadJson(fixtures.policy);
+  const policyErrors = validateAgentPluginMcpPolicy(policy);
+  recordResult('agent-plugin-mcp-compatibility', 'canonical-policy-invariants', policyErrors.length === 0, policyErrors);
+
+  const weakenedPolicy = JSON.parse(JSON.stringify(policy));
+  weakenedPolicy.prohibited_input_fields = weakenedPolicy.prohibited_input_fields.filter((name) => name !== 'access_token');
+  const weakenedPolicyErrors = validateAgentPluginMcpPolicy(weakenedPolicy);
+  const weakeningRejected = weakenedPolicyErrors.includes('prohibited_input_fields must preserve the canonical ordered set');
+  recordResult(
+    'agent-plugin-mcp-compatibility',
+    'credential-input-policy-cannot-be-weakened',
+    weakeningRejected,
+    weakeningRejected ? null : weakenedPolicyErrors
+  );
+
+  const missingPolicyResult = evalAgentPluginMcpCompatibility(null, loadJson(fixtures.example));
+  const missingPolicyFailsClosed = missingPolicyResult.computed_gate === 'HALT' &&
+    missingPolicyResult.conformance_verdict === 'FAIL' &&
+    missingPolicyResult.findings.some((finding) => finding.code === 'invalid_policy');
+  recordResult(
+    'agent-plugin-mcp-compatibility',
+    'missing-policy-fails-closed-without-crash',
+    missingPolicyFailsClosed,
+    missingPolicyFailsClosed ? null : missingPolicyResult
+  );
+
+  const diffwallConfig = fs.readFileSync(path.join(__dirname, 'rules/default.yml'), 'utf8');
+  const pluginSurfacesProtected = [
+    '".agents/plugins/**"',
+    '"plugins/**"',
+    '".codex-plugin/**"',
+    '".mcp.json"',
+    '".app.json"',
+    '"hooks/**"',
+    '"skills/**"'
+  ].every((entry) => diffwallConfig.includes(entry));
+  recordResult(
+    'agent-plugin-mcp-compatibility',
+    'repository-diffwall-policy-protects-plugin-surfaces',
+    pluginSurfacesProtected,
+    pluginSurfacesProtected ? null : ['rules/default.yml does not protect every plugin package or marketplace surface']
+  );
+
+  const example = loadJson(fixtures.example);
+  for (const tc of fixtures.cases) {
+    let record = JSON.parse(JSON.stringify(example));
+    record = applyPatch(record, tc.operations || []);
+    const { valid, errors } = validateSchema(fixtures.schema, record);
+
+    if (tc.expect_schema_valid === false) {
+      recordResult(
+        'agent-plugin-mcp-compatibility',
+        tc.case_id,
+        !valid,
+        valid ? ['schema unexpectedly accepted the compatibility record'] : null
+      );
+      continue;
+    }
+    if (!valid) {
+      recordResult('agent-plugin-mcp-compatibility', tc.case_id, false, errors);
+      continue;
+    }
+
+    const result = evalAgentPluginMcpCompatibility(policy, record);
+    let passed = result.computed_gate === tc.expect_computed_gate &&
+      result.conformance_verdict === tc.expect_conformance_verdict;
+    if (passed && tc.expect_finding) {
+      passed = result.findings.some((finding) => finding.code === tc.expect_finding);
+    }
+    recordResult('agent-plugin-mcp-compatibility', tc.case_id, passed, passed ? null : {
+      expected_gate: tc.expect_computed_gate,
+      expected_verdict: tc.expect_conformance_verdict,
+      expected_finding: tc.expect_finding,
+      got: result
+    });
   }
 }
 
@@ -500,6 +587,7 @@ function main() {
   }
 
   runSchemaTests();
+  runAgentPluginMcpCompatibilityTests();
   runBuildRunTests();
   runActionPermissionTests();
   runDecisionRecordTests();

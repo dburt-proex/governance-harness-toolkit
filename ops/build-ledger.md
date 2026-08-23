@@ -1,5 +1,62 @@
 # Toolkit Build Ledger
 
+## Run 012
+
+- Date: 2026-08-23
+- Directive: Define an Agent Plugins 1.0 + MCP Governance Compatibility Pack as the day's highest-leverage increment.
+- Scope: Add one version-pinned, machine-checkable compatibility and release pack for Agent Plugin packages and MCP tool inventories; repair the pre-existing immutable-Action-pin regression required to obtain a trustworthy baseline; do not install, publish, merge, deploy, or propagate a plugin.
+- Evidence:
+  - Baseline `main`: `eee08d82aa9ad0a50f81bd2a6d1430b280a1c716`
+  - `governance/build-contract.md`
+  - OpenAI Agent Plugins architecture, packaging, guidelines, security/privacy, and review documentation retrieved 2026-08-23
+  - Model Context Protocol specification, tools, authorization, and security guidance pinned to `2026-07-28`
+  - Existing workflow-execution/input-trust and action-permission contracts
+- Change isolation:
+  - Branch: `agent/agent-plugins-mcp-governance-1.0`
+  - Target repository only: `dburt-proex/governance-harness-toolkit`
+- Artifacts:
+  - `governance/agent-plugins-mcp-compatibility.md`
+  - `policies/agent-plugin-mcp-governance.json`
+  - `schemas/agent-plugin-mcp-compatibility.schema.json`
+  - `evaluators/agent-plugin-mcp-compatibility.js`
+  - `examples/agent-plugin-mcp-compatibility/read-only-governance-catalog.json`
+  - `fixtures/agent-plugin-mcp-compatibility/regression-cases.json`
+  - Repository regression, README, backlog, DiffWall surface protection, and immutable ecosystem-workflow Action pins
+- Controls implemented:
+  - Toolkit profile version separated from upstream OpenAI claims
+  - OpenAI documentation snapshot and MCP protocol pinned independently
+  - Required plugin manifest location and plugin-root path containment
+  - HTTPS remote and review-gated stdio transport boundaries
+  - OAuth scope/audience enforcement and token-passthrough prohibition
+  - Unique tool inventory, closed inputs, typed outputs, correct annotations, visible side effects, and exact operation-to-authority mapping
+  - Broad transcript/history and credential-input prohibition, including sensitive `x-mcp-header` rejection
+  - Scope, approval, confirmation, reversibility, idempotency, audit, consent, egress, privacy, retention, deletion, and inventory controls
+  - Consequential tools route to REVIEW; unsafe auto-approval, policy drift, hidden effects, unauthenticated sensitive access, permission changes, and financial transactions route to HALT
+  - Declared gates cannot downgrade the computed decision
+  - Plugin marketplace, manifest, MCP/app mapping, hook, Skill, and package paths added to repository DiffWall protection
+- Verification:
+  - Dependency install with task-local npm cache: PASS
+  - Pre-change suite: 82/83 PASS; existing mutable `actions/checkout@v4` and `actions/setup-python@v5` references caused the only failure
+  - Immutable tag targets resolved and pinned: checkout `11d5960a326750d5838078e36cf38b85af677262`; setup-python `a26af69be951a213d495a4c3e4e4022e16d87065`
+  - Completed read-only example: PASS / ALLOW
+  - Canonical policy weakening/missing-policy fail-closed behavior, governed write, missing annotation, annotation contradiction, broad context, token passthrough, hidden effect, protocol drift, POSIX/Windows path traversal, hooks, missing output schema, stdio, sensitive header, irreversible delete, unauthenticated restricted read, and gate downgrade fixtures: PASS
+  - Clean dependency install, JavaScript syntax checks, changed-JSON parsing, and `git diff --check`: PASS
+  - Full local suite: 105/105 PASS
+  - Machine-readable suite: 105/105 PASS with status `PASS`
+- Result: REVIEW pending exact-head GitHub CI, DiffWall evidence, human review, merge, and post-merge reconciliation.
+- Failure handling:
+  - Initial `npm ci` attempted to use an unavailable root-owned cache path; the retry used a task-local cache without changing repository dependency state.
+  - Baseline regression exposed mutable Action tags introduced by the ecosystem-classification workflow. The exact tag targets were resolved read-only and pinned before evaluating the new pack.
+- Confidence: High for deterministic record validation and gate routing; medium for real-world compatibility until discovery, identity, scope, and digest evidence are collected from an authenticated runtime.
+- Open risks:
+  - The compatibility record is caller-supplied and does not authenticate plugin commit, server identity, actor, OAuth subject, scopes, digests, or test evidence.
+  - The evaluator consumes a recorded tool inventory rather than performing a live `tools/list` handshake.
+  - Semantic minimality of otherwise permitted input fields still requires purpose-specific human review.
+  - MCP Tasks, Skills over MCP, MCP Apps, UI/CSP, public submission, and call-receipt emission are not modeled in profile 1.0.
+  - Upstream documentation can change; a new snapshot or MCP version requires a reviewed profile revision.
+- Next action: publish the isolated branch, open a bounded pull request, close exact-head CI and DiffWall gates, record the human promotion decision, and only then consider merge or downstream adoption.
+- Approval state: Human review required; `ALLOW` from the completed example grants no merge, publish, deployment, or tool-invocation authority.
+
 ## Run 011
 
 - Date: 2026-08-11

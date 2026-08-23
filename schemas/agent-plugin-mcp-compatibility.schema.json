@@ -1,0 +1,321 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://governance-harness-toolkit.local/schemas/agent-plugin-mcp-compatibility.schema.json",
+  "title": "Agent Plugin and MCP Governance Compatibility Record",
+  "description": "A closed release-conformance record for an Agent Plugins 1.0 package, its MCP server, discovered tools, governance controls, and retained evidence.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profile_id",
+    "profile_version",
+    "upstream",
+    "package",
+    "server",
+    "tools",
+    "controls",
+    "evidence",
+    "declared_gate"
+  ],
+  "properties": {
+    "profile_id": {
+      "type": "string",
+      "pattern": "^APM-[A-Z0-9][A-Z0-9._-]{2,63}$"
+    },
+    "profile_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "upstream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent_plugins", "mcp"],
+      "properties": {
+        "agent_plugins": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["profile", "documentation_snapshot", "source_url"],
+          "properties": {
+            "profile": {"type": "string", "minLength": 3, "maxLength": 100},
+            "documentation_snapshot": {"type": "string", "format": "date"},
+            "source_url": {"type": "string", "format": "uri"}
+          }
+        },
+        "mcp": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["protocol_version", "source_url"],
+          "properties": {
+            "protocol_version": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+            "source_url": {"type": "string", "format": "uri"}
+          }
+        }
+      }
+    },
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version",
+        "purpose",
+        "manifest_path",
+        "component_paths",
+        "has_skills",
+        "has_mcp_server",
+        "has_apps",
+        "has_hooks"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 100
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+        },
+        "purpose": {"type": "string", "minLength": 20, "maxLength": 500},
+        "manifest_path": {"type": "string", "minLength": 1, "maxLength": 300},
+        "component_paths": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 2, "maxLength": 300}
+        },
+        "has_skills": {"type": "boolean"},
+        "has_mcp_server": {"type": "boolean"},
+        "has_apps": {"type": "boolean"},
+        "has_hooks": {"type": "boolean"}
+      }
+    },
+    "server": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "server_id",
+        "transport",
+        "endpoint",
+        "authentication",
+        "input_validation",
+        "output_sanitization",
+        "rate_limit",
+        "timeout_ms",
+        "egress_allowlist"
+      ],
+      "properties": {
+        "server_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,128}$"
+        },
+        "transport": {"enum": ["streamable_http", "stdio"]},
+        "endpoint": {
+          "oneOf": [
+            {"type": "string", "format": "uri"},
+            {"type": "null"}
+          ]
+        },
+        "authentication": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "scopes",
+            "scopes_enforced_each_call",
+            "audience_validated",
+            "token_passthrough"
+          ],
+          "properties": {
+            "mode": {"enum": ["none", "oauth_2_1", "environment"]},
+            "scopes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {"type": "string", "minLength": 1, "maxLength": 200}
+            },
+            "scopes_enforced_each_call": {"type": "boolean"},
+            "audience_validated": {"type": "boolean"},
+            "token_passthrough": {"type": "boolean"}
+          }
+        },
+        "input_validation": {"type": "boolean"},
+        "output_sanitization": {"type": "boolean"},
+        "rate_limit": {"type": "boolean"},
+        "timeout_ms": {"type": "integer", "minimum": 1, "maximum": 300000},
+        "egress_allowlist": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "format": "uri"}
+        }
+      }
+    },
+    "tools": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "description",
+          "input_schema",
+          "output_schema",
+          "annotations",
+          "behavior",
+          "enforcement"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]{1,128}$"
+          },
+          "description": {"type": "string", "minLength": 10, "maxLength": 1000},
+          "input_schema": {"type": "object", "minProperties": 1},
+          "output_schema": {
+            "oneOf": [
+              {"type": "object", "minProperties": 1},
+              {"type": "null"}
+            ]
+          },
+          "annotations": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["readOnlyHint", "destructiveHint", "openWorldHint"],
+            "properties": {
+              "readOnlyHint": {"type": "boolean"},
+              "destructiveHint": {"type": "boolean"},
+              "openWorldHint": {"type": "boolean"}
+            }
+          },
+          "behavior": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "operation",
+              "external_effect",
+              "side_effects_declared",
+              "reversibility",
+              "idempotency",
+              "data_sensitivity",
+              "required_authority"
+            ],
+            "properties": {
+              "operation": {
+                "enum": [
+                  "read",
+                  "search",
+                  "create",
+                  "update",
+                  "delete",
+                  "send",
+                  "publish",
+                  "execute",
+                  "permission_change",
+                  "financial_transaction"
+                ]
+              },
+              "external_effect": {"type": "boolean"},
+              "side_effects_declared": {"type": "boolean"},
+              "reversibility": {"enum": ["not_applicable", "reversible", "irreversible"]},
+              "idempotency": {
+                "enum": ["not_applicable", "idempotent", "idempotency_key", "required_confirmation"]
+              },
+              "data_sensitivity": {"enum": ["public", "internal", "confidential", "restricted"]},
+              "required_authority": {
+                "enum": [
+                  "read",
+                  "search",
+                  "execute",
+                  "edit",
+                  "github_write",
+                  "network",
+                  "credential",
+                  "permission",
+                  "merge",
+                  "deploy"
+                ]
+              }
+            }
+          },
+          "enforcement": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "scope_authorized",
+              "approval_mode",
+              "audit_logged",
+              "confirmation_required",
+              "enabled_by_default"
+            ],
+            "properties": {
+              "scope_authorized": {"type": "boolean"},
+              "approval_mode": {"enum": ["auto", "prompt", "deny"]},
+              "audit_logged": {"type": "boolean"},
+              "confirmation_required": {"type": "boolean"},
+              "enabled_by_default": {"type": "boolean"}
+            }
+          }
+        }
+      }
+    },
+    "controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "least_privilege_reviewed",
+        "user_consent_required",
+        "structured_results_validated",
+        "pii_redacted_logs",
+        "raw_prompt_logging",
+        "retention_documented",
+        "correlation_ids",
+        "persists_user_data",
+        "deletion_supported",
+        "egress_enforced",
+        "tool_inventory_verified"
+      ],
+      "properties": {
+        "least_privilege_reviewed": {"type": "boolean"},
+        "user_consent_required": {"type": "boolean"},
+        "structured_results_validated": {"type": "boolean"},
+        "pii_redacted_logs": {"type": "boolean"},
+        "raw_prompt_logging": {"type": "boolean"},
+        "retention_documented": {"type": "boolean"},
+        "correlation_ids": {"type": "boolean"},
+        "persists_user_data": {"type": "boolean"},
+        "deletion_supported": {"type": "boolean"},
+        "egress_enforced": {"type": "boolean"},
+        "tool_inventory_verified": {"type": "boolean"}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "manifest_sha256",
+        "discovery_snapshot_sha256",
+        "source_refs",
+        "test_cases",
+        "recorded_at",
+        "decision_ref"
+      ],
+      "properties": {
+        "manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "discovery_snapshot_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "source_refs": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {"type": "string", "format": "uri"}
+        },
+        "test_cases": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 3, "maxLength": 300}
+        },
+        "recorded_at": {"type": "string", "format": "date-time"},
+        "decision_ref": {"type": "string", "minLength": 3, "maxLength": 500}
+      }
+    },
+    "declared_gate": {"enum": ["ALLOW", "REVIEW", "HALT"]}
+  }
+}

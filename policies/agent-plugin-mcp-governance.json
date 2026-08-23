@@ -1,0 +1,58 @@
+{
+  "policy_id": "POL-AGENT-PLUGIN-MCP-GOV-1",
+  "version": "1.0.0",
+  "default_gate": "REVIEW",
+  "profile": {
+    "name": "agent-plugins-1.0-mcp-governance",
+    "status": "toolkit_defined",
+    "agent_plugins_profile": "toolkit-agent-plugins-1.0",
+    "agent_plugins_documentation_snapshot": "2026-08-23",
+    "mcp_protocol_version": "2026-07-28"
+  },
+  "required_manifest_path": ".codex-plugin/plugin.json",
+  "required_tool_annotations": [
+    "readOnlyHint",
+    "destructiveHint",
+    "openWorldHint"
+  ],
+  "prohibited_input_fields": [
+    "conversation_history",
+    "full_conversation",
+    "raw_chat_transcript",
+    "chat_transcript",
+    "message_history",
+    "access_token",
+    "refresh_token",
+    "api_key",
+    "password",
+    "secret"
+  ],
+  "prohibited_automated_operations": [
+    "permission_change",
+    "financial_transaction"
+  ],
+  "write_operations": [
+    "create",
+    "update",
+    "delete",
+    "send",
+    "publish"
+  ],
+  "destructive_operations": [
+    "delete",
+    "permission_change",
+    "financial_transaction"
+  ],
+  "operation_authority": {
+    "read": "read",
+    "search": "search",
+    "create": "edit",
+    "update": "edit",
+    "delete": "edit",
+    "send": "network",
+    "publish": "network",
+    "execute": "execute",
+    "permission_change": "permission",
+    "financial_transaction": "credential"
+  }
+}

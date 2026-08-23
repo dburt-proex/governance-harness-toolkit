@@ -6,6 +6,13 @@ ignorePaths:
   - "README.md"
 
 protectedPaths:
+  - ".agents/plugins/**"
+  - "plugins/**"
+  - ".codex-plugin/**"
+  - ".mcp.json"
+  - ".app.json"
+  - "hooks/**"
+  - "skills/**"
   - ".github/workflows/**"
   - ".github/agents/**"
   - "AGENTS.md"
