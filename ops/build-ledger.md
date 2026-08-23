@@ -13,6 +13,7 @@
   - Existing workflow-execution/input-trust and action-permission contracts
 - Change isolation:
   - Branch: `agent/agent-plugins-mcp-governance-1.0`
+  - Draft pull request: https://github.com/dburt-proex/governance-harness-toolkit/pull/17
   - Target repository only: `dburt-proex/governance-harness-toolkit`
 - Artifacts:
   - `governance/agent-plugins-mcp-compatibility.md`
@@ -43,7 +44,11 @@
   - Clean dependency install, JavaScript syntax checks, changed-JSON parsing, and `git diff --check`: PASS
   - Full local suite: 105/105 PASS
   - Machine-readable suite: 105/105 PASS with status `PASS`
-- Result: REVIEW pending exact-head GitHub CI, DiffWall evidence, human review, merge, and post-merge reconciliation.
+  - Exact-head GitHub Regression Suite: PASS (`https://github.com/dburt-proex/governance-harness-toolkit/actions/runs/32650919624`)
+  - Ecosystem-classification workflow: PASS (`https://github.com/dburt-proex/governance-harness-toolkit/actions/runs/32650919631`)
+  - DiffWall: HALT, risk 85/100 (`https://github.com/dburt-proex/governance-harness-toolkit/actions/runs/32650919642`)
+  - DiffWall reasons: protected/high-impact files, workflow change, 1,599-line effective diff, and its source-without-test-change signal
+- Result: HALT for promotion. The branch and draft PR retain the verified proposal, but no merge is eligible until DiffWall's deterministic HALT receives an explicit governed disposition.
 - Failure handling:
   - Initial `npm ci` attempted to use an unavailable root-owned cache path; the retry used a task-local cache without changing repository dependency state.
   - Baseline regression exposed mutable Action tags introduced by the ecosystem-classification workflow. The exact tag targets were resolved read-only and pinned before evaluating the new pack.
@@ -54,7 +59,7 @@
   - Semantic minimality of otherwise permitted input fields still requires purpose-specific human review.
   - MCP Tasks, Skills over MCP, MCP Apps, UI/CSP, public submission, and call-receipt emission are not modeled in profile 1.0.
   - Upstream documentation can change; a new snapshot or MCP version requires a reviewed profile revision.
-- Next action: publish the isolated branch, open a bounded pull request, close exact-head CI and DiffWall gates, record the human promotion decision, and only then consider merge or downstream adoption.
+- Next action: review DiffWall's protected-file, workflow, and diff-size findings; either revise the proposed boundary or record an explicit authorized override with rationale and evidence. Keep the PR draft and do not merge meanwhile.
 - Approval state: Human review required; `ALLOW` from the completed example grants no merge, publish, deployment, or tool-invocation authority.
 
 ## Run 011
