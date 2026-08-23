@@ -44,9 +44,9 @@
   - Clean dependency install, JavaScript syntax checks, changed-JSON parsing, and `git diff --check`: PASS
   - Full local suite: 105/105 PASS
   - Machine-readable suite: 105/105 PASS with status `PASS`
-  - Exact-head GitHub Regression Suite: PASS (`https://github.com/dburt-proex/governance-harness-toolkit/actions/runs/32650919624`)
-  - Ecosystem-classification workflow: PASS (`https://github.com/dburt-proex/governance-harness-toolkit/actions/runs/32650919631`)
-  - DiffWall: HALT, risk 85/100 (`https://github.com/dburt-proex/governance-harness-toolkit/actions/runs/32650919642`)
+  - Pack implementation head before this evidence-only ledger append — GitHub Regression Suite: PASS (`https://github.com/dburt-proex/governance-harness-toolkit/actions/runs/32650919624`)
+  - Pack implementation head before this evidence-only ledger append — ecosystem-classification workflow: PASS (`https://github.com/dburt-proex/governance-harness-toolkit/actions/runs/32650919631`)
+  - Pack implementation head before this evidence-only ledger append — DiffWall: HALT, risk 85/100 (`https://github.com/dburt-proex/governance-harness-toolkit/actions/runs/32650919642`)
   - DiffWall reasons: protected/high-impact files, workflow change, 1,599-line effective diff, and its source-without-test-change signal
 - Result: HALT for promotion. The branch and draft PR retain the verified proposal, but no merge is eligible until DiffWall's deterministic HALT receives an explicit governed disposition.
 - Failure handling:
