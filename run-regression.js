@@ -97,6 +97,7 @@ function runSchemaTests() {
     'schemas/intake-record.schema.json',
     'schemas/learning-review.schema.json',
     'schemas/output-evaluation.schema.json',
+    'schemas/skill-record.schema.json',
     'schemas/source-record.schema.json',
     'schemas/workflow-execution-trust.schema.json',
     'schemas/workflow-record.schema.json'
@@ -320,6 +321,54 @@ function runWorkflowRouteTests() {
   }
 }
 
+// Skill registry compatibility evaluator tests
+function runSkillCompatibilityTests() {
+  log('=== Skill Compatibility Evaluator Tests ===');
+
+  let evalSkillCompatibility;
+  try {
+    ({ evaluate: evalSkillCompatibility } = require('./evaluators/skill-compatibility.js'));
+  } catch (err) {
+    recordResult('skill-compatibility', 'evaluator-available', false, [err.message]);
+    return;
+  }
+
+  const fixtures = loadJson('fixtures/skill-record/regression-cases.json');
+  const workflow = loadJson(fixtures.workflow_example);
+  const canonicalRecords = loadJson(fixtures.registry_example);
+
+  for (const tc of fixtures.cases) {
+    let skillRecords = JSON.parse(JSON.stringify(canonicalRecords));
+    if (tc.exclude_skill_ids) {
+      skillRecords = skillRecords.filter((record) => !tc.exclude_skill_ids.includes(record.skill_id));
+    }
+    skillRecords = applyPatch(skillRecords, tc.operations || []);
+    if (tc.duplicate_skill_id) {
+      const duplicate = skillRecords.find((record) => record.skill_id === tc.duplicate_skill_id);
+      if (duplicate) skillRecords.push(JSON.parse(JSON.stringify(duplicate)));
+    }
+
+    const validations = skillRecords.map((record) => validateSchema(fixtures.schema, record));
+    const schemaValid = validations.every((result) => result.valid);
+    if (tc.expect_schema_valid === false) {
+      recordResult('skill-record', tc.case_id, !schemaValid, schemaValid ? ['schema unexpectedly accepted every record'] : null);
+      continue;
+    }
+    if (!schemaValid) {
+      recordResult('skill-compatibility', tc.case_id, false, validations.flatMap((result) => result.errors));
+      continue;
+    }
+
+    const result = evalSkillCompatibility(workflow, skillRecords);
+    const passed = result.computed_gate === tc.expect_computed_gate;
+    recordResult('skill-compatibility', tc.case_id, passed, passed ? null : {
+      expected: tc.expect_computed_gate,
+      got: result.computed_gate,
+      result
+    });
+  }
+}
+
 // Workflow execution and input trust tests
 function runWorkflowExecutionTrustTests() {
   log('=== Workflow Execution and Input Trust Tests ===');
@@ -508,6 +557,7 @@ function main() {
   runOutputEvaluationTests();
   runSourcePolicyTests();
   runWorkflowRouteTests();
+  runSkillCompatibilityTests();
   runWorkflowExecutionTrustTests();
   runSourceRecordTests();
   runIntakeRecordTests();

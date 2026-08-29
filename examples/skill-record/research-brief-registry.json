@@ -1,0 +1,56 @@
+[
+  {
+    "schema_version": "1.0.0",
+    "skill_record_id": "SKL-RESEARCH-BRIEF-001",
+    "skill_id": "research-brief",
+    "version": "1.0.0",
+    "title": "Research Brief",
+    "purpose": "Turn a scoped request into a governed, decision-ready research contract.",
+    "owner": {"name": "Drew Burt", "authority": "owner"},
+    "definition": {
+      "uri": "skill://flora-skills/root/.codex/skills/remote-skills/skill-6a524482639c8191a10d4f90f69bf3d2/SKILL.md",
+      "content_sha256": "da42659b22b39d1cfdb9eebb38ce9fe5432094378d3132b5a361dd0be761e121",
+      "verified_at": "2026-08-29T20:00:00Z"
+    },
+    "workflow_compatibility": [{"workflow_key": "research_brief", "workflow_version": "1.0.0"}],
+    "capability_requirements": {"external_writes": "prohibited", "sensitive_data": "none", "required_actions": ["read_public_sources"]},
+    "approval": {"status": "approved", "approver": "D.D. Burt", "approved_at": "2026-08-29T20:00:00Z"},
+    "lifecycle_status": "available"
+  },
+  {
+    "schema_version": "1.0.0",
+    "skill_record_id": "SKL-SOURCE-TRIAGE-001",
+    "skill_id": "source-triage",
+    "version": "1.0.0",
+    "title": "Source Triage",
+    "purpose": "Classify sources by authority, relevance, freshness, permissions, and evidentiary limits.",
+    "owner": {"name": "Drew Burt", "authority": "owner"},
+    "definition": {
+      "uri": "skill://flora-skills/root/.codex/skills/remote-skills/skill-6a52448ce3408191a990e927c859a656/SKILL.md",
+      "content_sha256": "c3baf080326d69d990d324cba496959430be2558dcd8f5cc49346d57513c6cfc",
+      "verified_at": "2026-08-29T20:00:00Z"
+    },
+    "workflow_compatibility": [{"workflow_key": "research_brief", "workflow_version": "1.0.0"}],
+    "capability_requirements": {"external_writes": "prohibited", "sensitive_data": "none", "required_actions": ["read_public_sources"]},
+    "approval": {"status": "approved", "approver": "D.D. Burt", "approved_at": "2026-08-29T20:00:00Z"},
+    "lifecycle_status": "available"
+  },
+  {
+    "schema_version": "1.0.0",
+    "skill_record_id": "SKL-EVALUATE-OUTPUT-001",
+    "skill_id": "evaluate-output",
+    "version": "1.0.0",
+    "title": "Evaluate Output",
+    "purpose": "Evaluate a workflow artifact against explicit requirements and route its release gate.",
+    "owner": {"name": "Drew Burt", "authority": "owner"},
+    "definition": {
+      "uri": "skill://flora-skills/root/.codex/skills/remote-skills/skill-6a5244bafa98819185a9045828a63452/SKILL.md",
+      "content_sha256": "95573ea4a51b27828faaf7eb52863f56ab97634f1c770fd9d3b4fed644a66c89",
+      "verified_at": "2026-08-29T20:00:00Z"
+    },
+    "workflow_compatibility": [{"workflow_key": "research_brief", "workflow_version": "1.0.0"}],
+    "capability_requirements": {"external_writes": "prohibited", "sensitive_data": "none", "required_actions": []},
+    "approval": {"status": "approved", "approver": "D.D. Burt", "approved_at": "2026-08-29T20:00:00Z"},
+    "lifecycle_status": "available"
+  }
+]

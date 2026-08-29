@@ -1,0 +1,62 @@
+{
+  "schema": "schemas/skill-record.schema.json",
+  "workflow_example": "examples/workflows/research-brief.json",
+  "registry_example": "examples/skill-record/research-brief-registry.json",
+  "cases": [
+    {
+      "case_id": "approved-compatible-research-workflow-allows",
+      "operations": [],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "ALLOW"
+    },
+    {
+      "case_id": "missing-required-skill-halts",
+      "exclude_skill_ids": ["source-triage"],
+      "operations": [],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT"
+    },
+    {
+      "case_id": "pending-skill-review",
+      "operations": [
+        {"op": "set", "path": "/0/lifecycle_status", "value": "proposed"},
+        {"op": "set", "path": "/0/approval/status", "value": "pending"},
+        {"op": "delete", "path": "/0/approval/approver"},
+        {"op": "delete", "path": "/0/approval/approved_at"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "REVIEW"
+    },
+    {
+      "case_id": "incompatible-workflow-version-halts",
+      "operations": [
+        {"op": "set", "path": "/0/workflow_compatibility/0/workflow_version", "value": "2.0.0"}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT"
+    },
+    {
+      "case_id": "capability-exceeds-workflow-halts",
+      "operations": [
+        {"op": "set", "path": "/0/capability_requirements/required_actions", "value": ["create_pull_request"]}
+      ],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT"
+    },
+    {
+      "case_id": "duplicate-active-skill-halts",
+      "duplicate_skill_id": "source-triage",
+      "operations": [],
+      "expect_schema_valid": true,
+      "expect_computed_gate": "HALT"
+    },
+    {
+      "case_id": "available-without-approval-is-schema-invalid",
+      "operations": [
+        {"op": "delete", "path": "/0/approval/approver"},
+        {"op": "delete", "path": "/0/approval/approved_at"}
+      ],
+      "expect_schema_valid": false
+    }
+  ]
+}
