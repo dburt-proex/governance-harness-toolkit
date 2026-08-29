@@ -1,5 +1,40 @@
 # Toolkit Build Ledger
 
+## Run 012
+
+- Date: 2026-08-29
+- Directive: `LD-2026-08-29-GHT-TK010-IMPLEMENT-001`
+- Scope: Implement TK-010 as the bounded governed Skill registry v1.0 contract: closed SkillRecord schema, pure compatibility evaluator, canonical research-workflow Skill records, deterministic fixtures, and regression-runner wiring only.
+- Evidence:
+  - Required base: `main` at `2c00cbe54a9bf70e43afaf8f996abfd8ee051332`
+  - Owner approval: D.D.Burt-Owner approval of `LD-2026-08-29-GHT-SKILL-REGISTRY-CONTRACT-001`
+  - Pre-change regression: `npm run test:ci` 83/83 PASS
+  - TDD proof: new evaluator-availability case failed as expected before implementation (83/84 passed; missing `evaluators/skill-compatibility.js`)
+  - Verified canonical definitions: `research-brief` `da42659b22b39d1cfdb9eebb38ce9fe5432094378d3132b5a361dd0be761e121`; `source-triage` `c3baf080326d69d990d324cba496959430be2558dcd8f5cc49346d57513c6cfc`; `evaluate-output` `95573ea4a51b27828faaf7eb52863f56ab97634f1c770fd9d3b4fed644a66c89`
+- Change isolation:
+  - Branch: `agent/tk-010-skill-registry-v1`
+  - Changed paths: `schemas/skill-record.schema.json`, `evaluators/skill-compatibility.js`, `examples/skill-record/research-brief-registry.json`, `fixtures/skill-record/regression-cases.json`, `run-regression.js`, `ops/build-ledger.md`
+  - No source, intake, decision, artifact, CI, Actions, DiffWall, connector, MCP, dependency, or permission contract was changed.
+- Controls implemented:
+  - Closed SkillRecord identity, version, owner, definition URI/hash, exact workflow compatibility, capability ceiling, approval, and lifecycle fields.
+  - `available` records require approved status, approver, and approval timestamp.
+  - Deterministic ALLOW, REVIEW, and HALT resolution of each required workflow Skill, including missing, invalid, incompatible, authority-exceeding, unavailable, and duplicate-active cases.
+  - Canonical approved v1 records for `research-brief`, `source-triage`, and `evaluate-output` against `research_brief@1.0.0`.
+- Verification:
+  - `npm ci --ignore-scripts`: PASS
+  - `npm run test:ci`: 91/91 PASS after implementation
+  - `node evaluators/skill-compatibility.js examples/workflows/research-brief.json examples/skill-record/research-brief-registry.json`: PASS / ALLOW
+  - JSON Schema compilation and approved/invalid fixture validation: PASS through the regression suite
+  - Final `git diff --check` and allowlist review: PASS; only the six authorized paths are staged
+- Result: REVIEW pending the draft-PR evidence gate. No merge, deploy, external execution, connector call, Skill installation, or permission change is authorized.
+- Confidence: High for deterministic local compatibility evaluation; medium for live registry persistence and authenticated approval/definition resolution.
+- Open risks:
+  - Canonical Skill definition URIs and approval identities are asserted records; this increment does not create a persistent or authenticated live registry.
+  - Exact-head GitHub CI and draft-PR evidence are not yet retained.
+  - The existing TK-011/TK-012 backlog-state discrepancy remains untouched because it is outside this directive.
+- Next action: publish this exact isolated branch, open a draft PR, retain exact-head CI and changed-path evidence, and stop for governed review. Merge requires separate explicit approval.
+- Approval state: Owner-authorized for isolated implementation only; promotion remains REVIEW.
+
 ## Run 011
 
 - Date: 2026-08-11

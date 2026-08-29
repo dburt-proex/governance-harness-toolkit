@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dburt-proex.github.io/governance-harness-toolkit/schemas/skill-record.schema.json",
+  "title": "Governed Skill Record",
+  "description": "Canonical record for a reusable Skill's identity, approval, compatibility, and authority requirements.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "skill_record_id",
+    "skill_id",
+    "version",
+    "title",
+    "purpose",
+    "owner",
+    "definition",
+    "workflow_compatibility",
+    "capability_requirements",
+    "approval",
+    "lifecycle_status"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "skill_record_id": {"type": "string", "pattern": "^SKL-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "skill_id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,63}$"},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "title": {"type": "string", "minLength": 3, "maxLength": 160},
+    "purpose": {"type": "string", "minLength": 20, "maxLength": 1000},
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "authority"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1, "maxLength": 160},
+        "authority": {"enum": ["owner", "delegate", "system"]}
+      }
+    },
+    "definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uri", "content_sha256", "verified_at"],
+      "properties": {
+        "uri": {"type": "string", "format": "uri"},
+        "content_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "verified_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "workflow_compatibility": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["workflow_key", "workflow_version"],
+        "properties": {
+          "workflow_key": {"type": "string", "pattern": "^[a-z][a-z0-9_]{1,63}$"},
+          "workflow_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"}
+        }
+      }
+    },
+    "capability_requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["external_writes", "sensitive_data", "required_actions"],
+      "properties": {
+        "external_writes": {"enum": ["prohibited", "review_required", "authorized"]},
+        "sensitive_data": {"enum": ["none", "internal", "confidential", "restricted"]},
+        "required_actions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]{1,63}$"}
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {"enum": ["pending", "approved", "rejected"]},
+        "approver": {"type": "string", "minLength": 1, "maxLength": 160},
+        "approved_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "lifecycle_status": {"enum": ["proposed", "available", "deprecated", "retired", "blocked"]}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"lifecycle_status": {"const": "available"}},
+        "required": ["lifecycle_status"]
+      },
+      "then": {
+        "properties": {
+          "approval": {
+            "required": ["status", "approver", "approved_at"],
+            "properties": {"status": {"const": "approved"}}
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "approval": {
+            "properties": {"status": {"const": "approved"}},
+            "required": ["status"]
+          }
+        },
+        "required": ["approval"]
+      },
+      "then": {
+        "properties": {
+          "approval": {"required": ["status", "approver", "approved_at"]}
+        }
+      }
+    }
+  ]
+}
