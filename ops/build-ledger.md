@@ -1,5 +1,29 @@
 # Toolkit Build Ledger
 
+## Run 013
+
+- Date: 2026-08-29
+- Receipt: `REC-2026-08-29-GHT-TK010-POSTMERGE-001`
+- Directive: `LD-2026-08-29-GHT-TK010-POSTMERGE-CLOSEOUT-001`
+- Scope: Record the immutable post-merge closeout for TK-010 only. No Skill, workflow, policy, CI, connector, permission, or dependency contract changes are included.
+- Immutable merge state:
+  - Pull request: #21 — https://github.com/dburt-proex/governance-harness-toolkit/pull/21
+  - Merged main commit: `e668c74772aff74f8aad522bdc71fc738c3b3f9f`
+  - PR head verified before merge: `10393afba647efecb927afe72dc66a77a0a4c44a`
+  - Changed paths: `schemas/skill-record.schema.json`, `evaluators/skill-compatibility.js`, `examples/skill-record/research-brief-registry.json`, `fixtures/skill-record/regression-cases.json`, `run-regression.js`, `ops/build-ledger.md`
+- Verification:
+  - Exact PR-head DiffWall PR Firewall, run 11: PASS
+  - Exact PR-head Regression Suite, run 27: PASS
+  - Fresh checkout of merged `main`: `npm run test:ci` 91/91 PASS
+- Evidence-gap disposition:
+  - The available GitHub status and PR-workflow interfaces did not expose an independent push-event CI record for merge commit `e668c74772aff74f8aad522bdc71fc738c3b3f9f`.
+  - This is an evidence-availability limitation, not a recorded CI failure.
+  - The passed exact-head checks and fresh merged-main regression are retained as the closeout proof.
+- Result: REVIEW — TK-010 is merged and functionally verified; authenticated live Skill-definition storage and independent merge-commit CI visibility remain future integration concerns.
+- Change isolation: This closeout modifies only `ops/build-ledger.md`.
+- Next action: Select the next bounded contract increment from verified `main`; do not reuse stale TK-011/TK-012 backlog assertions without fresh inspection.
+- Approval state: Human-approved closeout specification by D.D.Burt. Repository mutation requires a separate exact-base execution directive.
+
 ## Run 012
 
 - Date: 2026-08-29
