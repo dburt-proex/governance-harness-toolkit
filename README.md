@@ -1,5 +1,7 @@
 # governance-harness-toolkit
 
+**Portfolio evidence:** [Systems & proof](https://drew-burt-portfolio.daxxer-os.chatgpt.site/systems)
+
 ## Regression suite
 
 Install the pinned dependencies and run the complete deterministic regression suite:
