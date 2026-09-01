@@ -1,5 +1,33 @@
 # Toolkit Build Ledger
 
+## Run 016
+
+- Date: 2026-09-01
+- Receipt: `REC-2026-09-01-GHT-DIRECTIVE-SPINE-POSTMERGE-001`
+- Directive: `LD-2026-09-01-GHT-DIRECTIVE-SPINE-POSTMERGE-RECEIPT-001`
+- Scope: Record the immutable post-merge closeout for Directive Spine v0.1 only. No schema, fixture, evaluator, regression-runner, runtime executor, Skill installation, registry persistence, connector, policy, CI, permission, UI, autonomy, or workflow change is included.
+- Immutable merge state:
+  - Pull request: #25 — https://github.com/dburt-proex/governance-harness-toolkit/pull/25
+  - Verified PR head: `6ea77fec44eb7446fa9843439de96c8b36be7d8f`
+  - Merged main commit: `8f9b85ddd7a967d2cae7f83cb4a52992d2899f9e`
+  - Required base before merge: `811ba81235b1a4313cbffa3d5c4cc7a5df55b24a`
+  - Changed paths: `schemas/directive-spine.schema.json`, `fixtures/directive-spine/regression-cases.json`, `run-regression.js`, `ops/build-ledger.md`
+- Verification:
+  - Exact PR-head DiffWall PR Firewall, run `33564023010`, job `100042951478`: PASS.
+  - Exact PR-head Regression Suite, run `33564023041`, job `100042951419`: PASS.
+  - Push Regression Suite on merged main commit, run `33564145120`, job `100043332363`: PASS.
+  - Fresh isolated checkout of merged `main` at `8f9b85ddd7a967d2cae7f83cb4a52992d2899f9e`: `npm ci --ignore-scripts` followed by `npm run test:ci` passed 108/108.
+- Failure handling:
+  - A 91/91 result observed during receipt preparation came from the stale audit checkout at `773c12ea33fc2bf4885c3b9f50aa975d0d3c3e03`, not the merged receipt worktree. It was excluded from this receipt; the exact merged checkout was re-established and verified before recording this result.
+- Result: PASS — Directive Spine v0.1 is merged with exact-head DiffWall and regression evidence, independent post-merge regression evidence, and fresh deterministic verification of the merged commit.
+- Residual risks:
+  - Skill binding and receipt references remain structural; no authenticated live registry or receipt dereference is implemented.
+  - Temporal expiration comparison remains deferred to a future gate evaluator.
+  - This receipt creates no runtime execution authority.
+- Change isolation: This closeout modifies only `ops/build-ledger.md`.
+- Next action: Do not begin runtime implementation. Any Directive Spine evaluator, registry-resolution, or execution increment requires a separate directive, exact-base verification, and explicit scope.
+- Approval state: Owner-directed receipt-only closeout by Drew Burt; authority is limited to this ledger receipt.
+
 ## Run 015
 
 - Date: 2026-09-01
