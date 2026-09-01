@@ -1,5 +1,42 @@
 # Toolkit Build Ledger
 
+## Run 015
+
+- Date: 2026-09-01
+- Receipt: `REC-2026-09-01-GHT-DIRECTIVE-SPINE-CONTRACT-001`
+- Directive: `LD-2026-08-30-GHT-DIRECTIVE-SPINE-CONTRACT-001`
+- Scope: Define Directive Spine v0.1 as a closed contract/schema/fixture increment binding a Leverage Directive to governed Skill identity, bounded authority, evidence snapshots, expiration, a Governance Gate, and execution or rejection receipt references. No runtime executor, Skill installation, registry persistence, connector, policy, CI, permission, UI, or autonomy change is included.
+- Required base: `main` at `811ba81235b1a4313cbffa3d5c4cc7a5df55b24a`.
+- Change isolation:
+  - Branch: `agent/directive-spine-v01-20260901`
+  - Changed paths: `schemas/directive-spine.schema.json`, `fixtures/directive-spine/regression-cases.json`, `run-regression.js`, `ops/build-ledger.md`
+  - No existing schema, evaluator, Skill record, workflow record, policy, workflow, dependency, or permission contract was modified.
+- Controls implemented:
+  - Closed, versioned Directive Spine record with stable `directive_spine_id`, `correlation_id`, and optional `parent_record_id` lineage.
+  - Structural binding to a governed Skill Record identity, version, and definition hash without asserting live registry resolution.
+  - Explicit separation of directive proposal status, bounded authority, evidence snapshots, gate decision, and execution state.
+  - ALLOW requires approved authority and only authorizes or completes execution; REVIEW prohibits execution; HALT requires a blocked state and a typed rejection receipt reference.
+  - Completed execution requires a typed execution receipt reference; unknown durable fields are rejected.
+  - Allowed paths are canonical, literal repository-relative paths; wildcard and traversal forms are rejected.
+  - Each action has one explicit `authorized` or `prohibited` decision in `action_permissions`, preventing contradictory dual-list authority.
+  - Required approval cannot use the `not_required` status.
+- TDD and verification:
+  - RED: `npm run test:ci` failed because the new fixture path could not load the absent `schemas/directive-spine.schema.json` contract.
+  - GREEN: `npm run test:ci` passed 101/101 after the schema was added.
+  - RED: independent review added typed-receipt, path-boundary, and approval-coherence cases; `npm run test:ci` failed 5 cases before their constraints were added.
+  - GREEN: `npm run test:ci` passed 106/106 after those constraints were added; direct adversarial checks rejected cross-type receipts, wildcard/traversal paths, and contradictory approval state.
+  - RED: independent re-review exposed overlapping parallel action lists; `npm run test:ci` failed 2 cases before the authority model was made unambiguous.
+  - GREEN: `npm run test:ci` passed 108/108 after replacing the lists with `action_permissions`; the legacy dual-list form is rejected.
+  - Directive Spine fixtures cover valid ALLOW, REVIEW, HALT, completed-receipt, typed-receipt, path-boundary, approval-coherence, and unambiguous-action paths plus missing correlation, pending ALLOW authority, missing terminal receipt, and unknown-field rejection cases.
+  - `git diff --check` and changed-path allowlist review remain required before promotion.
+- Result: REVIEW pending exact-head DiffWall, pull-request regression evidence, independent review, merge, and post-merge verification.
+- Open risks:
+  - Skill binding is structural; authenticated live registry lookup and definition resolution are intentionally deferred.
+  - JSON Schema validates expiration presence and lifecycle state but does not compare current time to `expires_at`; a future gate evaluator must enforce temporal expiration.
+  - Receipt references are pointers only; no execution, receipt writer, or append-only runtime ledger is introduced.
+- Next action: Publish this isolated branch, retain exact-head DiffWall and regression evidence, conduct independent review, and stop for the governed merge gate.
+- Approval state: Owner authorized all needed human approvals for the current work session. Merge and post-merge proof remain tied to the exact PR head and provider state.
+
 ## Run 014
 
 - Date: 2026-09-01
