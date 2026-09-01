@@ -1,5 +1,28 @@
 # Toolkit Build Ledger
 
+## Run 014
+
+- Date: 2026-09-01
+- Receipt: `REC-2026-09-01-GHT-BACKLOG-RECONCILIATION-001`
+- Directive: `LD-2026-09-01-GHT-BACKLOG-RECONCILIATION-IMPLEMENT-001`
+- Scope: Reconcile stale backlog state for TK-010, TK-011, and TK-012 from current `main` evidence only. No schema, evaluator, fixture, CI, workflow, permission, connector, or product-contract change is included.
+- Required base: `main` at `773c12ea33fc2bf4885c3b9f50aa975d0d3c3e03`.
+- Verified merge state:
+
+  | Work item | PR | Verified merge commit | Submitted approval evidence | Disposition |
+  |---|---:|---|---|---|
+  | TK-012 | #12 | `a52ccd1ecd80b32239e5728c204451fad93db606` | MISSING: no submitted approval records returned | Merged state recorded; governed completion remains MISSING. |
+  | TK-011 | #13 | `ebaada08c709b34ef3b44c1bf8adce3bfdaeb04b` | REVIEW: two submitted approvals reference `9c1f3de6d30cb01be1687321ac0f22d9f6e4bf4a`, not final PR head `76754daac9a40e2686abe9fcbb01097319bed193` | Merged state recorded; exact-head promotion evidence remains REVIEW. |
+  | TK-010 | #21 | `e668c74772aff74f8aad522bdc71fc738c3b3f9f` | MISSING: no submitted approval records returned; Run 013 retains owner-approved closeout | Merged state recorded; independent merge-commit CI visibility remains REVIEW. |
+
+- Verification:
+  - The three verified merge commits are ancestors of the required base.
+  - Fresh checkout of required base passed `npm run test:ci`: 91/91 PASS before this documentation-only change.
+  - Changed paths are limited to `ops/backlog.md` and `ops/build-ledger.md`.
+- Result: PASS — canonical backlog merge state is reconciled without converting unresolved promotion or CI evidence into completion claims.
+- Next action: From the post-merge verified `main` baseline, define Directive Spine v0.1 as a separate contract/schema/fixture-only increment and stop at the fresh DiffWall gate.
+- Approval state: Owner authorized this isolated reconciliation and all required human approvals for the current work session. Draft-PR, merge, and post-merge proof must still be recorded against their exact change SHA.
+
 ## Run 013
 
 - Date: 2026-08-29
