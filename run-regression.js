@@ -94,6 +94,7 @@ function runSchemaTests() {
     'schemas/action-request.schema.json',
     'schemas/build-run.schema.json',
     'schemas/decision-record.schema.json',
+    'schemas/directive-spine.schema.json',
     'schemas/intake-record.schema.json',
     'schemas/learning-review.schema.json',
     'schemas/output-evaluation.schema.json',
@@ -517,6 +518,24 @@ function runSourceRecordTests() {
   }
 }
 
+// Directive Spine schema tests
+function runDirectiveSpineTests() {
+  log('=== Directive Spine Schema Tests ===');
+  const fixtures = loadJson('fixtures/directive-spine/regression-cases.json');
+
+  for (const tc of fixtures.cases) {
+    let record = JSON.parse(JSON.stringify(fixtures.base_record));
+    record = applyPatch(record, tc.operations || []);
+    const { valid, errors } = validateSchema(fixtures.schema, record);
+
+    if (tc.expect_schema_valid === false) {
+      recordResult('directive-spine', tc.case_id, !valid, valid ? ['schema unexpectedly accepted the record'] : null);
+    } else if (tc.expect_schema_valid === true) {
+      recordResult('directive-spine', tc.case_id, valid, valid ? null : errors);
+    }
+  }
+}
+
 // Intake record schema tests
 function runIntakeRecordTests() {
   log('=== Intake Record Schema Tests ===');
@@ -561,6 +580,7 @@ function main() {
   runWorkflowExecutionTrustTests();
   runSourceRecordTests();
   runIntakeRecordTests();
+  runDirectiveSpineTests();
 
   const output = {
     timestamp: new Date().toISOString(),

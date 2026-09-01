@@ -1,0 +1,76 @@
+{
+  "schema": "schemas/directive-spine.schema.json",
+  "base_record": {
+    "schema_version": "1.0.0",
+    "directive_spine_id": "DSP-GHT-2026-09-01-001",
+    "correlation_id": "COR-2026-09-01-GHT-DIRECTIVE-SPINE-001",
+    "parent_record_id": "LD-2026-08-30-GHT-DIRECTIVE-SPINE-CONTRACT-001",
+    "recorded_at": "2026-09-01T21:40:00Z",
+    "intent": {
+      "directive_id": "LD-2026-09-01-GHT-DIRECTIVE-SPINE-IMPLEMENT-001",
+      "proposal_status": "approved",
+      "selected_move": "Define the governed Directive Spine contract without authorizing runtime execution.",
+      "target": {
+        "project": "Governance Harness Toolkit",
+        "repository": "dburt-proex/governance-harness-toolkit",
+        "base_ref": "main@811ba81235b1a4313cbffa3d5c4cc7a5df55b24a"
+      },
+      "expires_at": "2026-09-08T00:00:00Z"
+    },
+    "skill_binding": {
+      "skill_record_id": "SKL-RESEARCH-BRIEF-001",
+      "skill_id": "research-brief",
+      "version": "1.0.0",
+      "definition_sha256": "da42659b22b39d1cfdb9eebb38ce9fe5432094378d3132b5a361dd0be761e121"
+    },
+    "authority": {
+      "approval_required": true,
+      "approval_status": "approved",
+      "approver": "D.D. Burt",
+      "approved_at": "2026-09-01T21:40:00Z",
+      "authority_evidence_ref": "REC-2026-09-01-GHT-OWNER-APPROVAL-001",
+      "scope": {
+        "allowed_paths": ["schemas/directive-spine.schema.json", "fixtures/directive-spine/regression-cases.json", "run-regression.js"],
+        "action_permissions": {"repository_edit": "authorized", "merge_pull_request": "prohibited", "deploy": "prohibited"},
+        "external_effects": "prohibited"
+      }
+    },
+    "evidence_snapshots": [
+      {
+        "evidence_snapshot_id": "EVS-GHT-2026-09-01-001",
+        "source_ref": "ops/build-ledger.md#run-014",
+        "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "observed_at": "2026-09-01T21:40:00Z",
+        "classification": "internal"
+      }
+    ],
+    "gate_decision": {
+      "gate_id": "GAT-GHT-2026-09-01-001",
+      "state": "ALLOW",
+      "decided_at": "2026-09-01T21:40:00Z",
+      "policy_version": "1.0.0",
+      "reason_codes": ["OWNER_APPROVED", "SCOPE_BOUNDED"]
+    },
+    "execution": {
+      "state": "authorized"
+    }
+  },
+  "cases": [
+    {"case_id": "approved-skill-bound-directive-allows", "operations": [], "expect_schema_valid": true},
+    {"case_id": "single-action-decisions-are-valid", "operations": [{"op": "set", "path": "/authority/scope/action_permissions", "value": {"repository_edit": "authorized", "merge_pull_request": "prohibited", "deploy": "prohibited"}}, {"op": "delete", "path": "/authority/scope/authorized_actions"}, {"op": "delete", "path": "/authority/scope/prohibited_actions"}], "expect_schema_valid": true},
+    {"case_id": "parallel-action-lists-are-invalid", "operations": [{"op": "set", "path": "/authority/scope/authorized_actions", "value": ["repository_edit", "deploy"]}, {"op": "set", "path": "/authority/scope/prohibited_actions", "value": ["merge_pull_request", "deploy"]}], "expect_schema_valid": false},
+    {"case_id": "review-keeps-execution-unauthorized", "operations": [{"op": "set", "path": "/intent/proposal_status", "value": "proposed"}, {"op": "set", "path": "/authority/approval_status", "value": "pending"}, {"op": "delete", "path": "/authority/approver"}, {"op": "delete", "path": "/authority/approved_at"}, {"op": "delete", "path": "/authority/authority_evidence_ref"}, {"op": "set", "path": "/gate_decision/state", "value": "REVIEW"}, {"op": "set", "path": "/execution/state", "value": "not_authorized"}], "expect_schema_valid": true},
+    {"case_id": "halt-with-rejection-receipt-is-valid", "operations": [{"op": "set", "path": "/intent/proposal_status", "value": "rejected"}, {"op": "set", "path": "/gate_decision/state", "value": "HALT"}, {"op": "set", "path": "/execution/state", "value": "blocked"}, {"op": "set", "path": "/execution/receipt_reference", "value": {"record_id": "REC-GHT-2026-09-01-REJECTION-001", "receipt_kind": "rejection", "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "recorded_at": "2026-09-01T21:41:00Z"}}], "expect_schema_valid": true},
+    {"case_id": "completed-with-receipt-is-valid", "operations": [{"op": "set", "path": "/execution/state", "value": "completed"}, {"op": "set", "path": "/execution/receipt_reference", "value": {"record_id": "REC-GHT-2026-09-01-EXECUTION-001", "receipt_kind": "execution", "content_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "recorded_at": "2026-09-01T21:41:00Z"}}], "expect_schema_valid": true},
+    {"case_id": "missing-correlation-id-is-invalid", "operations": [{"op": "delete", "path": "/correlation_id"}], "expect_schema_valid": false},
+    {"case_id": "allow-with-pending-authority-is-invalid", "operations": [{"op": "set", "path": "/authority/approval_status", "value": "pending"}, {"op": "delete", "path": "/authority/approver"}, {"op": "delete", "path": "/authority/approved_at"}, {"op": "delete", "path": "/authority/authority_evidence_ref"}], "expect_schema_valid": false},
+    {"case_id": "complete-without-receipt-is-invalid", "operations": [{"op": "set", "path": "/execution/state", "value": "completed"}], "expect_schema_valid": false},
+    {"case_id": "halt-without-rejection-receipt-is-invalid", "operations": [{"op": "set", "path": "/intent/proposal_status", "value": "rejected"}, {"op": "set", "path": "/gate_decision/state", "value": "HALT"}, {"op": "set", "path": "/execution/state", "value": "blocked"}], "expect_schema_valid": false},
+    {"case_id": "halt-with-execution-receipt-is-invalid", "operations": [{"op": "set", "path": "/intent/proposal_status", "value": "rejected"}, {"op": "set", "path": "/gate_decision/state", "value": "HALT"}, {"op": "set", "path": "/execution/state", "value": "blocked"}, {"op": "set", "path": "/execution/receipt_reference", "value": {"record_id": "REC-GHT-2026-09-01-EXECUTION-001", "receipt_kind": "execution", "content_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "recorded_at": "2026-09-01T21:42:00Z"}}], "expect_schema_valid": false},
+    {"case_id": "completed-with-rejection-receipt-is-invalid", "operations": [{"op": "set", "path": "/execution/state", "value": "completed"}, {"op": "set", "path": "/execution/receipt_reference", "value": {"record_id": "REC-GHT-2026-09-01-REJECTION-001", "receipt_kind": "rejection", "content_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "recorded_at": "2026-09-01T21:42:00Z"}}], "expect_schema_valid": false},
+    {"case_id": "wildcard-allowed-path-is-invalid", "operations": [{"op": "set", "path": "/authority/scope/allowed_paths", "value": ["**"]}], "expect_schema_valid": false},
+    {"case_id": "path-traversal-allowed-path-is-invalid", "operations": [{"op": "set", "path": "/authority/scope/allowed_paths", "value": ["schemas/../../.git/config"]}], "expect_schema_valid": false},
+    {"case_id": "approval-required-with-not-required-status-is-invalid", "operations": [{"op": "set", "path": "/intent/proposal_status", "value": "proposed"}, {"op": "set", "path": "/authority/approval_status", "value": "not_required"}, {"op": "delete", "path": "/authority/approver"}, {"op": "delete", "path": "/authority/approved_at"}, {"op": "delete", "path": "/authority/authority_evidence_ref"}, {"op": "set", "path": "/gate_decision/state", "value": "REVIEW"}, {"op": "set", "path": "/execution/state", "value": "not_authorized"}], "expect_schema_valid": false},
+    {"case_id": "unknown-durable-field-is-invalid", "operations": [{"op": "set", "path": "/unreviewed_autonomy", "value": true}], "expect_schema_valid": false}
+  ]
+}

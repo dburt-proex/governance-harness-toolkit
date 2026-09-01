@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dburt-proex.github.io/governance-harness-toolkit/schemas/directive-spine.schema.json",
+  "title": "Governed Directive Spine Record",
+  "description": "Closed contract binding a leverage directive to governed Skill identity, bounded authority, evidence snapshots, a gate decision, and an execution or rejection receipt reference.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "directive_spine_id",
+    "correlation_id",
+    "recorded_at",
+    "intent",
+    "skill_binding",
+    "authority",
+    "evidence_snapshots",
+    "gate_decision",
+    "execution"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "directive_spine_id": {"type": "string", "pattern": "^DSP-[A-Z0-9][A-Z0-9._-]{2,127}$"},
+    "correlation_id": {"type": "string", "pattern": "^COR-[A-Z0-9][A-Z0-9._-]{2,127}$"},
+    "parent_record_id": {"type": "string", "pattern": "^[A-Z][A-Z0-9]{1,15}-[A-Z0-9][A-Z0-9._-]{2,127}$"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "intent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["directive_id", "proposal_status", "selected_move", "target", "expires_at"],
+      "properties": {
+        "directive_id": {"type": "string", "pattern": "^LD-[0-9]{4}-[0-9]{2}-[0-9]{2}-[A-Z0-9][A-Z0-9._-]{2,127}$"},
+        "proposal_status": {"enum": ["proposed", "approved", "rejected", "expired", "superseded"]},
+        "selected_move": {"type": "string", "minLength": 20, "maxLength": 2000},
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["project", "repository", "base_ref"],
+          "properties": {
+            "project": {"type": "string", "minLength": 3, "maxLength": 160},
+            "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+            "base_ref": {"type": "string", "minLength": 8, "maxLength": 256}
+          }
+        },
+        "expires_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "skill_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill_record_id", "skill_id", "version", "definition_sha256"],
+      "properties": {
+        "skill_record_id": {"type": "string", "pattern": "^SKL-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+        "skill_id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,63}$"},
+        "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "definition_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["approval_required", "approval_status", "scope"],
+      "properties": {
+        "approval_required": {"type": "boolean"},
+        "approval_status": {"enum": ["not_required", "pending", "approved", "rejected"]},
+        "approver": {"type": "string", "minLength": 1, "maxLength": 160},
+        "approved_at": {"type": "string", "format": "date-time"},
+        "authority_evidence_ref": {"type": "string", "minLength": 3, "maxLength": 256},
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["allowed_paths", "action_permissions", "external_effects"],
+          "properties": {
+            "allowed_paths": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^(?!.*[*?\\[\\]{}])[A-Za-z0-9][A-Za-z0-9._-]*(?:/[A-Za-z0-9][A-Za-z0-9._-]*)*$"}},
+            "action_permissions": {"type": "object", "minProperties": 1, "propertyNames": {"pattern": "^[a-z][a-z0-9_]{1,63}$"}, "additionalProperties": {"enum": ["authorized", "prohibited"]}},
+            "external_effects": {"enum": ["prohibited", "review_required", "authorized"]}
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"approval_required": {"const": false}}, "required": ["approval_required"]},
+          "then": {"properties": {"approval_status": {"const": "not_required"}}, "required": ["approval_status"]}
+        },
+        {
+          "if": {"properties": {"approval_required": {"const": true}}, "required": ["approval_required"]},
+          "then": {"properties": {"approval_status": {"enum": ["pending", "approved", "rejected"]}}, "required": ["approval_status"]}
+        },
+        {
+          "if": {"properties": {"approval_status": {"const": "approved"}}, "required": ["approval_status"]},
+          "then": {"required": ["approver", "approved_at", "authority_evidence_ref"]}
+        }
+      ]
+    },
+    "evidence_snapshots": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["evidence_snapshot_id", "source_ref", "content_sha256", "observed_at", "classification"],
+        "properties": {
+          "evidence_snapshot_id": {"type": "string", "pattern": "^EVS-[A-Z0-9][A-Z0-9._-]{2,127}$"},
+          "source_ref": {"type": "string", "minLength": 3, "maxLength": 512},
+          "content_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "observed_at": {"type": "string", "format": "date-time"},
+          "classification": {"enum": ["primary", "internal", "contextual"]}
+        }
+      }
+    },
+    "gate_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gate_id", "state", "decided_at", "policy_version", "reason_codes"],
+      "properties": {
+        "gate_id": {"type": "string", "pattern": "^GAT-[A-Z0-9][A-Z0-9._-]{2,127}$"},
+        "state": {"enum": ["ALLOW", "REVIEW", "HALT"]},
+        "decided_at": {"type": "string", "format": "date-time"},
+        "policy_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$"}}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state"],
+      "properties": {
+        "state": {"enum": ["not_authorized", "authorized", "completed", "blocked"]},
+        "receipt_reference": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["record_id", "receipt_kind", "content_sha256", "recorded_at"],
+          "properties": {
+            "record_id": {"type": "string", "pattern": "^REC-[A-Z0-9][A-Z0-9._-]{2,127}$"},
+            "receipt_kind": {"enum": ["execution", "rejection"]},
+            "content_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+            "recorded_at": {"type": "string", "format": "date-time"}
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"gate_decision": {"properties": {"state": {"const": "ALLOW"}}, "required": ["state"]}}, "required": ["gate_decision"]},
+      "then": {
+        "properties": {
+          "intent": {"properties": {"proposal_status": {"const": "approved"}}, "required": ["proposal_status"]},
+          "authority": {"properties": {"approval_status": {"const": "approved"}}, "required": ["approval_status"]},
+          "execution": {"properties": {"state": {"enum": ["authorized", "completed"]}}, "required": ["state"]}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"gate_decision": {"properties": {"state": {"const": "REVIEW"}}, "required": ["state"]}}, "required": ["gate_decision"]},
+      "then": {"properties": {"execution": {"properties": {"state": {"const": "not_authorized"}}, "required": ["state"]}}}
+    },
+    {
+      "if": {"properties": {"gate_decision": {"properties": {"state": {"const": "HALT"}}, "required": ["state"]}}, "required": ["gate_decision"]},
+      "then": {
+        "properties": {
+          "intent": {"properties": {"proposal_status": {"enum": ["rejected", "expired", "superseded"]}}, "required": ["proposal_status"]},
+          "execution": {"properties": {"state": {"const": "blocked"}, "receipt_reference": {"properties": {"receipt_kind": {"const": "rejection"}}, "required": ["receipt_kind"]}}, "required": ["state", "receipt_reference"]}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"execution": {"properties": {"state": {"const": "completed"}}, "required": ["state"]}}, "required": ["execution"]},
+      "then": {"properties": {"execution": {"properties": {"receipt_reference": {"properties": {"receipt_kind": {"const": "execution"}}, "required": ["receipt_kind"]}}, "required": ["receipt_reference"]}}}
+    }
+  ]
+}
