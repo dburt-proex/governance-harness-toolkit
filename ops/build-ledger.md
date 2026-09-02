@@ -466,7 +466,7 @@
   - The evaluator expects JSON Schema validation before coherence evaluation
   - Human identity and approval assertions are not authenticated
 - Next action: TK-009, define the governed workflow registry; TK-008 requires human review before merge
-- Approval state: Human review required to promote executable build-run contract to main
+- Approval state: Human review required to promote the executable build-run contract to main
 
 ## Run 007
 
@@ -668,7 +668,7 @@
   - Score and confidence inputs are supplied rather than independently calibrated
   - Example content hash is a synthetic test value
 - Next action: TK-005, define the action and connector permission matrix; TK-004 requires human review before merge
-- Approval state: Human review required to promote executable release gate to main
+- Approval state: Human review required to promote the executable release gate to main
 
 ## Run 003
 
@@ -716,7 +716,7 @@
   - Evidence source IDs are not yet resolved against the source registry at runtime
   - Approver identity is asserted, not authenticated
 - Next action: TK-004 may proceed independently; TK-003 requires human review before merge
-- Approval state: Human review required to promote executable evaluator to main
+- Approval state: Human review required to promote the executable evaluator to main
 
 ## Run 002
 
