@@ -1,5 +1,37 @@
 # Toolkit Build Ledger
 
+## Run 018
+
+- Date: 2026-09-02
+- Receipt: `REC-2026-09-02-GHT-DIRECTIVE-SPINE-BINDING-POSTMERGE-001`
+- Directive: `LD-2026-09-02-GHT-DIRECTIVE-SPINE-BINDING-POSTMERGE-RECEIPT-001`
+- Scope: Record the immutable post-merge closeout for Directive Spine Binding Evaluator PR #27 only. No evaluator, schema, fixture, regression-runner, runtime executor, Skill installation, live registry, persistence, connector, policy, CI, permission, UI, automation, or execution behavior is changed.
+- Immutable merge state:
+  - Pull request: #27 — https://github.com/dburt-proex/governance-harness-toolkit/pull/27
+  - Verified PR head: `356420ef3f2ed60c43523d2fca0055373d2fdadb`
+  - Merged main commit: `7470dfa5270e4b7d5a074d1469db2b5f19d482a9`
+  - Required base before merge: `df075aa42da06b6f34ea2af3f736d7095b246564`
+  - Changed paths: `evaluators/directive-spine-binding.js`, `fixtures/directive-spine/binding-regression-cases.json`, `run-regression.js`, `ops/build-ledger.md`
+- Verification:
+  - Exact PR-head Regression Suite, run `33586504444`, job `100111655874`: PASS.
+  - Exact PR-head DiffWall PR Firewall, run `33586504548`, job `100111659047`: PASS.
+  - Fresh isolated checkout of merged `main` at `7470dfa5270e4b7d5a074d1469db2b5f19d482a9`: `npm ci --ignore-scripts` followed by `npm run test:ci` passed 118/118.
+  - Fresh receipt-worktree baseline at the same commit: `npm ci --ignore-scripts` followed by `npm run test:ci` passed 118/118.
+  - Active-browser inspection of PR #27 confirmed the merged state, four commits, two passed checks, the exact merge SHA, and the retained post-merge verification comment.
+  - Provider combined-status data for the merge commit is empty; this is an evidence-availability limitation, not a recorded CI failure.
+- Review disposition:
+  - Automated review on exact head `356420ef3f2ed60c43523d2fca0055373d2fdadb` recorded one unresolved, non-outdated P2 thread in `evaluators/directive-spine-binding.js` lines 82-84.
+  - The finding is that a schema-valid `proposed` or `deprecated` SkillRecord with `approval.status: rejected` is routed to REVIEW instead of HALT.
+  - This receipt does not repair or suppress that finding because the authorized closeout is receipt-only.
+- Result: REVIEW — PR #27 is merged with exact-head DiffWall and regression proof plus fresh post-merge regression verification; the unresolved rejected-approval routing defect remains a separate bounded repair obligation.
+- Residual risks:
+  - Rejected approval can be softened to REVIEW for the reviewable lifecycle states identified above until a separate binding-evaluator repair is authorized and verified.
+  - Registry records remain in-memory inputs; no authenticated live registry or definition dereference is performed.
+  - Binding evidence creates no execution authority.
+- Change isolation: This closeout modifies only `ops/build-ledger.md`.
+- Next action: Build the separately authorized pure Directive Gate Evaluator from the exact post-receipt `main` baseline. Do not introduce execution behavior. Schedule the binding-evaluator P2 repair as its own isolated increment rather than commingling it with the gate evaluator.
+- Approval state: Owner-directed receipt-only closeout by D.D. Burt; authority is limited to this immutable ledger entry.
+
 ## Run 017
 
 - Date: 2026-09-02
