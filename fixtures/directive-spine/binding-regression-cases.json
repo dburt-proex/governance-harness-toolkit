@@ -1,0 +1,72 @@
+{
+  "directive_fixture": "fixtures/directive-spine/regression-cases.json",
+  "registry_example": "examples/skill-record/research-brief-registry.json",
+  "cases": [
+    {
+      "case_id": "exact-approved-binding-allows",
+      "expect_binding_gate": "ALLOW"
+    },
+    {
+      "case_id": "missing-bound-skill-record-halts",
+      "exclude_skill_record_ids": ["SKL-RESEARCH-BRIEF-001"],
+      "expect_binding_gate": "HALT"
+    },
+    {
+      "case_id": "duplicate-bound-skill-record-halts",
+      "duplicate_skill_record_id": "SKL-RESEARCH-BRIEF-001",
+      "expect_binding_gate": "HALT"
+    },
+    {
+      "case_id": "substituted-skill-id-halts",
+      "registry_operations": [
+        {"op": "set", "path": "/0/skill_id", "value": "source-triage"}
+      ],
+      "expect_binding_gate": "HALT"
+    },
+    {
+      "case_id": "substituted-version-halts",
+      "registry_operations": [
+        {"op": "set", "path": "/0/version", "value": "1.0.1"}
+      ],
+      "expect_binding_gate": "HALT"
+    },
+    {
+      "case_id": "substituted-definition-hash-halts",
+      "registry_operations": [
+        {"op": "set", "path": "/0/definition/content_sha256", "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
+      ],
+      "expect_binding_gate": "HALT"
+    },
+    {
+      "case_id": "pending-proposed-bound-skill-reviews",
+      "registry_operations": [
+        {"op": "set", "path": "/0/lifecycle_status", "value": "proposed"},
+        {"op": "set", "path": "/0/approval/status", "value": "pending"},
+        {"op": "delete", "path": "/0/approval/approver"},
+        {"op": "delete", "path": "/0/approval/approved_at"}
+      ],
+      "expect_binding_gate": "REVIEW"
+    },
+    {
+      "case_id": "blocked-bound-skill-halts",
+      "registry_operations": [
+        {"op": "set", "path": "/0/lifecycle_status", "value": "blocked"}
+      ],
+      "expect_binding_gate": "HALT"
+    },
+    {
+      "case_id": "malformed-bound-skill-record-halts",
+      "registry_operations": [
+        {"op": "delete", "path": "/0/definition/content_sha256"}
+      ],
+      "expect_binding_gate": "HALT"
+    },
+    {
+      "case_id": "malformed-directive-spine-halts",
+      "directive_operations": [
+        {"op": "set", "path": "/unreviewed_autonomy", "value": true}
+      ],
+      "expect_binding_gate": "HALT"
+    }
+  ]
+}

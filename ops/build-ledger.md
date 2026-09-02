@@ -1,5 +1,35 @@
 # Toolkit Build Ledger
 
+## Run 017
+
+- Date: 2026-09-02
+- Receipt: `REC-2026-09-02-GHT-DIRECTIVE-SPINE-BINDING-001`
+- Directive: `LD-2026-09-02-GHT-DIRECTIVE-SPINE-BINDING-EVALUATOR-001`
+- Scope: Add one pure Directive Spine Binding Evaluator, deterministic positive and adversarial fixtures, regression-runner wiring, and this ledger receipt. No live registry lookup, Skill installation, executor, connector, persistence, external write, schema expansion, UI, automation, policy, or permission change is included.
+- Required base: `main` at `df075aa42da06b6f34ea2af3f736d7095b246564`.
+- Change isolation:
+  - Branch: `agent/directive-spine-binding-20260902`
+  - Changed paths: `evaluators/directive-spine-binding.js`, `fixtures/directive-spine/binding-regression-cases.json`, `run-regression.js`, `ops/build-ledger.md`
+  - No governed schema, SkillRecord, WorkflowRecord, registry data, runtime executor, workflow, connector, dependency, or permission contract was modified.
+- Controls implemented:
+  - Validates the closed Directive Spine record and every supplied Skill Registry record before resolution.
+  - Resolves only one exact `skill_record_id` and compares the bound `skill_id`, version, and definition SHA-256.
+  - Returns an independent `binding_gate` without mutating or promoting the Directive Spine's declared `gate_decision`.
+  - Emits ALLOW only for an exact, available, approved binding; REVIEW for exact proposed or deprecated records; HALT for missing, duplicate, malformed, substituted, retired, or blocked records.
+- TDD and verification:
+  - Baseline: `npm ci --ignore-scripts` followed by `npm run test:ci` passed 108/108.
+  - RED: `npm run test:ci` failed 108/109 because `evaluators/directive-spine-binding.js` was absent.
+  - GREEN: `npm run test:ci` passed 118/118 after the evaluator was added.
+  - Direct exact-binding evaluation returned `binding_gate: ALLOW`, `binding_verdict: PASS`, and `resolved_skill_record_id: SKL-RESEARCH-BRIEF-001`.
+  - Fixtures cover exact approved ALLOW; pending proposed REVIEW; missing, duplicate, skill-ID substitution, version substitution, hash substitution, blocked, malformed-registry, and malformed-Directive Spine HALT paths.
+  - `git diff --check`: PASS.
+- Result: REVIEW pending frozen-diff inspection, exact-head pull-request DiffWall and regression evidence, review, merge, and post-merge verification.
+- Residual risks:
+  - Registry records are supplied in memory; no authenticated live registry or definition dereference is performed.
+  - Binding resolution is evidence only and creates no execution authority.
+- Next action: Publish only this exact isolated increment, retain exact-head CI evidence, and stop at the governed promotion gate.
+- Approval state: Owner approval recorded from D.D. Burt for this bounded increment; no runtime implementation is authorized.
+
 ## Run 016
 
 - Date: 2026-09-01
