@@ -1,0 +1,183 @@
+{
+  "directive_fixture": "fixtures/directive-spine/regression-cases.json",
+  "base_as_of": "2026-09-02T12:00:00Z",
+  "cases": [
+    {
+      "case_id": "internal-contemporaneous-evidence-allows",
+      "expect_computed_gate": "ALLOW",
+      "expect_record_verdict": "PASS"
+    },
+    {
+      "case_id": "primary-contemporaneous-evidence-allows",
+      "directive_operations": [
+        {"op": "set", "path": "/evidence_snapshots/0/classification", "value": "primary"}
+      ],
+      "expect_computed_gate": "ALLOW",
+      "expect_record_verdict": "PASS"
+    },
+    {
+      "case_id": "expiration-is-inclusive-at-deadline",
+      "as_of": "2026-09-08T00:00:00Z",
+      "expect_computed_gate": "HALT",
+      "expect_record_verdict": "FAIL",
+      "expect_finding_code": "DIRECTIVE_EXPIRED"
+    },
+    {
+      "case_id": "offset-equivalent-expiration-is-inclusive",
+      "as_of": "2026-09-07T20:00:00-04:00",
+      "expect_computed_gate": "HALT",
+      "expect_record_verdict": "FAIL",
+      "expect_finding_code": "DIRECTIVE_EXPIRED"
+    },
+    {
+      "case_id": "coherent-expired-record-halts",
+      "as_of": "2026-09-08T00:00:00Z",
+      "directive_operations": [
+        {"op": "set", "path": "/intent/proposal_status", "value": "expired"},
+        {"op": "set", "path": "/gate_decision/state", "value": "HALT"},
+        {"op": "set", "path": "/execution/state", "value": "blocked"},
+        {"op": "set", "path": "/execution/receipt_reference", "value": {"record_id": "REC-GHT-2026-09-02-GATE-EXPIRED-001", "receipt_kind": "rejection", "content_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "recorded_at": "2026-09-08T00:00:00Z"}}
+      ],
+      "expect_computed_gate": "HALT",
+      "expect_record_verdict": "PASS",
+      "expect_finding_code": "DIRECTIVE_EXPIRED"
+    },
+    {
+      "case_id": "pending-authority-reviews",
+      "directive_operations": [
+        {"op": "set", "path": "/intent/proposal_status", "value": "proposed"},
+        {"op": "set", "path": "/authority/approval_status", "value": "pending"},
+        {"op": "delete", "path": "/authority/approver"},
+        {"op": "delete", "path": "/authority/approved_at"},
+        {"op": "delete", "path": "/authority/authority_evidence_ref"},
+        {"op": "set", "path": "/gate_decision/state", "value": "REVIEW"},
+        {"op": "set", "path": "/execution/state", "value": "not_authorized"}
+      ],
+      "expect_computed_gate": "REVIEW",
+      "expect_record_verdict": "PASS",
+      "expect_finding_code": "APPROVAL_PENDING"
+    },
+    {
+      "case_id": "rejected-authority-cannot-declare-review",
+      "directive_operations": [
+        {"op": "set", "path": "/intent/proposal_status", "value": "proposed"},
+        {"op": "set", "path": "/authority/approval_status", "value": "rejected"},
+        {"op": "set", "path": "/gate_decision/state", "value": "REVIEW"},
+        {"op": "set", "path": "/execution/state", "value": "not_authorized"}
+      ],
+      "expect_computed_gate": "HALT",
+      "expect_record_verdict": "FAIL",
+      "expect_finding_code": "APPROVAL_REJECTED"
+    },
+    {
+      "case_id": "superseded-intent-cannot-declare-review",
+      "directive_operations": [
+        {"op": "set", "path": "/intent/proposal_status", "value": "superseded"},
+        {"op": "set", "path": "/gate_decision/state", "value": "REVIEW"},
+        {"op": "set", "path": "/execution/state", "value": "not_authorized"}
+      ],
+      "expect_computed_gate": "HALT",
+      "expect_record_verdict": "FAIL",
+      "expect_finding_code": "PROPOSAL_TERMINAL"
+    },
+    {
+      "case_id": "contextual-only-evidence-reviews",
+      "directive_operations": [
+        {"op": "set", "path": "/evidence_snapshots/0/classification", "value": "contextual"},
+        {"op": "set", "path": "/gate_decision/state", "value": "REVIEW"},
+        {"op": "set", "path": "/execution/state", "value": "not_authorized"}
+      ],
+      "expect_computed_gate": "REVIEW",
+      "expect_record_verdict": "PASS",
+      "expect_finding_code": "CONTEXTUAL_ONLY_EVIDENCE"
+    },
+    {
+      "case_id": "evidence-observed-after-decision-halts",
+      "directive_operations": [
+        {"op": "set", "path": "/evidence_snapshots/0/observed_at", "value": "2026-09-01T21:40:01Z"}
+      ],
+      "expect_computed_gate": "HALT",
+      "expect_record_verdict": "FAIL",
+      "expect_finding_code": "NO_CONTEMPORANEOUS_EVIDENCE"
+    },
+    {
+      "case_id": "duplicate-evidence-identities-halt",
+      "duplicate_evidence_snapshot": true,
+      "expect_computed_gate": "HALT",
+      "expect_record_verdict": "FAIL",
+      "expect_finding_code": "DUPLICATE_EVIDENCE_ID"
+    },
+    {
+      "case_id": "approval-after-gate-decision-halts",
+      "directive_operations": [
+        {"op": "set", "path": "/authority/approved_at", "value": "2026-09-01T21:40:01Z"}
+      ],
+      "expect_computed_gate": "HALT",
+      "expect_record_verdict": "FAIL",
+      "expect_finding_code": "APPROVAL_AFTER_DECISION"
+    },
+    {
+      "case_id": "pending-approval-cannot-carry-approved-metadata",
+      "directive_operations": [
+        {"op": "set", "path": "/intent/proposal_status", "value": "proposed"},
+        {"op": "set", "path": "/authority/approval_status", "value": "pending"},
+        {"op": "set", "path": "/gate_decision/state", "value": "REVIEW"},
+        {"op": "set", "path": "/execution/state", "value": "not_authorized"}
+      ],
+      "expect_computed_gate": "HALT",
+      "expect_record_verdict": "FAIL",
+      "expect_finding_code": "APPROVAL_METADATA_CONFLICT"
+    },
+    {
+      "case_id": "overdeclared-review-is-a-record-failure",
+      "directive_operations": [
+        {"op": "set", "path": "/gate_decision/state", "value": "REVIEW"},
+        {"op": "set", "path": "/execution/state", "value": "not_authorized"}
+      ],
+      "expect_computed_gate": "ALLOW",
+      "expect_record_verdict": "FAIL",
+      "expect_finding_code": "DECLARED_GATE_MISMATCH"
+    },
+    {
+      "case_id": "not-required-authority-exposes-schema-gate-conflict",
+      "directive_operations": [
+        {"op": "set", "path": "/authority/approval_required", "value": false},
+        {"op": "set", "path": "/authority/approval_status", "value": "not_required"},
+        {"op": "delete", "path": "/authority/approver"},
+        {"op": "delete", "path": "/authority/approved_at"},
+        {"op": "delete", "path": "/authority/authority_evidence_ref"},
+        {"op": "set", "path": "/gate_decision/state", "value": "REVIEW"},
+        {"op": "set", "path": "/execution/state", "value": "not_authorized"}
+      ],
+      "expect_computed_gate": "ALLOW",
+      "expect_record_verdict": "FAIL",
+      "expect_finding_code": "DECLARED_GATE_MISMATCH"
+    },
+    {
+      "case_id": "future-declared-gate-decision-halts",
+      "as_of": "2026-09-02T12:00:00Z",
+      "directive_operations": [
+        {"op": "set", "path": "/gate_decision/decided_at", "value": "2026-09-03T00:00:00Z"}
+      ],
+      "expect_computed_gate": "HALT",
+      "expect_record_verdict": "FAIL",
+      "expect_finding_code": "DECISION_AFTER_AS_OF"
+    },
+    {
+      "case_id": "invalid-evaluation-time-halts",
+      "as_of": "not-a-date",
+      "expect_computed_gate": "HALT",
+      "expect_record_verdict": "FAIL",
+      "expect_finding_code": "INVALID_AS_OF"
+    },
+    {
+      "case_id": "malformed-directive-spine-halts",
+      "directive_operations": [
+        {"op": "set", "path": "/unreviewed_autonomy", "value": true}
+      ],
+      "expect_computed_gate": "HALT",
+      "expect_record_verdict": "FAIL",
+      "expect_finding_code": "DIRECTIVE_MALFORMED"
+    }
+  ]
+}
