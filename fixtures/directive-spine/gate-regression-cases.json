@@ -30,6 +30,23 @@
       "expect_finding_code": "DIRECTIVE_EXPIRED"
     },
     {
+      "case_id": "leap-second-expiration-is-inclusive",
+      "as_of": "2026-09-07T23:59:60Z",
+      "expect_computed_gate": "HALT",
+      "expect_record_verdict": "FAIL",
+      "expect_finding_code": "DIRECTIVE_EXPIRED"
+    },
+    {
+      "case_id": "leap-second-approval-and-evidence-equality-allows",
+      "directive_operations": [
+        {"op": "set", "path": "/authority/approved_at", "value": "2026-09-01T23:59:60Z"},
+        {"op": "set", "path": "/evidence_snapshots/0/observed_at", "value": "2026-09-01T23:59:60Z"},
+        {"op": "set", "path": "/gate_decision/decided_at", "value": "2026-09-02T00:00:00Z"}
+      ],
+      "expect_computed_gate": "ALLOW",
+      "expect_record_verdict": "PASS"
+    },
+    {
       "case_id": "coherent-expired-record-halts",
       "as_of": "2026-09-08T00:00:00Z",
       "directive_operations": [
