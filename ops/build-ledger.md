@@ -1,5 +1,43 @@
 # Toolkit Build Ledger
 
+## Run 019
+
+- Date: 2026-09-02
+- Receipt: `REC-2026-09-02-GHT-DIRECTIVE-GATE-EVALUATOR-001`
+- Directive: `LD-2026-09-02-GHT-DIRECTIVE-GATE-EVALUATOR-001`
+- Scope: Add one pure Directive Gate Evaluator, deterministic positive and adversarial fixtures, regression-runner wiring, and this ledger receipt. No execution request, executor, receipt writer, live registry, reference dereference, filesystem access, network access, persistence, connector, schema expansion, policy, CI, permission, UI, or automation change is included.
+- Required base: `main` at `d1aa08a7b98e2e21bbdabae919fd4fb59b6eb6aa`.
+- Change isolation:
+  - Branch: `agent/directive-gate-evaluator-20260902`
+  - Changed paths: `evaluators/directive-gate.js`, `fixtures/directive-spine/gate-regression-cases.json`, `run-regression.js`, `ops/build-ledger.md`
+  - No governed schema, binding evaluator, SkillRecord, WorkflowRecord, registry data, runtime executor, workflow, connector, dependency, or permission contract was modified.
+- Controls implemented:
+  - Validates the closed Directive Spine before evaluation and requires an explicit RFC 3339 `asOf` value; no ambient clock is read.
+  - Computes ALLOW, REVIEW, or HALT independently from inclusive expiration, intent and authority state, authority metadata timing, evidence identity/classification/timing, and deterministic severity precedence.
+  - Treats equality at `expires_at` as expired, terminal intent or rejected authority as HALT, pending authority as REVIEW, and approval after the declared decision or evaluation time as HALT.
+  - Requires at least one primary or internal evidence snapshot observed on or before the declared decision and evaluation time; contextual-only evidence routes to REVIEW, no contemporaneous evidence routes to HALT, and duplicate evidence identities route to HALT.
+  - Compares the declared gate only after independent computation. A mismatch fails record conformance without rewriting the computed gate.
+  - Repeated evaluations are byte-identical and the regression runner verifies the input Directive Spine remains unchanged.
+- TDD and verification:
+  - Baseline: `npm ci --ignore-scripts` followed by `npm run test:ci` passed 118/118.
+  - Initial RED: `npm run test:ci` failed 118/119 because `evaluators/directive-gate.js` was absent.
+  - Independent contract review identified the repository convention separating computed gate from record verdict and removed an unnecessary evidence-resolution context. The revised suite then failed 118/135 against the superseded implementation contract.
+  - Initial GREEN: `node --check evaluators/directive-gate.js` and `npm run test:ci` passed 136/136 after the pure evaluator was aligned to the revised tests.
+  - Pre-promotion adversarial RED: RFC 3339 leap-second cases failed 136/138 because the format validator accepted leap seconds while the native date parser returned `NaN`.
+  - Intermediate GREEN: deterministic leap-second normalization removed that fail-open edge; `node --check evaluators/directive-gate.js` and `npm run test:ci` passed 138/138.
+  - Exact-head automated review then identified a P1 precision defect: native date parsing truncated accepted fractional seconds beyond three digits. Three new ordering cases failed 138/141 before the fix.
+  - Final GREEN: exact whole-second plus arbitrary-precision fractional comparison closed the P1 across expiration, approval, and evidence ordering; `node --check evaluators/directive-gate.js` and `npm run test:ci` passed 141/141.
+  - Fixtures cover current internal and primary evidence ALLOW; pending authority and contextual-only evidence REVIEW; exact, offset-equivalent, leap-second, and sub-millisecond expiration, coherent expiration, rejected authority, superseded intent, post-decision evidence, duplicate evidence identity, post-decision approval, approval-metadata conflict, future decision, malformed time, and malformed Directive Spine HALT paths.
+  - Declared-gate fixtures cover coherent ALLOW/REVIEW/HALT plus ALLOW/REVIEW mismatch and the existing no-approval schema conflict.
+- Result: REVIEW pending frozen-diff inspection, independent implementation audit, exact-head pull-request DiffWall and regression evidence, review, merge, and post-merge verification.
+- Residual risks:
+  - The current schema forces `approval_status: not_required` when approval is unnecessary but requires `approval_status: approved` for declared ALLOW. The evaluator treats not-required authority as satisfied and exposes the resulting computed ALLOW / declared REVIEW mismatch; any schema repair must be a separate increment.
+  - Evidence hashes, source references, authority evidence references, and receipt references remain structural; this evaluator performs no dereference or authenticity check.
+  - Receipt timing/type edge cases, action interpretation, binding status, and all execution behavior remain outside this evaluator.
+  - The PR #27 rejected-approval binding defect recorded in Run 018 remains a separate repair obligation and is not modified here.
+- Next action: Publish only this exact isolated increment, retain exact-head DiffWall and regression evidence, and stop at the governed promotion gate before any execution behavior.
+- Approval state: Owner approval recorded from D.D. Burt for this bounded pure evaluator increment; no execution implementation is authorized.
+
 ## Run 018
 
 - Date: 2026-09-02

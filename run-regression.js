@@ -575,6 +575,49 @@ function runDirectiveSpineBindingTests() {
   }
 }
 
+// Directive Gate evaluator tests
+function runDirectiveGateTests() {
+  log('=== Directive Gate Evaluator Tests ===');
+
+  let evalDirectiveGate;
+  try {
+    ({ evaluate: evalDirectiveGate } = require('./evaluators/directive-gate.js'));
+  } catch (err) {
+    recordResult('directive-gate', 'evaluator-available', false, [err.message]);
+    return;
+  }
+
+  const fixtures = loadJson('fixtures/directive-spine/gate-regression-cases.json');
+  const directiveFixtures = loadJson(fixtures.directive_fixture);
+
+  for (const tc of fixtures.cases) {
+    let directiveSpine = JSON.parse(JSON.stringify(directiveFixtures.base_record));
+    directiveSpine = applyPatch(directiveSpine, tc.directive_operations || []);
+    if (tc.duplicate_evidence_snapshot) {
+      directiveSpine.evidence_snapshots.push(JSON.parse(JSON.stringify(directiveSpine.evidence_snapshots[0])));
+    }
+
+    const asOf = tc.as_of || fixtures.base_as_of;
+    const inputBefore = JSON.stringify(directiveSpine);
+    const result = evalDirectiveGate(directiveSpine, asOf);
+    const repeatedResult = evalDirectiveGate(directiveSpine, asOf);
+    const resultFindings = [...(result.findings || []), ...(result.record_failures || [])];
+    const deterministicAndPure = JSON.stringify(result) === JSON.stringify(repeatedResult) &&
+      JSON.stringify(directiveSpine) === inputBefore;
+    const passed = result.computed_gate === tc.expect_computed_gate &&
+      result.record_verdict === tc.expect_record_verdict &&
+      (!tc.expect_finding_code || resultFindings.some((finding) => finding.code === tc.expect_finding_code)) &&
+      deterministicAndPure;
+    recordResult('directive-gate', tc.case_id, passed, passed ? null : {
+      expected_gate: tc.expect_computed_gate,
+      expected_verdict: tc.expect_record_verdict,
+      expected_finding_code: tc.expect_finding_code,
+      deterministic_and_pure: deterministicAndPure,
+      got: result
+    });
+  }
+}
+
 // Intake record schema tests
 function runIntakeRecordTests() {
   log('=== Intake Record Schema Tests ===');
@@ -621,6 +664,7 @@ function main() {
   runIntakeRecordTests();
   runDirectiveSpineTests();
   runDirectiveSpineBindingTests();
+  runDirectiveGateTests();
 
   const output = {
     timestamp: new Date().toISOString(),
