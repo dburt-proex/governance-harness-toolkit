@@ -37,6 +37,15 @@
       "expect_finding_code": "DIRECTIVE_EXPIRED"
     },
     {
+      "case_id": "sub-millisecond-pre-expiration-allows",
+      "as_of": "2026-09-08T00:00:00.0001Z",
+      "directive_operations": [
+        {"op": "set", "path": "/intent/expires_at", "value": "2026-09-08T00:00:00.0002Z"}
+      ],
+      "expect_computed_gate": "ALLOW",
+      "expect_record_verdict": "PASS"
+    },
+    {
       "case_id": "leap-second-approval-and-evidence-equality-allows",
       "directive_operations": [
         {"op": "set", "path": "/authority/approved_at", "value": "2026-09-01T23:59:60Z"},
@@ -118,6 +127,16 @@
       "expect_finding_code": "NO_CONTEMPORANEOUS_EVIDENCE"
     },
     {
+      "case_id": "sub-millisecond-evidence-after-decision-halts",
+      "directive_operations": [
+        {"op": "set", "path": "/gate_decision/decided_at", "value": "2026-09-01T21:40:00.0001Z"},
+        {"op": "set", "path": "/evidence_snapshots/0/observed_at", "value": "2026-09-01T21:40:00.0002Z"}
+      ],
+      "expect_computed_gate": "HALT",
+      "expect_record_verdict": "FAIL",
+      "expect_finding_code": "NO_CONTEMPORANEOUS_EVIDENCE"
+    },
+    {
       "case_id": "duplicate-evidence-identities-halt",
       "duplicate_evidence_snapshot": true,
       "expect_computed_gate": "HALT",
@@ -128,6 +147,16 @@
       "case_id": "approval-after-gate-decision-halts",
       "directive_operations": [
         {"op": "set", "path": "/authority/approved_at", "value": "2026-09-01T21:40:01Z"}
+      ],
+      "expect_computed_gate": "HALT",
+      "expect_record_verdict": "FAIL",
+      "expect_finding_code": "APPROVAL_AFTER_DECISION"
+    },
+    {
+      "case_id": "sub-millisecond-approval-after-decision-halts",
+      "directive_operations": [
+        {"op": "set", "path": "/gate_decision/decided_at", "value": "2026-09-01T21:40:00.0001Z"},
+        {"op": "set", "path": "/authority/approved_at", "value": "2026-09-01T21:40:00.0002Z"}
       ],
       "expect_computed_gate": "HALT",
       "expect_record_verdict": "FAIL",
