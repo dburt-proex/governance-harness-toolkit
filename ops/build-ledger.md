@@ -363,7 +363,7 @@
 - Controls implemented:
   - `evaluators/post-merge-reconciliation.js` halts on backlog, ledger, pull-request, or promotion-evidence disagreement.
   - `fixtures/post-merge-reconciliation/regression-cases.json` retains the prior stale-state mismatch and approval-evidence mismatch as regression cases.
-- Next action: dburt-proex must append durable approval evidence or an explicit evidence-gap disposition for each blocker before treating these increments as governed complete.
+- Next action: dburt-proex must append durable approval evidence or an explicit owner evidence-gap disposition for each blocker before treating these increments as governed complete.
 
 ## Run 009
 
@@ -458,7 +458,7 @@
   - No implementation or verification failures occurred
   - Concurrent repository advancement was handled by re-reading canonical backlog and ledger before recording this run
 - Result: REVIEW, TK-008 implementation verified in draft PR #8
-- Confidence: High for structural run durability; medium for automatic record generation
+- Confidence: High for structural run durability and deterministic count coherence; medium for automatic record generation
 - Open risks:
   - Draft PR #8 is not merged
   - Build runs are not yet emitted automatically from the automation loop
@@ -619,7 +619,7 @@
   - The policy is not yet connected to live connector invocation
   - Matrix coverage is finite; unmatched actions intentionally default to REVIEW
 - Next action: TK-006, build the compounding learning loop; TK-005 requires human review before merge
-- Approval state: Human review required to promote the executable action policy to main
+- Approval state: Human review required to promote executable action policy to main
 
 ## Run 004
 
@@ -791,7 +791,6 @@
 - Failure handling:
   - Python jsonschema dependency was unavailable
   - Verification moved to an isolated Ajv installation without adding a repository runtime dependency
-  - Fixture hashes are synthetic test values
 - Result: PASS, TK-001 complete
 - Confidence: High for structural validation; medium for policy completeness
 - Open risks:
