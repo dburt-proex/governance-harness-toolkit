@@ -24,8 +24,10 @@
   - Independent contract review identified the repository convention separating computed gate from record verdict and removed an unnecessary evidence-resolution context. The revised suite then failed 118/135 against the superseded implementation contract.
   - Initial GREEN: `node --check evaluators/directive-gate.js` and `npm run test:ci` passed 136/136 after the pure evaluator was aligned to the revised tests.
   - Pre-promotion adversarial RED: RFC 3339 leap-second cases failed 136/138 because the format validator accepted leap seconds while the native date parser returned `NaN`.
-  - Final GREEN: a deterministic leap-second parser removed that fail-open edge; `node --check evaluators/directive-gate.js` and `npm run test:ci` passed 138/138.
-  - Fixtures cover current internal and primary evidence ALLOW; pending authority and contextual-only evidence REVIEW; exact, offset-equivalent, and leap-second expiration, coherent expiration, rejected authority, superseded intent, post-decision evidence, duplicate evidence identity, post-decision approval, approval-metadata conflict, future decision, malformed time, and malformed Directive Spine HALT paths.
+  - Intermediate GREEN: deterministic leap-second normalization removed that fail-open edge; `node --check evaluators/directive-gate.js` and `npm run test:ci` passed 138/138.
+  - Exact-head automated review then identified a P1 precision defect: native date parsing truncated accepted fractional seconds beyond three digits. Three new ordering cases failed 138/141 before the fix.
+  - Final GREEN: exact whole-second plus arbitrary-precision fractional comparison closed the P1 across expiration, approval, and evidence ordering; `node --check evaluators/directive-gate.js` and `npm run test:ci` passed 141/141.
+  - Fixtures cover current internal and primary evidence ALLOW; pending authority and contextual-only evidence REVIEW; exact, offset-equivalent, leap-second, and sub-millisecond expiration, coherent expiration, rejected authority, superseded intent, post-decision evidence, duplicate evidence identity, post-decision approval, approval-metadata conflict, future decision, malformed time, and malformed Directive Spine HALT paths.
   - Declared-gate fixtures cover coherent ALLOW/REVIEW/HALT plus ALLOW/REVIEW mismatch and the existing no-approval schema conflict.
 - Result: REVIEW pending frozen-diff inspection, independent implementation audit, exact-head pull-request DiffWall and regression evidence, review, merge, and post-merge verification.
 - Residual risks:
