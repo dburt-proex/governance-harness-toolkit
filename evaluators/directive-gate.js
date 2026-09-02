@@ -20,13 +20,30 @@ function schemaErrors(validate) {
 }
 
 function parseRfc3339(value) {
-  const parsed = Date.parse(value);
-  if (Number.isFinite(parsed)) return parsed;
+  const parts = /^(\d{4}-\d{2}-\d{2}[Tt ]\d{2}:\d{2}:)(\d{2})(?:\.(\d+))?([Zz]|[+-]\d{2}:\d{2})$/.exec(value);
+  if (!parts) return null;
 
-  const leapSecond = /^(.*T\d{2}:\d{2}):60(\.\d+)?(Z|[+-]\d{2}:\d{2})$/.exec(value);
-  if (!leapSecond) return Number.NaN;
-  const priorSecond = Date.parse(`${leapSecond[1]}:59${leapSecond[2] || ''}${leapSecond[3]}`);
-  return Number.isFinite(priorSecond) ? priorSecond + 1000 : Number.NaN;
+  const second = Number(parts[2]);
+  const baseSecond = second === 60 ? 59 : second;
+  const baseMilliseconds = Date.parse(`${parts[1]}${String(baseSecond).padStart(2, '0')}${parts[4]}`);
+  if (!Number.isFinite(baseMilliseconds)) return null;
+
+  return {
+    whole_seconds: BigInt(baseMilliseconds / 1000) + (second === 60 ? 1n : 0n),
+    fractional_digits: (parts[3] || '').replace(/0+$/, '')
+  };
+}
+
+function compareInstants(left, right) {
+  if (left.whole_seconds < right.whole_seconds) return -1;
+  if (left.whole_seconds > right.whole_seconds) return 1;
+
+  const width = Math.max(left.fractional_digits.length, right.fractional_digits.length);
+  const leftFraction = left.fractional_digits.padEnd(width, '0');
+  const rightFraction = right.fractional_digits.padEnd(width, '0');
+  if (leftFraction < rightFraction) return -1;
+  if (leftFraction > rightFraction) return 1;
+  return 0;
 }
 
 function finding(code, gate, path, message) {
@@ -95,11 +112,22 @@ function evaluate(directiveSpine, asOf) {
 
   const findings = [];
   const recordFailures = [];
-  const asOfMs = parseRfc3339(asOf);
-  const expiresAtMs = parseRfc3339(directiveSpine.intent.expires_at);
-  const decidedAtMs = parseRfc3339(directiveSpine.gate_decision.decided_at);
+  const asOfInstant = parseRfc3339(asOf);
+  const expiresAtInstant = parseRfc3339(directiveSpine.intent.expires_at);
+  const decidedAtInstant = parseRfc3339(directiveSpine.gate_decision.decided_at);
+  if (!asOfInstant || !expiresAtInstant || !decidedAtInstant) {
+    return invalidResult(
+      directiveSpine,
+      asOf,
+      'UNSUPPORTED_TEMPORAL_VALUE',
+      '/',
+      'A schema-valid temporal value could not be normalized for exact comparison',
+      true,
+      true
+    );
+  }
 
-  if (decidedAtMs > asOfMs) {
+  if (compareInstants(decidedAtInstant, asOfInstant) > 0) {
     findings.push(finding(
       'DECISION_AFTER_AS_OF',
       'HALT',
@@ -107,7 +135,7 @@ function evaluate(directiveSpine, asOf) {
       'Declared gate decision occurs after the evaluation time'
     ));
   }
-  if (asOfMs >= expiresAtMs) {
+  if (compareInstants(asOfInstant, expiresAtInstant) >= 0) {
     findings.push(finding(
       'DIRECTIVE_EXPIRED',
       'HALT',
@@ -145,8 +173,15 @@ function evaluate(directiveSpine, asOf) {
   } else if (authority.approval_status === 'rejected') {
     findings.push(finding('APPROVAL_REJECTED', 'HALT', '/authority/approval_status', 'Authority approval was explicitly rejected'));
   } else if (authority.approval_status === 'approved') {
-    const approvedAtMs = parseRfc3339(authority.approved_at);
-    if (approvedAtMs > decidedAtMs) {
+    const approvedAtInstant = parseRfc3339(authority.approved_at);
+    if (!approvedAtInstant) {
+      findings.push(finding(
+        'UNSUPPORTED_TEMPORAL_VALUE',
+        'HALT',
+        '/authority/approved_at',
+        'Authority approval time could not be normalized for exact comparison'
+      ));
+    } else if (compareInstants(approvedAtInstant, decidedAtInstant) > 0) {
       findings.push(finding(
         'APPROVAL_AFTER_DECISION',
         'HALT',
@@ -154,7 +189,7 @@ function evaluate(directiveSpine, asOf) {
         'Authority approval occurs after the declared gate decision'
       ));
     }
-    if (approvedAtMs > asOfMs) {
+    if (approvedAtInstant && compareInstants(approvedAtInstant, asOfInstant) > 0) {
       findings.push(finding(
         'APPROVAL_AFTER_AS_OF',
         'HALT',
@@ -175,8 +210,10 @@ function evaluate(directiveSpine, asOf) {
   }
 
   const contemporaneousEvidence = directiveSpine.evidence_snapshots.filter((snapshot) => {
-    const observedAtMs = parseRfc3339(snapshot.observed_at);
-    return observedAtMs <= decidedAtMs && observedAtMs <= asOfMs;
+    const observedAtInstant = parseRfc3339(snapshot.observed_at);
+    return observedAtInstant &&
+      compareInstants(observedAtInstant, decidedAtInstant) <= 0 &&
+      compareInstants(observedAtInstant, asOfInstant) <= 0;
   });
   if (!contemporaneousEvidence.length) {
     findings.push(finding(
