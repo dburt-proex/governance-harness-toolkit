@@ -19,6 +19,16 @@ function schemaErrors(validate) {
   return (validate.errors || []).map((error) => `${error.instancePath || '/'}: ${error.message}`);
 }
 
+function parseRfc3339(value) {
+  const parsed = Date.parse(value);
+  if (Number.isFinite(parsed)) return parsed;
+
+  const leapSecond = /^(.*T\d{2}:\d{2}):60(\.\d+)?(Z|[+-]\d{2}:\d{2})$/.exec(value);
+  if (!leapSecond) return Number.NaN;
+  const priorSecond = Date.parse(`${leapSecond[1]}:59${leapSecond[2] || ''}${leapSecond[3]}`);
+  return Number.isFinite(priorSecond) ? priorSecond + 1000 : Number.NaN;
+}
+
 function finding(code, gate, path, message) {
   return {code, gate, path, message};
 }
@@ -85,9 +95,9 @@ function evaluate(directiveSpine, asOf) {
 
   const findings = [];
   const recordFailures = [];
-  const asOfMs = Date.parse(asOf);
-  const expiresAtMs = Date.parse(directiveSpine.intent.expires_at);
-  const decidedAtMs = Date.parse(directiveSpine.gate_decision.decided_at);
+  const asOfMs = parseRfc3339(asOf);
+  const expiresAtMs = parseRfc3339(directiveSpine.intent.expires_at);
+  const decidedAtMs = parseRfc3339(directiveSpine.gate_decision.decided_at);
 
   if (decidedAtMs > asOfMs) {
     findings.push(finding(
@@ -135,7 +145,7 @@ function evaluate(directiveSpine, asOf) {
   } else if (authority.approval_status === 'rejected') {
     findings.push(finding('APPROVAL_REJECTED', 'HALT', '/authority/approval_status', 'Authority approval was explicitly rejected'));
   } else if (authority.approval_status === 'approved') {
-    const approvedAtMs = Date.parse(authority.approved_at);
+    const approvedAtMs = parseRfc3339(authority.approved_at);
     if (approvedAtMs > decidedAtMs) {
       findings.push(finding(
         'APPROVAL_AFTER_DECISION',
@@ -165,7 +175,7 @@ function evaluate(directiveSpine, asOf) {
   }
 
   const contemporaneousEvidence = directiveSpine.evidence_snapshots.filter((snapshot) => {
-    const observedAtMs = Date.parse(snapshot.observed_at);
+    const observedAtMs = parseRfc3339(snapshot.observed_at);
     return observedAtMs <= decidedAtMs && observedAtMs <= asOfMs;
   });
   if (!contemporaneousEvidence.length) {
