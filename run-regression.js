@@ -536,6 +536,45 @@ function runDirectiveSpineTests() {
   }
 }
 
+// Directive Spine binding evaluator tests
+function runDirectiveSpineBindingTests() {
+  log('=== Directive Spine Binding Evaluator Tests ===');
+
+  let evalDirectiveSpineBinding;
+  try {
+    ({ evaluate: evalDirectiveSpineBinding } = require('./evaluators/directive-spine-binding.js'));
+  } catch (err) {
+    recordResult('directive-spine-binding', 'evaluator-available', false, [err.message]);
+    return;
+  }
+
+  const fixtures = loadJson('fixtures/directive-spine/binding-regression-cases.json');
+  const directiveFixtures = loadJson(fixtures.directive_fixture);
+  const canonicalRecords = loadJson(fixtures.registry_example);
+
+  for (const tc of fixtures.cases) {
+    let directiveSpine = JSON.parse(JSON.stringify(directiveFixtures.base_record));
+    let skillRecords = JSON.parse(JSON.stringify(canonicalRecords));
+    directiveSpine = applyPatch(directiveSpine, tc.directive_operations || []);
+    if (tc.exclude_skill_record_ids) {
+      skillRecords = skillRecords.filter((record) => !tc.exclude_skill_record_ids.includes(record.skill_record_id));
+    }
+    skillRecords = applyPatch(skillRecords, tc.registry_operations || []);
+    if (tc.duplicate_skill_record_id) {
+      const duplicate = skillRecords.find((record) => record.skill_record_id === tc.duplicate_skill_record_id);
+      if (duplicate) skillRecords.push(JSON.parse(JSON.stringify(duplicate)));
+    }
+
+    const result = evalDirectiveSpineBinding(directiveSpine, skillRecords);
+    const passed = result.binding_gate === tc.expect_binding_gate;
+    recordResult('directive-spine-binding', tc.case_id, passed, passed ? null : {
+      expected: tc.expect_binding_gate,
+      got: result.binding_gate,
+      result
+    });
+  }
+}
+
 // Intake record schema tests
 function runIntakeRecordTests() {
   log('=== Intake Record Schema Tests ===');
@@ -581,6 +620,7 @@ function main() {
   runSourceRecordTests();
   runIntakeRecordTests();
   runDirectiveSpineTests();
+  runDirectiveSpineBindingTests();
 
   const output = {
     timestamp: new Date().toISOString(),
