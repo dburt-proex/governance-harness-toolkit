@@ -1,5 +1,52 @@
 # Toolkit Build Ledger
 
+## Run 020
+
+- Date: 2026-09-02
+- Receipt: `REC-2026-09-02-GHT-DIRECTIVE-GATE-POSTMERGE-001`
+- Directive: `LD-2026-09-02-GHT-DIRECTIVE-GATE-POSTMERGE-RECEIPT-001`
+- Scope: Record one immutable, repository-native post-merge closeout for Directive Gate Evaluator PR #29 only. No schema, evaluator, fixture, regression-runner, binding repair, execution request, executor, dispatcher, receipt writer, live registry, reference dereference, persistence, connector, policy, CI, permission, UI, automation, deployment, or runtime execution behavior is changed.
+- Work contract:
+  - Action class: A1 / BUILD under the current owner-directed GHT delegation.
+  - Delegation ID: `SWD-2026-09-02-GHT-DIRECTIVE-GATE-POSTMERGE-001`.
+  - Owner: Drew Burt / D.D. Burt.
+  - Authority source: direct owner instruction authorizing this receipt-only increment on 2026-09-02.
+  - Effective at: `2026-09-02T21:04:00Z`.
+  - Conservative expiry: `2026-09-05T00:00:00Z`; the owner supplied a date-only 2026-09-05 expiry, so this receipt narrows rather than expands that authority. Any earlier change to `main`, PR #29 evidence, or `ops/build-ledger.md` is also a stop condition.
+  - Repository: `dburt-proex/governance-harness-toolkit`.
+  - Required base: `main` at `6264a4caf4a9938e467881633f3299d04210a6c2`.
+  - Branch: `agent/directive-gate-postmerge-receipt-20260902`.
+  - Allowed path: `ops/build-ledger.md` only.
+  - Delivery mode: `ready_pr`; merge requires separate explicit authority.
+  - Proof required: exact-base verification, one-file diff, exact evidence transcription, 141/141 regression or investigated variance, clean diff check, and confirmation that no execution behavior was added.
+  - Rollback: close the unmerged PR and remove the agent-owned branch if the receipt is rejected or any gate fails; do not rewrite main or prior ledger history.
+  - Stops: base drift, ledger drift, failed check, unexpected path, conflicting concurrent write, changed PR #29 evidence, expired authority, or any need to modify a prohibited surface.
+- Immutable merge state:
+  - Pull request: #29 — https://github.com/dburt-proex/governance-harness-toolkit/pull/29
+  - Verified exact PR head: `67c45302415a6a889f209019b38f6c0277bf09d7`.
+  - Merged main commit: `6264a4caf4a9938e467881633f3299d04210a6c2`.
+  - Merge parents: `d1aa08a7b98e2e21bbdabae919fd4fb59b6eb6aa` and exact reviewed head `67c45302415a6a889f209019b38f6c0277bf09d7`.
+  - Merge tree: `d16f632d2ac1a40ffac3de7fc327cce77e71b760`, matching the tested exact-head tree.
+  - First-parent changed paths: `evaluators/directive-gate.js`, `fixtures/directive-spine/gate-regression-cases.json`, `run-regression.js`, `ops/build-ledger.md`.
+- Verification:
+  - Exact-head Regression Suite run `33595628821`, job `100138380033`: PASS; workflow explicitly checked out `67c45302415a6a889f209019b38f6c0277bf09d7`; `npm run test:ci` reported 141/141 passed, 0 failed.
+  - Exact-head DiffWall PR Firewall run `33595628798`, job `100138380111`: PASS; PR conversation recorded DiffWall route `ALLOW`.
+  - Exact-head Codex re-review after the fractional-precision repair recorded no major issues in the retained PR #29 post-merge evidence.
+  - Fresh detached checkout of merge commit `6264a4caf4a9938e467881633f3299d04210a6c2` recorded `npm ci --ignore-scripts` and `npm run test:ci` at 141/141 PASS with a clean worktree.
+  - Fresh repository inspection immediately before this receipt branch was created confirmed `main` still pointed to `6264a4caf4a9938e467881633f3299d04210a6c2`; no existing `DIRECTIVE-GATE-POSTMERGE` receipt was found on the default branch.
+  - The GitHub branch read reported `main` as unprotected with no required status checks at receipt preparation time. This is recorded as provider state, not as authority to bypass any control.
+  - The merge commit exposes no separate combined-status entries; exact-head CI plus the retained detached post-merge regression are the available verification evidence.
+- Review disposition and retained boundaries:
+  - The Directive Gate Evaluator remains a pure evaluator. It adds no executor, execution request, dispatcher, receipt writer, filesystem or network effect, persistence, connector, UI, automation, or other runtime execution behavior.
+  - The current no-approval schema conflict remains unresolved and is not repaired by this receipt.
+  - The PR #27 rejected-approval Skill-binding P2 recorded in Run 018 remains unresolved and is not repaired by this receipt.
+  - Evidence hashes, source references, authority evidence references, registry records, and receipt references remain structural where previously recorded; this receipt does not upgrade them to authenticated runtime proof.
+  - No REVIEW or UNKNOWN condition is converted into PASS, ALLOW, approved, or governed-complete by this closeout.
+- Result: REVIEW — PR #29 is merged with exact-head Regression and DiffWall evidence, retained Codex re-review evidence, and fresh detached post-merge regression evidence. This receipt closes the repository-native provenance gap only; it does not grant execution authority or declare the Directive Spine execution-ready.
+- Change isolation: This closeout modifies only `ops/build-ledger.md` from the verified `6264a4caf4a9938e467881633f3299d04210a6c2` base.
+- Next gate: Stop before execution behavior. Any execution request, dispatcher, executor, receipt writer, persistence, connector, or automation work requires a separate bounded directive and fresh gate. The unresolved PR #27 rejected-approval binding defect and no-approval schema conflict remain separate REVIEW items to resolve before considering an execution layer.
+- Approval state: Owner-directed receipt-only closeout by Drew Burt / D.D. Burt. Authority covers this one-file branch/PR increment only; merge is not authorized by this receipt directive.
+
 ## Run 019
 
 - Date: 2026-09-02
