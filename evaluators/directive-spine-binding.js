@@ -80,6 +80,10 @@ function evaluate(directiveSpine, skillRecords) {
     return resultFor(directiveSpine, hardViolations, reviewReasons, record.skill_record_id);
   }
   if (REVIEWABLE_STATUSES.has(record.lifecycle_status)) {
+    if (record.approval.status === 'rejected') {
+      hardViolations.push('Bound SkillRecord approval was rejected');
+      return resultFor(directiveSpine, hardViolations, reviewReasons, record.skill_record_id);
+    }
     reviewReasons.push(`Bound SkillRecord is ${record.lifecycle_status} or pending approval`);
     return resultFor(directiveSpine, hardViolations, reviewReasons, record.skill_record_id);
   }
