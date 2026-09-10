@@ -1,5 +1,38 @@
 # Toolkit Build Ledger
 
+## Run 021
+
+- Date: 2026-09-09
+- Receipt: `REC-2026-09-09-GHT-REJECTED-APPROVAL-BINDING-001`
+- Directive: `LD-2026-09-09-GHT-REJECTED-APPROVAL-DISPATCH-GATE-001`
+- Correlation: `GHT-DIRECTIVE-SPINE-PR27-REPAIR`; parent record: `PR29-POSTMERGE-CLOSEOUT`.
+- Scope: Repair only the rejected-approval routing defect inherited from PR #27. A schema-valid proposed or deprecated SkillRecord whose approval status is rejected must produce a binding `HALT`, never `REVIEW`. No no-approval schema repair, executor, dispatch, connector, persistence, automation, external action, CI, permission, policy, dependency, or runtime behavior is included.
+- Work contract:
+  - Action class and gate: A1 / BUILD, AUTO-ALLOW under the active owner-directed GHT delegation.
+  - Delegation ID: `SWD-2026-09-09-GHT-REJECTED-APPROVAL-001`.
+  - Owner: Drew Burt / D.D. Burt.
+  - Authority source: direct owner instruction supplying the bounded implementation directive on 2026-09-09.
+  - Effective at: `2026-09-09T20:23:06Z`; expires at: `2026-09-10T00:00:00Z`.
+  - Repository: `dburt-proex/governance-harness-toolkit`.
+  - Required base: `main` at `cc8eb2e85364b32262d64f8afdd8f58ccaf35446`.
+  - Branch: `agent/rejected-approval-binding-20260909`.
+  - Allowed paths: `evaluators/directive-spine-binding.js`, `fixtures/directive-spine/binding-regression-cases.json`, and this append-only `ops/build-ledger.md` receipt.
+  - Delivery mode: `ready_pr`; merge requires the separate merge gate.
+  - Rollback: close the unmerged PR and remove the agent-owned branch. Do not rewrite `main` or prior ledger history.
+  - Stops: base drift, failed regression, unexpected path or derived file, schema/runtime/CI/protection change, scope expansion, unrelated work, or delegation expiry.
+- Root cause: The evaluator returned `REVIEW` for every reviewable lifecycle before considering `approval.status: rejected`, so explicit rejection was softened to pending review for proposed and deprecated records.
+- TDD evidence:
+  - Baseline: `npm ci --ignore-scripts` followed by `npm run test:ci` passed 141/141 on the exact required base.
+  - RED: Added real-input regression cases for proposed-plus-rejected and deprecated-plus-rejected records. `npm run test:ci` failed exactly those two cases at 141/143 because both returned `REVIEW` instead of expected `HALT`.
+  - GREEN: Added one rejected-status guard inside the existing reviewable-lifecycle branch. `node --check evaluators/directive-spine-binding.js` and `npm run test:ci` then passed 143/143.
+- Change isolation: The correction changes only rejected approval behavior for the two reviewable lifecycle states. Pending proposed/deprecated routing remains `REVIEW`; exact available-plus-approved remains `ALLOW`; blocked, retired, malformed, missing, duplicate, and identity-mismatch paths remain governed by their existing behavior.
+- Result: REVIEW pending final exact-head regression, scope and secret inspection, DiffWall, pull-request publication, and fresh merge disposition. No merge is authorized by this directive.
+- Residual risks:
+  - The separate no-approval schema conflict remains unresolved and must not be bundled into this increment.
+  - Registry records remain in-memory inputs; definition hashes and references are structural and are not dereferenced or authenticated here.
+  - Binding evidence creates no execution authority, and no downstream dispatcher or execution boundary exists in this increment.
+- Next gate: Publish only this isolated repair with exact-head regression and DiffWall evidence, then stop for fresh merge disposition. After a successful merge, address the no-approval schema conflict as a separate governed increment before considering any execution boundary.
+
 ## Run 020
 
 - Date: 2026-09-02

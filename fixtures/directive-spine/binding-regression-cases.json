@@ -48,6 +48,26 @@
       "expect_binding_gate": "REVIEW"
     },
     {
+      "case_id": "rejected-proposed-bound-skill-halts",
+      "registry_operations": [
+        {"op": "set", "path": "/0/lifecycle_status", "value": "proposed"},
+        {"op": "set", "path": "/0/approval/status", "value": "rejected"},
+        {"op": "delete", "path": "/0/approval/approver"},
+        {"op": "delete", "path": "/0/approval/approved_at"}
+      ],
+      "expect_binding_gate": "HALT"
+    },
+    {
+      "case_id": "rejected-deprecated-bound-skill-halts",
+      "registry_operations": [
+        {"op": "set", "path": "/0/lifecycle_status", "value": "deprecated"},
+        {"op": "set", "path": "/0/approval/status", "value": "rejected"},
+        {"op": "delete", "path": "/0/approval/approver"},
+        {"op": "delete", "path": "/0/approval/approved_at"}
+      ],
+      "expect_binding_gate": "HALT"
+    },
+    {
       "case_id": "blocked-bound-skill-halts",
       "registry_operations": [
         {"op": "set", "path": "/0/lifecycle_status", "value": "blocked"}
