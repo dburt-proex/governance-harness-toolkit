@@ -71,6 +71,7 @@
     {"case_id": "wildcard-allowed-path-is-invalid", "operations": [{"op": "set", "path": "/authority/scope/allowed_paths", "value": ["**"]}], "expect_schema_valid": false},
     {"case_id": "path-traversal-allowed-path-is-invalid", "operations": [{"op": "set", "path": "/authority/scope/allowed_paths", "value": ["schemas/../../.git/config"]}], "expect_schema_valid": false},
     {"case_id": "approval-required-with-not-required-status-is-invalid", "operations": [{"op": "set", "path": "/intent/proposal_status", "value": "proposed"}, {"op": "set", "path": "/authority/approval_status", "value": "not_required"}, {"op": "delete", "path": "/authority/approver"}, {"op": "delete", "path": "/authority/approved_at"}, {"op": "delete", "path": "/authority/authority_evidence_ref"}, {"op": "set", "path": "/gate_decision/state", "value": "REVIEW"}, {"op": "set", "path": "/execution/state", "value": "not_authorized"}], "expect_schema_valid": false},
+    {"case_id": "no-approval-allow-is-valid", "operations": [{"op": "set", "path": "/authority/approval_required", "value": false}, {"op": "set", "path": "/authority/approval_status", "value": "not_required"}, {"op": "delete", "path": "/authority/approver"}, {"op": "delete", "path": "/authority/approved_at"}, {"op": "delete", "path": "/authority/authority_evidence_ref"}], "expect_schema_valid": true},
     {"case_id": "unknown-durable-field-is-invalid", "operations": [{"op": "set", "path": "/unreviewed_autonomy", "value": true}], "expect_schema_valid": false}
   ]
 }
