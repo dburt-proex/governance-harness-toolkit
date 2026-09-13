@@ -145,7 +145,12 @@
       "then": {
         "properties": {
           "intent": {"properties": {"proposal_status": {"const": "approved"}}, "required": ["proposal_status"]},
-          "authority": {"properties": {"approval_status": {"const": "approved"}}, "required": ["approval_status"]},
+          "authority": {
+            "oneOf": [
+              {"properties": {"approval_required": {"const": true}, "approval_status": {"const": "approved"}}, "required": ["approval_required", "approval_status"]},
+              {"properties": {"approval_required": {"const": false}, "approval_status": {"const": "not_required"}}, "required": ["approval_required", "approval_status"]}
+            ]
+          },
           "execution": {"properties": {"state": {"enum": ["authorized", "completed"]}}, "required": ["state"]}
         }
       }
