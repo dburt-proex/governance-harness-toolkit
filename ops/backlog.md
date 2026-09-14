@@ -17,6 +17,18 @@ Priority is evidence-weighted leverage, not feature count.
 | TK-012 | Add a repository-native regression runner and CI gate | Make quality verification reproducible without rebuilding an ad hoc harness | merged | PR #12 merged at `a52ccd1ecd80b32239e5728c204451fad93db606`; pinned runner and CI exist. No submitted approval evidence was returned; governed completion remains MISSING. |
 | TK-010 | Define governed Skill registry | Make reusable execution discoverable, versioned, owned, and compatibility-checked | merged | PR #21 merged at `e668c74772aff74f8aad522bdc71fc738c3b3f9f`; Run 013 records owner-approved closeout and 91/91 merged-main regression. No submitted approval evidence was returned; independent merge-commit CI visibility remains REVIEW. |
 
+
+| TK-013 | Define Directive Spine v0.1 | Bind directive intent to governed Skill identity, bounded authority, evidence, gate state, and receipt references | merged | PR #25 merged at `8f9b85ddd7a967d2cae7f83cb4a52992d2899f9e`; Run 016 records exact-head and post-merge verification at 108/108. Skill and receipt references remain structural. |
+| TK-014 | Enforce Directive Spine Skill binding | Resolve one exact schema-valid SkillRecord identity without granting execution authority | merged | PR #27 merged at `7470dfa5270e4b7d5a074d1469db2b5f19d482a9`; Run 018 records 118/118 post-merge verification and the subsequently repaired rejected-approval defect. |
+| TK-015 | Implement the pure Directive Gate evaluator | Compute expiration, authority, evidence, and declared-gate coherence without side effects | merged | PR #29 merged at `6264a4caf4a9938e467881633f3299d04210a6c2`; Run 020 records exact-head and detached post-merge verification at 141/141. |
+| TK-016 | Repair rejected SkillRecord approval routing | Ensure explicit rejection binds to HALT for reviewable Skill lifecycle states | merged | PR #31 merged at `1845b3476fff873ad3ea31df773db159953963da`; Run 021 records deterministic RED/GREEN evidence and 143/143 verification. |
+| TK-017 | Repair no-approval Directive Spine ALLOW coherence | Represent explicitly unnecessary approval without weakening required-approval negative controls | merged | PR #32 merged at `241b1adb1f66a3a738b769cc2c2e9d093a9c9fca`; Run 022 and PR #34 closeout record 146/146 verification. |
+| TK-018 | Define a pure Directive-to-Workflow Execution Trust composition gate | Prevent requested authorities, target paths, and external effects from widening beyond an independently valid Directive Spine | queued | Closed composition contract, deterministic non-widening evaluator, negative authority/path/effect fixtures, runner integration, and no executor, dispatcher, connector, persistence, receipt writer, automation, or deployment behavior. |
+
+## Current reconciliation notes
+
+- PR #33 is superseded by merged PR #34: both propose an alternative Run 022 receipt for PR #32, while canonical `main@da49d47653bba7d944a0a565b8213d3777f20920` already contains Run 022. Do not merge or rebase PR #33; closing it requires a separate owner-authorized provider action.
+
 ## Selection rule
 
 Choose the highest-priority item whose dependencies are satisfied and whose completion creates reusable control for multiple workflows. Do not start interface work until the relevant schema and evaluator exist.
