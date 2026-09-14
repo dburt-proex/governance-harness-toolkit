@@ -1,5 +1,50 @@
 # Toolkit Build Ledger
 
+## Run 022
+
+- Date: 2026-09-14
+- Receipt: `REC-2026-09-14-GHT-PR32-POSTMERGE-001`
+- Directive: `LD-2026-09-13-GHT-PR32-POSTMERGE-RECEIPT-001`
+- Correlation: `GHT-DIRECTIVE-SPINE-PR32-REPAIR`; parent record: `PR32-MERGE-241B1AD`.
+- Scope: Record one immutable, repository-native post-merge closeout for Directive Spine no-approval repair PR #32 only. No schema, fixture, evaluator, regression-runner, dependency, workflow, policy, execution request, executor, dispatcher, connector, persistence, automation, publication, deployment, or other runtime execution behavior is changed.
+- Work contract:
+  - Action class and gate: A1 / BUILD, AUTO-ALLOW under the active owner-directed GHT delegation.
+  - Delegation ID: `SWD-2026-09-13-GHT-PR32-POSTMERGE-RECEIPT-001`.
+  - Owner: Drew Burt / D.D. Burt.
+  - Authority source: direct owner authorization of the bounded receipt directive on 2026-09-13.
+  - Effective at: `2026-09-13T23:58:40Z`; expires at: `2026-09-27T23:58:40Z`.
+  - Repository: `dburt-proex/governance-harness-toolkit`.
+  - Required base: `main` at `241b1adb1f66a3a738b769cc2c2e9d093a9c9fca`.
+  - Branch: `agent/pr32-postmerge-receipt-20260913`.
+  - Allowed path: `ops/build-ledger.md` only.
+  - Delivery mode: `ready_pr`; merge is prohibited by this directive and requires a fresh promotion gate.
+  - Proof required: fresh exact-base verification, `npm ci --ignore-scripts`, `npm run test:ci` at 146/146, exact PR #32 base/head/merge and CI/DiffWall evidence, one-file append-only diff, scope and secret checks, and confirmation that no execution behavior was introduced.
+  - Rollback: close the unmerged receipt PR and remove the agent-owned branch and worktree. Do not rewrite `main` or any prior ledger history.
+  - Stops: base or ledger drift, failed regression, unexpected path, conflicting concurrent write, changed PR #32 evidence, protected-surface change, delegation expiry, or any execution-layer work.
+- Immutable merge state:
+  - Pull request: #32 — https://github.com/dburt-proex/governance-harness-toolkit/pull/32
+  - Verified base: `1845b3476fff873ad3ea31df773db159953963da`.
+  - Verified exact PR head: `f3dfcd3963bd968c498bfc68ce6cea3ddef3d05b`.
+  - Squash-merged main commit: `241b1adb1f66a3a738b769cc2c2e9d093a9c9fca`; parent: `1845b3476fff873ad3ea31df773db159953963da`.
+  - Merge tree: `a7920dcacab367281469171215eab69a6fb00704`, matching the tested exact-head tree.
+  - Changed paths from the verified base: `fixtures/directive-spine/regression-cases.json` and `schemas/directive-spine.schema.json`.
+- TDD and verification evidence:
+  - RED commit `addeb21fe5c3db607c6f6e7006792114969218e6` added only `no-approval-allow-is-valid`. Regression Suite run `34752936708`, job `103712414991`, explicitly checked out that commit and failed exactly 143/144: the Directive Spine schema required `approval_status: approved` for declared ALLOW.
+  - The repair retained `approval_required: true` plus `approval_status: approved` and added `approval_required: false` plus `approval_status: not_required` as the only two authority combinations accepted for declared ALLOW. Negative fixtures preserve rejection of required-plus-pending, required-plus-rejected, and required-plus-not-required states.
+  - Exact-head Regression Suite run `34753019189`, job `103712627564`, explicitly checked out `f3dfcd3963bd968c498bfc68ce6cea3ddef3d05b` and passed 146/146 with 0 failed.
+  - Exact-head DiffWall PR Firewall run `34753019218`, job `103712627797`, passed with route `ALLOW`, risk score 20/100, and an exact two-file, 9-addition, 1-deletion report. Its attempt to publish the final PR comment returned 404, but the retained workflow log and enforcement exit status remained successful.
+  - Fresh isolated checkout of merged `main@241b1adb1f66a3a738b769cc2c2e9d093a9c9fca` ran `npm ci --ignore-scripts` and `npm run test:ci`; the regression suite passed 146/146 with 0 failed before this receipt was appended.
+  - The squash-merge commit exposes no separate workflow runs or combined-status entries; exact-head CI, matching tree identity, and the fresh post-merge regression are the retained proof.
+- Review disposition and retained boundaries:
+  - The no-approval contradiction recorded in Run 019 is repaired: declared ALLOW can now represent either required-and-approved authority or explicitly unnecessary authority while preserving negative approval controls.
+  - This closeout creates no execution authority and does not add an executor, dispatcher, connector, persistence, receipt writer, automation, external action, or deployment behavior.
+  - Evidence hashes, source references, authority references, registry records, and receipt references remain structural unless independently resolved; this receipt does not upgrade them to authenticated runtime proof.
+  - The exact-head CI dependency installation reported one high-severity package vulnerability. This receipt neither changes dependencies nor represents that unrelated risk as remediated.
+- Result: REVIEW pending exact-head regression, scope and secret inspection, DiffWall, pull-request publication, and fresh promotion disposition for this receipt-only branch. No merge is authorized by this directive.
+- Change isolation: This run appends only this Run 022 entry to `ops/build-ledger.md` from verified `main@241b1adb1f66a3a738b769cc2c2e9d093a9c9fca`; prior ledger history is unchanged.
+- Next gate: Review only the exact-head receipt PR for promotion. Do not begin executor, dispatcher, connector, persistence, receipt-writer, automation, deployment, or other execution-layer work.
+- Approval state: Owner-authorized receipt preparation by Drew Burt / D.D. Burt. Authority covers this one-file branch and ready PR only; merge remains prohibited pending a fresh gate.
+
 ## Run 021
 
 - Date: 2026-09-09
