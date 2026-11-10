@@ -11,7 +11,7 @@ function evaluate(input,now="2026-11-10T12:00:00Z"){
  if(input.requested_tool!=="retrieve_approved_faq")add("TOOL_SCOPE","HALT");
  if(typeof input.snippet!=="string")add("INVALID_CONTEXT","HALT");
  else{
- if(/ignore (all |the )?(previous|prior) instructions|reveal (the )?(system prompt|secrets)|grant (me |new )?(github|write|admin) (access|authority|permission)/i.test(input.snippet))add("INSTRUCTION_PROMOTION","HALT");
+ if(/ignore (all |the )?(previous|prior) instructions|reveal (the )?(system prompt|secrets)|grant (me |new )?(github write|github|write|admin) (access|authority|permission)/i.test(input.snippet))add("INSTRUCTION_PROMOTION","HALT");
  if(!input.snippet.trim()||input.snippet.length>6000)add("CONTEXT_QUALITY","REVIEW");
  }
  const age=(Date.parse(now)-Date.parse(input.source_updated_at))/86400000;
