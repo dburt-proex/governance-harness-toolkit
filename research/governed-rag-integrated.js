@@ -59,7 +59,12 @@ function evaluateVerifiedInternal(input, registryEnvelope, options = {}) {
 
   let workflowDecision;
   const executionRequest = config.executionRequest;
-  if (!isRecord(executionRequest) || !Array.isArray(executionRequest.inputs) ||
+  if (Object.hasOwn(config, 'workflowPolicy')) {
+    workflowDecision = canonicalFailure(
+      'canonical_policy_override_prohibited',
+      'The canonical GHT workflow policy cannot be overridden per evaluation.'
+    );
+  } else if (!isRecord(executionRequest) || !Array.isArray(executionRequest.inputs) ||
       !isRecord(executionRequest.authority) || !isRecord(executionRequest.workflow) ||
       !isRecord(executionRequest.gates) || !isRecord(executionRequest.gates.human_approval)) {
     workflowDecision = canonicalFailure(
@@ -90,7 +95,7 @@ function evaluateVerifiedInternal(input, registryEnvelope, options = {}) {
           'The GHT workflow request failed the canonical schema.'
         );
       } else {
-        const policy = config.workflowPolicy || defaultWorkflowPolicy;
+        const policy = defaultWorkflowPolicy;
         workflowDecision = {
           evaluated: true,
           ...evaluateWorkflowExecutionTrust(policy, request)

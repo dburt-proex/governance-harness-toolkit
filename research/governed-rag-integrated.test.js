@@ -14,9 +14,9 @@ const trustOptions = {
   trustedKeys: { 'test-key': pair.publicKey },
   expectedRegistryId: 'faq-registry',
   minimumRevision: 4,
-  now,
-  workflowPolicy: policy
+  now
 };
+const weakenedPolicy = { ...policy, protected_paths: [] };
 
 function makeEnvelope(text = snippet, sourceUpdatedAt = '2026-11-09T12:00:00Z') {
   const textDigest = crypto.createHash('sha256').update(text).digest('hex');
@@ -74,6 +74,9 @@ function makeExecutionRequest(declaredGate = 'ALLOW', variant = '') {
   if (variant === 'unscoped-github-write') {
     authority.github_write = { requested: true, scope_authorized: false };
   }
+  if (variant === 'untrusted-workflow-policy-override') {
+    authority.edit = { requested: true, scope_authorized: true };
+  }
   return {
     request_id: 'WXT-RAG-TEST-001',
     actor: { class: 'automation', authorized: true, fork: false },
@@ -87,13 +90,15 @@ function makeExecutionRequest(declaredGate = 'ALLOW', variant = '') {
       write_permissions: false,
       third_party_actions: []
     },
-    targets: ['research/governed-rag'],
+    targets: variant === 'untrusted-workflow-policy-override'
+      ? ['policies/workflow-execution-input-trust.json']
+      : ['research/governed-rag'],
     gates: {
       trusted_context_present: true,
       diffwall_evidence: 'ALLOW',
       deterministic_approval: true,
       human_approval: { status: 'not_required' },
-      staged_write: false,
+      staged_write: variant === 'untrusted-workflow-policy-override',
       evidence_retained: true,
       model_override_requested: false
     },
@@ -142,6 +147,7 @@ const cases = [
   ['unsigned or substituted signing key', makeRecord(), makeEnvelopeSignedByOtherKey(), 'HALT', 'REVIEW', 'ordinary'],
   ['canonical policy HALT is preserved', makeRecord(), makeEnvelope(), 'HALT', 'HALT', 'unscoped-github-write'],
   ['retrieved data cannot become instructions', makeRecord(), makeEnvelope(), 'HALT', 'HALT', 'untrusted-rag-as-instruction'],
+  ['per-call weakened policy is rejected', makeRecord(), makeEnvelope(), 'HALT', 'ALLOW', 'untrusted-workflow-policy-override'],
   ['schema-invalid canonical request halts', makeRecord(), makeEnvelope(), 'HALT', 'ALLOW', 'schema-invalid']
 ];
 
@@ -174,10 +180,14 @@ for (const [name, record, envelope, expected, declaredGate, requestVariant] of c
   const request = makeExecutionRequest(declaredGate, requestVariant);
   if (requestVariant === 'schema-invalid') delete request.actor.authorized;
   const requestBefore = JSON.stringify(request);
-  const result = evaluateVerified(record, envelope, {
+  const options = {
     ...trustOptions,
     executionRequest: request
-  });
+  };
+  if (requestVariant === 'untrusted-workflow-policy-override') {
+    options.workflowPolicy = weakenedPolicy;
+  }
+  const result = evaluateVerified(record, envelope, options);
   assert.equal(result.gate, expected, name);
   assert.equal(result.external_effects, false, name);
   assert.equal(JSON.stringify(request), requestBefore, name + ' must not mutate the canonical request');
@@ -194,6 +204,10 @@ for (const [name, record, envelope, expected, declaredGate, requestVariant] of c
   }
   if (name === 'retrieved data cannot become instructions') {
     assert.ok(result.workflow_execution.findings.some((finding) => finding.code === 'untrusted_input_as_authority'));
+  }
+  if (name === 'per-call weakened policy is rejected') {
+    assert.ok(result.workflow_execution.findings.some((finding) =>
+      finding.code === 'canonical_policy_override_prohibited'));
   }
   if (name === 'schema-invalid canonical request halts') {
     assert.equal(result.workflow_execution.evaluated, false);
