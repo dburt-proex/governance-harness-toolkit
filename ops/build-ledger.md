@@ -17,6 +17,14 @@
 - Result: REVIEW. Local implementation and verification complete; exact-head GitHub CI/DiffWall and promotion review remain required. No claim of merge, cloud operation, continuous observation, authenticated live registries or live customer adoption.
 - Next gate: publish the isolated review branch/PR, retain exact-head checks, and stop before merge or deployment. Historical entries remain unchanged.
 
+### Run 023 exact-head review and dependency follow-up
+
+- Initial PR #37 head `41216674807768225c2df9b4fd35d55ec3fc7f66`: GitHub Regression Suite run `43654922143`, job `132631234717`, explicitly checked out that head and passed 153/153 regression plus 38/38 operability tests on Ubuntu / Node 20.20.2.
+- DiffWall run `43654922200`, job `132631234878`, returned HALT, score 100: protected files +20, package manifest +20, process execution in the test runner/tests +30, and large diff +30. This is retained review evidence; no gate override or merge was performed.
+- CI's dependency installation reported a moderate advisory. A direct npm registry advisory check identified the existing `fast-uri@3.1.7` resolution, including GHSA-hrr3-gc8f-f4qj, GHSA-w74x-v6f9-j3xg and GHSA-wjr9-j795-jxcr. The smallest version outside all returned vulnerable ranges was `3.1.9`.
+- Follow-up changes only the fast-uri lock entry (version, registry tarball and integrity) within Ajv's existing compatible range. Exact published tarball SHA-512 verified. The complete locked package set returned no advisories in the follow-up npm registry query on November 14. This is a point-in-time registry result, not a guarantee of future vulnerability absence.
+- The initial no-dependency-change statement above describes the initial PR head. This follow-up deliberately changes the transitive lock resolution; direct dependency constraints and host permissions remain unchanged. Standard pinned installation and complete tests are required again on the updated exact head.
+
 ## Run 022
 
 - Date: 2026-09-14
