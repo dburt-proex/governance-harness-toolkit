@@ -3,7 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const Ajv = require('ajv');
+const Ajv = require('ajv/dist/2020');
 const addFormats = require('ajv-formats');
 
 const { evaluate: evalBuildRun } = require('./evaluators/build-run.js');
@@ -21,7 +21,7 @@ const {
 } = require('./evaluators/workflow-execution-trust.js');
 
 function createAjv() {
-  const ajv = new Ajv({ allErrors: true, verbose: true, strict: false, validateSchema: false });
+  const ajv = new Ajv({ allErrors: true, verbose: true, strict: false, validateSchema: true });
   addFormats(ajv);
   return ajv;
 }
@@ -91,6 +91,14 @@ function recordResult(category, caseId, passed, details) {
 function runSchemaTests() {
   log('=== Schema Validation Tests ===');
   const schemas = [
+    'schemas/action-policy.schema.json',
+    'schemas/workflow-trust-policy.schema.json',
+    'schemas/source-evaluation-date.schema.json',
+    'schemas/reconciliation.schema.json',
+    'schemas/directive-execution.schema.json',
+    'schemas/evidence-manifest.schema.json',
+    'schemas/review-packet.schema.json',
+
     'schemas/action-request.schema.json',
     'schemas/build-run.schema.json',
     'schemas/decision-record.schema.json',
@@ -226,7 +234,7 @@ function runPostMergeReconciliationTests() {
   const fixtures = loadJson('fixtures/post-merge-reconciliation/regression-cases.json');
 
   for (const tc of fixtures.cases) {
-    const result = evalPostMergeReconciliation(tc);
+    const result = evalPostMergeReconciliation({items: tc.items, declared_gate: tc.declared_gate});
     const passed = result.computed_gate === tc.expected.computed_gate &&
       result.record_verdict === tc.expected.record_verdict &&
       result.mismatches.length === tc.expected.mismatch_count &&

@@ -1,6 +1,6 @@
 'use strict';
 
-function evaluateOutput(record) {
+function evaluateOutputUnchecked(record) {
   const haltReasons = [];
   const reviewReasons = [];
   const checks = [];
@@ -71,6 +71,8 @@ function evaluateOutput(record) {
     checks
   };
 }
+
+const evaluateOutput = require('../lib/validation').guard(evaluateOutputUnchecked, [[0, "output-evaluation"]]);
 
 if (require.main === module) {
   const fs = require('fs');

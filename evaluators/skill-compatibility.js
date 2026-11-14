@@ -2,7 +2,7 @@
 'use strict';
 
 const fs = require('fs');
-const Ajv = require('ajv');
+const Ajv = require('ajv/dist/2020');
 const addFormats = require('ajv-formats');
 const skillRecordSchema = require('../schemas/skill-record.schema.json');
 const workflowRecordSchema = require('../schemas/workflow-record.schema.json');
@@ -12,7 +12,7 @@ const SENSITIVITY_RANK = {none: 0, internal: 1, confidential: 2, restricted: 3};
 const ACTIVE_STATUSES = new Set(['proposed', 'available', 'deprecated']);
 
 function createValidator(schema) {
-  const ajv = new Ajv({allErrors: true, strict: false, validateSchema: false});
+  const ajv = new Ajv({allErrors: true, strict: false, validateSchema: true});
   addFormats(ajv);
   return ajv.compile(schema);
 }

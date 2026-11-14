@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "Regression suite for schema validation and evaluator consistency checks",
   "scripts": {
-    "test": "node run-regression.js",
-    "test:ci": "node run-regression.js --json"
+    "test": "node run-checks.js",
+    "test:ci": "node run-checks.js --json",
+    "ght": "node bin/ght.js",
+    "test:operability": "node --test tests/*.test.js"
   },
   "dependencies": {
     "ajv": "8.20.0",

@@ -18,7 +18,7 @@ function check(checks, id, passed, severity, detail) {
   checks.push({ id, passed, severity, detail });
 }
 
-function evaluate(record, asOf) {
+function evaluateUnchecked(record, asOf) {
   const checks = [];
   const reference = isoDate(asOf);
   const lastChecked = isoDate(record.freshness.last_checked);
@@ -71,6 +71,8 @@ function evaluate(record, asOf) {
     reasons: violations.map((item) => `${item.id}: ${item.detail}`)
   };
 }
+
+const evaluate = require('../lib/validation').guard(evaluateUnchecked, [[0, "source-record"], [1, "source-evaluation-date"]]);
 
 if (require.main === module) {
   const [recordPath, asOf] = process.argv.slice(2);

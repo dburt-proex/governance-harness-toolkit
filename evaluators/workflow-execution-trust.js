@@ -65,6 +65,8 @@ function indexBy(items, key) {
 }
 
 function validatePolicy(policy) {
+  const shapeErrors = require('../lib/validation').errors('workflow-trust-policy', policy);
+  if (shapeErrors.length) return shapeErrors;
   const errors = [];
   if (!policy || typeof policy !== 'object') return ['policy must be an object'];
   if (policy.default_gate !== 'REVIEW') errors.push('default_gate must be REVIEW');
@@ -144,7 +146,7 @@ function matchingPinException(policy, action) {
   );
 }
 
-function evaluate(policy, request) {
+function evaluateUnchecked(policy, request) {
   const findings = [];
   const add = (gate, code, detail) => findings.push({ gate, code, detail });
   const policyErrors = validatePolicy(policy);
@@ -299,6 +301,8 @@ function evaluate(policy, request) {
     }
   };
 }
+
+const evaluate = require('../lib/validation').guard(evaluateUnchecked, [[0, "workflow-trust-policy"], [1, "workflow-execution-trust"]]);
 
 if (require.main === module) {
   const [policyPath, requestPath] = process.argv.slice(2);

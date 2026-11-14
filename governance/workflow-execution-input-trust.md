@@ -83,7 +83,10 @@ Failures are explicit and fail closed. A workflow retains, at minimum, the reque
 
 ## Conformance
 
-Validate the request against the schema, then compute the policy gate:
+The CLI and exported evaluator now validate the request and policy before
+computing the gate. Malformed input fails closed. For plain-language output,
+run `npm run ght -- check trust examples/workflow-execution-trust/scoped-staged-write.json`.
+The legacy direct command remains supported:
 
 ```sh
 node evaluators/workflow-execution-trust.js \

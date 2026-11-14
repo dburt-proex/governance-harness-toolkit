@@ -30,7 +30,7 @@ function effectiveGate(policyGate, approval) {
   return 'REVIEW';
 }
 
-function evaluate(matrix, request) {
+function evaluateUnchecked(matrix, request) {
   const ordered = [...matrix.rules].sort((a, b) => b.priority - a.priority);
   const matched = ordered.find((rule) => matches(rule, request));
   const policyGate = matched ? matched.gate : matrix.default_gate;
@@ -53,6 +53,8 @@ function evaluate(matrix, request) {
     rationale: matched ? matched.rationale : 'No explicit rule matched; the default review gate applies.'
   };
 }
+
+const evaluate = require('../lib/validation').guard(evaluateUnchecked, [[0, "action-policy"], [1, "action-request"]]);
 
 if (require.main === module) {
   const [matrixPath, requestPath] = process.argv.slice(2);

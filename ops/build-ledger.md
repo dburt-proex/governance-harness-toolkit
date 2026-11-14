@@ -1,5 +1,22 @@
 # Toolkit Build Ledger
 
+## Run 023
+
+- Date: 2026-11-14.
+- Owner scope: Drew requested implementation of the reviewed recommendations in priority order, then directed resumption after an environment disconnect. No merge, release, deployment, paid service or fleet rollout is included.
+- Base: upstream `main@1e46f6d0227acdc8e1390592b2a6b683d9a32ea2`.
+- Work branch: `agent/ght-operability-20261114`.
+- Order: (1) fail-closed input validation, (2) plain-language entry point, (3) TK-018 non-widening composition, (4) local evidence and signed-approval verification, (5) onboarding/current-state documentation, followed by the guided intake, review timeline, local workflow adapter and review export.
+- Changes: every existing evaluator validates its applicable record before coherence evaluation; action/trust policies have shape validation; Ajv's actual Draft 2020-12 engine validates schemas; the legacy regression interface remains available; a complete check runner reports both suites as one JSON object.
+- TK-018: checks directive time/approval/evidence state, exact Skill binding, execution trust, explicit action mapping, literal target paths, external effects, repository and exact commit. Supplied references are compared, not treated as authenticated provider state.
+- Evidence: local files are confined to a selected root and checked by SHA-256. Optional Ed25519 approvals bind exact subject bytes and ordered evidence entries, approver, key ID and expiry. Operator-provisioned public keys are external trust inputs. Signatures do not prove source truth, human intent or permissions beyond the recorded scope.
+- Usability: `npm run ght -- --help`; guided submitted intake; real file-input local decision review; per-review timeline and Markdown export; no automatic business-action execution. Outcomes remain UNKNOWN. Outputs refuse overwrite. Synthetic demos are labeled and deliberately REVIEW when evidence or signer trust is missing.
+- Verification: Windows Node 24.16.0; `npm run test:ci` passed 153/153 regression checks and 38/38 operability tests. New tests cover malformed direct APIs, original missing-field bypass, malformed policies, scope/path/commit/Skill/expiry widening, signature tampering, unknown signer, changed bytes, path escapes, duplicate evidence, source identity gaps, matching approver, UNKNOWN outcome preservation, refused overwrite and CLI exit/JSON behavior.
+- Dependency installation: normal shell network access was unavailable. The six exact lockfile tarballs were retrieved through the available runtime and every SHA-512 integrity value matched before temporary local extraction. No dependency or lockfile changes. Remote CI must independently perform the standard pinned installation.
+- Recovery: execution environment disconnected during final documentation work; the working files were recovered and tests rerun. Reconstructed in-session drafts were not substituted for recovered source without testing.
+- Result: REVIEW. Local implementation and verification complete; exact-head GitHub CI/DiffWall and promotion review remain required. No claim of merge, cloud operation, continuous observation, authenticated live registries or live customer adoption.
+- Next gate: publish the isolated review branch/PR, retain exact-head checks, and stop before merge or deployment. Historical entries remain unchanged.
+
 ## Run 022
 
 - Date: 2026-09-14

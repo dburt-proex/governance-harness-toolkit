@@ -6,7 +6,7 @@ const fs = require('fs');
 const GOVERNANCE_MUTATIONS = new Set(['policy_rule', 'skill_update']);
 const HIGH_SEVERITY = new Set(['high', 'critical']);
 
-function evaluate(review) {
+function evaluateUnchecked(review) {
   const reasons = [];
   const metrics = {
     observation_count: review.observations.length,
@@ -55,6 +55,8 @@ function evaluate(review) {
     reasons
   };
 }
+
+const evaluate = require('../lib/validation').guard(evaluateUnchecked, [[0, "learning-review"]]);
 
 if (require.main === module) {
   const [reviewPath] = process.argv.slice(2);
