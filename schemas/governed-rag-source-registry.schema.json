@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://governance-harness-toolkit.local/schemas/governed-rag-source-registry.schema.json",
+  "title": "Signed Governed RAG Source Registry",
+  "description": "The payload is canonicalized and Ed25519-signed. Authenticity depends on a public key pinned outside this envelope and an independently configured minimum revision.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["payload", "signature"],
+  "properties": {
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["registry_id", "revision", "issued_at", "expires_at", "sources"],
+      "properties": {
+        "registry_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"},
+        "revision": {"type": "integer", "minimum": 1},
+        "issued_at": {"type": "string", "format": "date-time"},
+        "expires_at": {"type": "string", "format": "date-time"},
+        "sources": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {"pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"},
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source_id", "enabled", "version", "permission", "sha256", "source_updated_at"],
+            "properties": {
+              "source_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"},
+              "enabled": {"type": "boolean"},
+              "version": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"},
+              "permission": {"enum": ["approved", "denied"]},
+              "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+              "source_updated_at": {"type": "string", "format": "date-time"}
+            }
+          }
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "key_id", "value"],
+      "properties": {
+        "algorithm": {"const": "Ed25519"},
+        "key_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"},
+        "value": {"type": "string", "pattern": "^[A-Za-z0-9+/]{86}==$"}
+      }
+    }
+  }
+}

@@ -1,12 +1,14 @@
 "use strict";
 const ALLOWED=new Set(["source_id","source_digest","source_version","retrieved_at","source_updated_at","license_or_permission","retrieval_score","snippet","request_id","requested_tool","citation","answer","action","owner_approved","verified_digest"]);
 const REQUIRED=["source_id","source_digest","source_version","retrieved_at","source_updated_at","license_or_permission","retrieval_score","snippet","request_id","requested_tool"];
-function evaluate(input,now="2026-11-10T12:00:00Z"){
+const FIXTURE_SOURCE_IDS=["approved_faq_v1"];
+function evaluate(input,now="2026-11-10T12:00:00Z",trustedSourceIds=FIXTURE_SOURCE_IDS){
  const reasons=[];const add=(code,gate)=>reasons.push({code,gate});
  if(!input||typeof input!=="object"||Array.isArray(input))return {gate:"HALT",reasons:[{code:"INVALID_INPUT",gate:"HALT"}]};
  if(Object.keys(input).some(k=>!ALLOWED.has(k)))add("UNKNOWN_FIELD","HALT");
  if(REQUIRED.some(k=>!(k in input)))add("MISSING_REQUIRED_FIELD","HALT");
- if(input.source_id!=="approved_faq_v1"||!/^[a-f0-9]{64}$/.test(input.source_digest||"")||input.verified_digest!==true)add("UNVERIFIED_PROVENANCE","HALT");
+ const sourceIds=Array.isArray(trustedSourceIds)?trustedSourceIds:[];
+ if(typeof input.source_id!=="string"||!/^[a-z0-9][a-z0-9._-]{0,63}$/.test(input.source_id)||!sourceIds.includes(input.source_id)||!/^[a-f0-9]{64}$/.test(input.source_digest||"")||input.verified_digest!==true)add("UNVERIFIED_PROVENANCE","HALT");
  if(input.license_or_permission!=="approved")add("DATA_RIGHTS","HALT");
  if(input.requested_tool!=="retrieve_approved_faq")add("TOOL_SCOPE","HALT");
  if(typeof input.snippet!=="string")add("INVALID_CONTEXT","HALT");

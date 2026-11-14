@@ -2,6 +2,7 @@
 'use strict';
 
 const fs = require('fs');
+const { spawnSync } = require('node:child_process');
 const path = require('path');
 const Ajv = require('ajv');
 const addFormats = require('ajv-formats');
@@ -100,6 +101,7 @@ function runSchemaTests() {
     'schemas/output-evaluation.schema.json',
     'schemas/skill-record.schema.json',
     'schemas/source-record.schema.json',
+    'schemas/governed-rag-source-registry.schema.json',
     'schemas/workflow-execution-trust.schema.json',
     'schemas/workflow-record.schema.json'
   ];
@@ -638,6 +640,31 @@ function runIntakeRecordTests() {
   }
 }
 
+function runGovernedRagTests(jsonMode) {
+  log('=== Governed RAG Registry and GHT Integration Tests ===');
+  const testFiles = [
+    'research/governed-rag-registry.test.js',
+    'research/governed-rag-provenance.test.js',
+    'research/governed-rag-preflight.test.js',
+    'research/governed-rag-integrated.test.js'
+  ];
+
+  for (const testFile of testFiles) {
+    const result = spawnSync(process.execPath, [testFile], {
+      cwd: __dirname,
+      encoding: 'utf8'
+    });
+    const output = [result.stdout, result.stderr].filter(Boolean).join('\n').trim();
+    const passed = !result.error && result.status === 0;
+    recordResult('governed-rag', path.basename(testFile), passed, passed ? null : {
+      status: result.status,
+      error: result.error ? result.error.message : null,
+      output
+    });
+    if (passed && !jsonMode && output) log(output);
+  }
+}
+
 function main() {
   const jsonMode = process.argv.includes('--json');
 
@@ -665,6 +692,7 @@ function main() {
   runDirectiveSpineTests();
   runDirectiveSpineBindingTests();
   runDirectiveGateTests();
+  runGovernedRagTests(jsonMode);
 
   const output = {
     timestamp: new Date().toISOString(),
