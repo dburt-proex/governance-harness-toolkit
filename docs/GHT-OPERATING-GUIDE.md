@@ -65,6 +65,7 @@ From a clean checkout, use the lockfile-pinned dependencies:
 ~~~powershell
 git clone https://github.com/dburt-proex/governance-harness-toolkit.git
 Set-Location governance-harness-toolkit
+git switch research/governed-rag-preflight-20261105
 npm.cmd ci
 npm.cmd test
 npm.cmd run test:ci

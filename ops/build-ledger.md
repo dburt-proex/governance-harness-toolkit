@@ -1,5 +1,19 @@
 # Toolkit Build Ledger
 
+## Run 024
+
+- Date: 2026-11-14
+- Scope: Make the operating guide's clean-checkout instructions select the review branch it documents.
+- Authorization: Direct user request for the GHT operating guide.
+- Repository: dburt-proex/governance-harness-toolkit
+- Branch: research/governed-rag-preflight-20261105
+- Starting head: 0f5eeda7c2a41ee1d1b3767b76976ccb8a44ffd5
+- Files: docs/GHT-OPERATING-GUIDE.md; ops/build-ledger.md.
+- Verification: Documentation-only correction. Confirmed the clone sequence checks out research/governed-rag-preflight-20261105 before running setup. No additional tests were run; the focused 76/76 RAG result from Run 023 remains the post-fix code evidence.
+- Result: Guide setup now targets the branch containing the guide and RAG integration changes.
+- Recovery: Revert the documentation correction commit with git revert <commit-sha>.
+- Next gate: Run npm test and npm run test:ci on the exact resulting branch head and complete independent review before merge. No merge or deployment is authorized by this work.
+
 ## Run 023
 
 - Date: 2026-11-14
