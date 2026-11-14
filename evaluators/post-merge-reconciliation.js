@@ -3,7 +3,7 @@
 
 const fs = require('fs');
 
-function evaluate(records) {
+function evaluateUnchecked(records) {
   const mismatches = [];
   const blockers = [];
 
@@ -28,6 +28,8 @@ function evaluate(records) {
     blockers
   };
 }
+
+const evaluate = require('../lib/validation').guard(evaluateUnchecked, [[0,'reconciliation']]);
 
 if (require.main === module) {
   const [recordsPath] = process.argv.slice(2);

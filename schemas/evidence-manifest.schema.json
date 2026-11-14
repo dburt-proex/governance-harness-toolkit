@@ -1,0 +1,9 @@
+{
+ "$schema":"https://json-schema.org/draft/2020-12/schema",
+ "type":"object","additionalProperties":false,"required":["subject_sha256","files"],
+ "properties":{
+  "subject_sha256":{"type":"string","pattern":"^[a-f0-9]{64}$"},
+  "files":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["path","sha256"],"properties":{"path":{"type":"string","minLength":1},"sha256":{"type":"string","pattern":"^[a-f0-9]{64}$"},"source_id":{"type":"string","pattern":"^SRC-[A-Z0-9][A-Z0-9._-]{2,63}$"}}}},
+  "approval":{"type":"object","additionalProperties":false,"required":["key_id","approver","expires_at","signature"],"properties":{"key_id":{"type":"string","minLength":1},"approver":{"type":"string","minLength":1},"expires_at":{"type":"string","format":"date-time"},"signature":{"type":"string","pattern":"^[A-Za-z0-9+/]+={0,2}$"}}}
+ }
+}

@@ -1,0 +1,514 @@
+{
+  "directive": {
+    "schema_version": "1.0.0",
+    "directive_spine_id": "DSP-GHT-2026-09-01-001",
+    "correlation_id": "COR-2026-09-01-GHT-DIRECTIVE-SPINE-001",
+    "parent_record_id": "LD-2026-08-30-GHT-DIRECTIVE-SPINE-CONTRACT-001",
+    "recorded_at": "2026-09-01T21:40:00Z",
+    "intent": {
+      "directive_id": "LD-2026-09-01-GHT-DIRECTIVE-SPINE-IMPLEMENT-001",
+      "proposal_status": "approved",
+      "selected_move": "Define the governed Directive Spine contract without authorizing runtime execution.",
+      "target": {
+        "project": "Governance Harness Toolkit",
+        "repository": "dburt-proex/governance-harness-toolkit",
+        "base_ref": "fc1e7ca95bba3787992d381e85f71f5cbe0be771"
+      },
+      "expires_at": "2026-09-08T00:00:00Z"
+    },
+    "skill_binding": {
+      "skill_record_id": "SKL-RESEARCH-BRIEF-001",
+      "skill_id": "research-brief",
+      "version": "1.0.0",
+      "definition_sha256": "da42659b22b39d1cfdb9eebb38ce9fe5432094378d3132b5a361dd0be761e121"
+    },
+    "authority": {
+      "approval_required": true,
+      "approval_status": "approved",
+      "approver": "D.D. Burt",
+      "approved_at": "2026-09-01T21:40:00Z",
+      "authority_evidence_ref": "REC-2026-09-01-GHT-OWNER-APPROVAL-001",
+      "scope": {
+        "allowed_paths": [
+          "evaluators/workflow-execution-trust.js"
+        ],
+        "action_permissions": {
+          "read": "authorized",
+          "search": "authorized",
+          "execute": "authorized",
+          "repository_edit": "authorized"
+        },
+        "external_effects": "prohibited"
+      }
+    },
+    "evidence_snapshots": [
+      {
+        "evidence_snapshot_id": "EVS-GHT-2026-09-01-001",
+        "source_ref": "ops/build-ledger.md#run-014",
+        "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "observed_at": "2026-09-01T21:40:00Z",
+        "classification": "internal"
+      }
+    ],
+    "gate_decision": {
+      "gate_id": "GAT-GHT-2026-09-01-001",
+      "state": "ALLOW",
+      "decided_at": "2026-09-01T21:40:00Z",
+      "policy_version": "1.0.0",
+      "reason_codes": [
+        "OWNER_APPROVED",
+        "SCOPE_BOUNDED"
+      ]
+    },
+    "execution": {
+      "state": "authorized"
+    }
+  },
+  "request": {
+    "request_id": "WXT-EXAMPLE-001",
+    "actor": {
+      "class": "maintainer",
+      "authorized": true,
+      "fork": false
+    },
+    "event": {
+      "name": "pull_request",
+      "dispatch_authorized": false
+    },
+    "inputs": [
+      {
+        "class": "pull_request_body",
+        "treated_as_authoritative_instruction": false,
+        "verified": false
+      },
+      {
+        "class": "repository_file",
+        "treated_as_authoritative_instruction": false,
+        "verified": true
+      }
+    ],
+    "authority": {
+      "read": {
+        "requested": true,
+        "scope_authorized": true
+      },
+      "search": {
+        "requested": true,
+        "scope_authorized": true
+      },
+      "execute": {
+        "requested": true,
+        "scope_authorized": true
+      },
+      "edit": {
+        "requested": true,
+        "scope_authorized": true
+      },
+      "github_write": {
+        "requested": false,
+        "scope_authorized": false
+      },
+      "network": {
+        "requested": false,
+        "scope_authorized": false
+      },
+      "credential": {
+        "requested": false,
+        "scope_authorized": false
+      },
+      "permission": {
+        "requested": false,
+        "scope_authorized": false
+      },
+      "merge": {
+        "requested": false,
+        "scope_authorized": false
+      },
+      "deploy": {
+        "requested": false,
+        "scope_authorized": false
+      }
+    },
+    "workflow": {
+      "uses_pull_request_target": false,
+      "checks_out_untrusted_ref": false,
+      "executes_untrusted_code": false,
+      "write_permissions": false,
+      "third_party_actions": [
+        {
+          "uses": "actions/checkout",
+          "ref": "11d5960a326750d5838078e36cf38b85af677262"
+        }
+      ]
+    },
+    "targets": [
+      "evaluators/workflow-execution-trust.js"
+    ],
+    "gates": {
+      "trusted_context_present": true,
+      "diffwall_evidence": "ALLOW",
+      "deterministic_approval": true,
+      "human_approval": {
+        "status": "not_required"
+      },
+      "staged_write": true,
+      "evidence_retained": true,
+      "model_override_requested": false
+    },
+    "evidence": {
+      "commit_sha": "fc1e7ca95bba3787992d381e85f71f5cbe0be771",
+      "diffwall_run_url": "https://github.com/example/repository/actions/runs/1001",
+      "workflow_run_urls": [
+        "https://github.com/example/repository/actions/runs/1002"
+      ],
+      "checks": [
+        "schema validation and regression suite passed"
+      ],
+      "decision_ref": "WXT-EXAMPLE-001 decision"
+    },
+    "declared_gate": "ALLOW"
+  },
+  "skills": [
+    {
+      "schema_version": "1.0.0",
+      "skill_record_id": "SKL-RESEARCH-BRIEF-001",
+      "skill_id": "research-brief",
+      "version": "1.0.0",
+      "title": "Research Brief",
+      "purpose": "Turn a scoped request into a governed, decision-ready research contract.",
+      "owner": {
+        "name": "Drew Burt",
+        "authority": "owner"
+      },
+      "definition": {
+        "uri": "skill://flora-skills/root/.codex/skills/remote-skills/skill-6a524482639c8191a10d4f90f69bf3d2/SKILL.md",
+        "content_sha256": "da42659b22b39d1cfdb9eebb38ce9fe5432094378d3132b5a361dd0be761e121",
+        "verified_at": "2026-08-29T20:00:00Z"
+      },
+      "workflow_compatibility": [
+        {
+          "workflow_key": "research_brief",
+          "workflow_version": "1.0.0"
+        }
+      ],
+      "capability_requirements": {
+        "external_writes": "prohibited",
+        "sensitive_data": "none",
+        "required_actions": [
+          "read_public_sources"
+        ]
+      },
+      "approval": {
+        "status": "approved",
+        "approver": "D.D. Burt",
+        "approved_at": "2026-08-29T20:00:00Z"
+      },
+      "lifecycle_status": "available"
+    },
+    {
+      "schema_version": "1.0.0",
+      "skill_record_id": "SKL-SOURCE-TRIAGE-001",
+      "skill_id": "source-triage",
+      "version": "1.0.0",
+      "title": "Source Triage",
+      "purpose": "Classify sources by authority, relevance, freshness, permissions, and evidentiary limits.",
+      "owner": {
+        "name": "Drew Burt",
+        "authority": "owner"
+      },
+      "definition": {
+        "uri": "skill://flora-skills/root/.codex/skills/remote-skills/skill-6a52448ce3408191a990e927c859a656/SKILL.md",
+        "content_sha256": "c3baf080326d69d990d324cba496959430be2558dcd8f5cc49346d57513c6cfc",
+        "verified_at": "2026-08-29T20:00:00Z"
+      },
+      "workflow_compatibility": [
+        {
+          "workflow_key": "research_brief",
+          "workflow_version": "1.0.0"
+        }
+      ],
+      "capability_requirements": {
+        "external_writes": "prohibited",
+        "sensitive_data": "none",
+        "required_actions": [
+          "read_public_sources"
+        ]
+      },
+      "approval": {
+        "status": "approved",
+        "approver": "D.D. Burt",
+        "approved_at": "2026-08-29T20:00:00Z"
+      },
+      "lifecycle_status": "available"
+    },
+    {
+      "schema_version": "1.0.0",
+      "skill_record_id": "SKL-EVALUATE-OUTPUT-001",
+      "skill_id": "evaluate-output",
+      "version": "1.0.0",
+      "title": "Evaluate Output",
+      "purpose": "Evaluate a workflow artifact against explicit requirements and route its release gate.",
+      "owner": {
+        "name": "Drew Burt",
+        "authority": "owner"
+      },
+      "definition": {
+        "uri": "skill://flora-skills/root/.codex/skills/remote-skills/skill-6a5244bafa98819185a9045828a63452/SKILL.md",
+        "content_sha256": "95573ea4a51b27828faaf7eb52863f56ab97634f1c770fd9d3b4fed644a66c89",
+        "verified_at": "2026-08-29T20:00:00Z"
+      },
+      "workflow_compatibility": [
+        {
+          "workflow_key": "research_brief",
+          "workflow_version": "1.0.0"
+        }
+      ],
+      "capability_requirements": {
+        "external_writes": "prohibited",
+        "sensitive_data": "none",
+        "required_actions": []
+      },
+      "approval": {
+        "status": "approved",
+        "approver": "D.D. Burt",
+        "approved_at": "2026-08-29T20:00:00Z"
+      },
+      "lifecycle_status": "available"
+    }
+  ],
+  "policy": {
+    "policy_id": "POL-WORKFLOW-EXECUTION-INPUT-TRUST-1",
+    "version": "1.0.0",
+    "title": "Canonical Workflow Execution and Input Trust Policy",
+    "default_gate": "REVIEW",
+    "input_trust_classes": [
+      {
+        "class": "pull_request_title",
+        "trust": "untrusted",
+        "may_authorize": false,
+        "verification_required": false,
+        "allowed_use": "routing context and display data"
+      },
+      {
+        "class": "pull_request_body",
+        "trust": "untrusted",
+        "may_authorize": false,
+        "verification_required": false,
+        "allowed_use": "requested scope and acceptance-criteria evidence"
+      },
+      {
+        "class": "comment",
+        "trust": "untrusted",
+        "may_authorize": false,
+        "verification_required": false,
+        "allowed_use": "discussion context; identity and authority must be resolved separately"
+      },
+      {
+        "class": "issue",
+        "trust": "untrusted",
+        "may_authorize": false,
+        "verification_required": false,
+        "allowed_use": "problem and backlog context"
+      },
+      {
+        "class": "commit_message",
+        "trust": "untrusted",
+        "may_authorize": false,
+        "verification_required": false,
+        "allowed_use": "change description and traceability only"
+      },
+      {
+        "class": "repository_file",
+        "trust": "conditional",
+        "may_authorize": false,
+        "verification_required": true,
+        "allowed_use": "repository context after provenance and instruction-precedence checks"
+      },
+      {
+        "class": "configuration_file",
+        "trust": "conditional",
+        "may_authorize": false,
+        "verification_required": true,
+        "allowed_use": "configuration data after schema, provenance, and scope validation"
+      },
+      {
+        "class": "generated_artifact",
+        "trust": "conditional",
+        "may_authorize": false,
+        "verification_required": true,
+        "allowed_use": "derived evidence after generator, source, and digest verification"
+      },
+      {
+        "class": "dependency_metadata",
+        "trust": "conditional",
+        "may_authorize": false,
+        "verification_required": true,
+        "allowed_use": "dependency resolution after registry, integrity, and lockfile validation"
+      },
+      {
+        "class": "workflow_output",
+        "trust": "conditional",
+        "may_authorize": false,
+        "verification_required": true,
+        "allowed_use": "evidence after producer identity, run, commit, and artifact verification"
+      },
+      {
+        "class": "external_web_content",
+        "trust": "untrusted",
+        "may_authorize": false,
+        "verification_required": true,
+        "allowed_use": "discovery or cited evidence after source-policy validation"
+      }
+    ],
+    "authorities": [
+      {
+        "authority": "read",
+        "effect": "non_mutating",
+        "scope_required": true,
+        "approval": "policy"
+      },
+      {
+        "authority": "search",
+        "effect": "non_mutating",
+        "scope_required": true,
+        "approval": "policy"
+      },
+      {
+        "authority": "execute",
+        "effect": "consequential",
+        "scope_required": true,
+        "approval": "deterministic_or_human"
+      },
+      {
+        "authority": "edit",
+        "effect": "consequential_write",
+        "scope_required": true,
+        "approval": "deterministic_or_human"
+      },
+      {
+        "authority": "github_write",
+        "effect": "consequential_write",
+        "scope_required": true,
+        "approval": "deterministic_or_human"
+      },
+      {
+        "authority": "network",
+        "effect": "external_effect",
+        "scope_required": true,
+        "approval": "deterministic_or_human"
+      },
+      {
+        "authority": "credential",
+        "effect": "protected_boundary",
+        "scope_required": true,
+        "approval": "human_only"
+      },
+      {
+        "authority": "permission",
+        "effect": "protected_boundary",
+        "scope_required": true,
+        "approval": "human_only"
+      },
+      {
+        "authority": "merge",
+        "effect": "protected_boundary",
+        "scope_required": true,
+        "approval": "human_only"
+      },
+      {
+        "authority": "deploy",
+        "effect": "protected_boundary",
+        "scope_required": true,
+        "approval": "human_only"
+      }
+    ],
+    "trigger_controls": {
+      "pull_request": {
+        "forks": "untrusted",
+        "external_contributors": "untrusted",
+        "write_permissions": "prohibited_for_external_or_fork"
+      },
+      "pull_request_target": {
+        "allowed_mode": "trusted-base metadata only",
+        "untrusted_checkout": "HALT",
+        "untrusted_execution": "HALT",
+        "external_write_permissions": "HALT"
+      },
+      "workflow_dispatch": {
+        "actor_authorization_required": true,
+        "dispatch_scope_required": true,
+        "unauthorized_result": "HALT"
+      }
+    },
+    "protected_paths": [
+      ".github/workflows/**",
+      ".github/agents/**",
+      "AGENTS.md",
+      "CLAUDE.md",
+      "governance/**",
+      "policies/**",
+      "rules/**",
+      "schemas/**",
+      "package.json",
+      "package-lock.json"
+    ],
+    "staged_writes": {
+      "required_for": [
+        "edit",
+        "github_write"
+      ],
+      "requirements": [
+        "bounded target",
+        "review branch",
+        "reversible change",
+        "diff and test evidence",
+        "promotion gate"
+      ]
+    },
+    "deterministic_gate": {
+      "authority": "DiffWall",
+      "missing_evidence": "REVIEW",
+      "review_result": "REVIEW",
+      "halt_result": "HALT",
+      "model_override_allowed": false
+    },
+    "action_pinning": {
+      "expectation": "full_commit_sha",
+      "pattern": "^[0-9a-fA-F]{40}$",
+      "exceptions": [],
+      "exception_requirements": [
+        "exception_id",
+        "exact action and ref",
+        "owner",
+        "security rationale",
+        "compensating control",
+        "review date"
+      ]
+    },
+    "failure_behavior": {
+      "unknown_actor_or_scope": "HALT",
+      "unknown_input_class": "HALT",
+      "missing_trusted_context": "REVIEW",
+      "missing_diffwall_evidence": "REVIEW",
+      "rejected_human_gate": "HALT",
+      "missing_execution_evidence": "REVIEW"
+    },
+    "evidence_retention": {
+      "required": true,
+      "minimum_fields": [
+        "request identifier",
+        "actor and event",
+        "input trust classes",
+        "requested authorities and scopes",
+        "target paths",
+        "DiffWall route and exact commit",
+        "deterministic and human gates",
+        "test and workflow evidence",
+        "computed decision and findings"
+      ]
+    }
+  },
+  "as_of": "2026-09-02T00:00:00Z",
+  "repository": "dburt-proex/governance-harness-toolkit",
+  "commit_sha": "fc1e7ca95bba3787992d381e85f71f5cbe0be771"
+}

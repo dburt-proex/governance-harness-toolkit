@@ -1,0 +1,379 @@
+{
+  "type": "object",
+  "required": [
+    "policy_id",
+    "version",
+    "title",
+    "default_gate",
+    "input_trust_classes",
+    "authorities",
+    "trigger_controls",
+    "protected_paths",
+    "staged_writes",
+    "deterministic_gate",
+    "action_pinning",
+    "failure_behavior",
+    "evidence_retention"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "policy_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "default_gate": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input_trust_classes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "class",
+          "trust",
+          "may_authorize",
+          "verification_required",
+          "allowed_use"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "class": {
+            "type": "string",
+            "minLength": 1
+          },
+          "trust": {
+            "type": "string",
+            "minLength": 1
+          },
+          "may_authorize": {
+            "type": "boolean"
+          },
+          "verification_required": {
+            "type": "boolean"
+          },
+          "allowed_use": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "authorities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "authority",
+          "effect",
+          "scope_required",
+          "approval"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "authority": {
+            "type": "string",
+            "minLength": 1
+          },
+          "effect": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scope_required": {
+            "type": "boolean"
+          },
+          "approval": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "trigger_controls": {
+      "type": "object",
+      "required": [
+        "pull_request",
+        "pull_request_target",
+        "workflow_dispatch"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "pull_request": {
+          "type": "object",
+          "required": [
+            "forks",
+            "external_contributors",
+            "write_permissions"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "forks": {
+              "type": "string",
+              "minLength": 1
+            },
+            "external_contributors": {
+              "type": "string",
+              "minLength": 1
+            },
+            "write_permissions": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "pull_request_target": {
+          "type": "object",
+          "required": [
+            "allowed_mode",
+            "untrusted_checkout",
+            "untrusted_execution",
+            "external_write_permissions"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "allowed_mode": {
+              "type": "string",
+              "minLength": 1
+            },
+            "untrusted_checkout": {
+              "type": "string",
+              "minLength": 1
+            },
+            "untrusted_execution": {
+              "type": "string",
+              "minLength": 1
+            },
+            "external_write_permissions": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "workflow_dispatch": {
+          "type": "object",
+          "required": [
+            "actor_authorization_required",
+            "dispatch_scope_required",
+            "unauthorized_result"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "actor_authorization_required": {
+              "type": "boolean"
+            },
+            "dispatch_scope_required": {
+              "type": "boolean"
+            },
+            "unauthorized_result": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "protected_paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "staged_writes": {
+      "type": "object",
+      "required": [
+        "required_for",
+        "requirements"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "required_for": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "deterministic_gate": {
+      "type": "object",
+      "required": [
+        "authority",
+        "missing_evidence",
+        "review_result",
+        "halt_result",
+        "model_override_allowed"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "authority": {
+          "type": "string",
+          "minLength": 1
+        },
+        "missing_evidence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "review_result": {
+          "type": "string",
+          "minLength": 1
+        },
+        "halt_result": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model_override_allowed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "action_pinning": {
+      "type": "object",
+      "required": [
+        "expectation",
+        "pattern",
+        "exceptions",
+        "exception_requirements"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "expectation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pattern": {
+          "type": "string",
+          "minLength": 1
+        },
+        "exceptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "exception_id",
+              "uses",
+              "ref",
+              "owner",
+              "security_rationale",
+              "compensating_control",
+              "review_date"
+            ],
+            "properties": {
+              "exception_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uses": {
+                "type": "string",
+                "minLength": 1
+              },
+              "ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "owner": {
+                "type": "string",
+                "minLength": 1
+              },
+              "security_rationale": {
+                "type": "string",
+                "minLength": 1
+              },
+              "compensating_control": {
+                "type": "string",
+                "minLength": 1
+              },
+              "review_date": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "exception_requirements": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "failure_behavior": {
+      "type": "object",
+      "required": [
+        "unknown_actor_or_scope",
+        "unknown_input_class",
+        "missing_trusted_context",
+        "missing_diffwall_evidence",
+        "rejected_human_gate",
+        "missing_execution_evidence"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "unknown_actor_or_scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "unknown_input_class": {
+          "type": "string",
+          "minLength": 1
+        },
+        "missing_trusted_context": {
+          "type": "string",
+          "minLength": 1
+        },
+        "missing_diffwall_evidence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rejected_human_gate": {
+          "type": "string",
+          "minLength": 1
+        },
+        "missing_execution_evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "evidence_retention": {
+      "type": "object",
+      "required": [
+        "required",
+        "minimum_fields"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "minimum_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

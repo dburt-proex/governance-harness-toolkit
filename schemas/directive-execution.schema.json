@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["directive", "request", "skills", "policy", "as_of", "repository", "commit_sha"],
+  "properties": {
+    "directive": {"type": "object"}, "request": {"type": "object"},
+    "skills": {"type": "array", "items": {"type": "object"}},
+    "policy": {"type": "object"}, "as_of": {"type": "string", "format": "date-time"},
+    "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "commit_sha": {"type": "string", "pattern": "^[a-f0-9]{40}$"}
+  }
+}

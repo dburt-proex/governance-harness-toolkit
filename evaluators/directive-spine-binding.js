@@ -2,7 +2,7 @@
 'use strict';
 
 const fs = require('fs');
-const Ajv = require('ajv');
+const Ajv = require('ajv/dist/2020');
 const addFormats = require('ajv-formats');
 const directiveSpineSchema = require('../schemas/directive-spine.schema.json');
 const skillRecordSchema = require('../schemas/skill-record.schema.json');
@@ -10,7 +10,7 @@ const skillRecordSchema = require('../schemas/skill-record.schema.json');
 const REVIEWABLE_STATUSES = new Set(['proposed', 'deprecated']);
 
 function createValidator(schema) {
-  const ajv = new Ajv({allErrors: true, strict: false, validateSchema: false});
+  const ajv = new Ajv({allErrors: true, strict: false, validateSchema: true});
   addFormats(ajv);
   return ajv.compile(schema);
 }

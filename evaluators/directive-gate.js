@@ -1,13 +1,13 @@
 'use strict';
 
-const Ajv = require('ajv');
+const Ajv = require('ajv/dist/2020');
 const addFormats = require('ajv-formats');
 const directiveSpineSchema = require('../schemas/directive-spine.schema.json');
 
 const GATE_RANK = {ALLOW: 0, REVIEW: 1, HALT: 2};
 
 function createValidator(schema) {
-  const ajv = new Ajv({allErrors: true, strict: false, validateSchema: false});
+  const ajv = new Ajv({allErrors: true, strict: false, validateSchema: true});
   addFormats(ajv);
   return ajv.compile(schema);
 }

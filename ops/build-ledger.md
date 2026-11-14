@@ -1,5 +1,30 @@
 # Toolkit Build Ledger
 
+## Run 023
+
+- Date: 2026-11-14.
+- Owner scope: Drew requested implementation of the reviewed recommendations in priority order, then directed resumption after an environment disconnect. No merge, release, deployment, paid service or fleet rollout is included.
+- Base: upstream `main@1e46f6d0227acdc8e1390592b2a6b683d9a32ea2`.
+- Work branch: `agent/ght-operability-20261114`.
+- Order: (1) fail-closed input validation, (2) plain-language entry point, (3) TK-018 non-widening composition, (4) local evidence and signed-approval verification, (5) onboarding/current-state documentation, followed by the guided intake, review timeline, local workflow adapter and review export.
+- Changes: every existing evaluator validates its applicable record before coherence evaluation; action/trust policies have shape validation; Ajv's actual Draft 2020-12 engine validates schemas; the legacy regression interface remains available; a complete check runner reports both suites as one JSON object.
+- TK-018: checks directive time/approval/evidence state, exact Skill binding, execution trust, explicit action mapping, literal target paths, external effects, repository and exact commit. Supplied references are compared, not treated as authenticated provider state.
+- Evidence: local files are confined to a selected root and checked by SHA-256. Optional Ed25519 approvals bind exact subject bytes and ordered evidence entries, approver, key ID and expiry. Operator-provisioned public keys are external trust inputs. Signatures do not prove source truth, human intent or permissions beyond the recorded scope.
+- Usability: `npm run ght -- --help`; guided submitted intake; real file-input local decision review; per-review timeline and Markdown export; no automatic business-action execution. Outcomes remain UNKNOWN. Outputs refuse overwrite. Synthetic demos are labeled and deliberately REVIEW when evidence or signer trust is missing.
+- Verification: Windows Node 24.16.0; `npm run test:ci` passed 153/153 regression checks and 38/38 operability tests. New tests cover malformed direct APIs, original missing-field bypass, malformed policies, scope/path/commit/Skill/expiry widening, signature tampering, unknown signer, changed bytes, path escapes, duplicate evidence, source identity gaps, matching approver, UNKNOWN outcome preservation, refused overwrite and CLI exit/JSON behavior.
+- Dependency installation: normal shell network access was unavailable. The six exact lockfile tarballs were retrieved through the available runtime and every SHA-512 integrity value matched before temporary local extraction. No dependency or lockfile changes. Remote CI must independently perform the standard pinned installation.
+- Recovery: execution environment disconnected during final documentation work; the working files were recovered and tests rerun. Reconstructed in-session drafts were not substituted for recovered source without testing.
+- Result: REVIEW. Local implementation and verification complete; exact-head GitHub CI/DiffWall and promotion review remain required. No claim of merge, cloud operation, continuous observation, authenticated live registries or live customer adoption.
+- Next gate: publish the isolated review branch/PR, retain exact-head checks, and stop before merge or deployment. Historical entries remain unchanged.
+
+### Run 023 exact-head review and dependency follow-up
+
+- Initial PR #37 head `41216674807768225c2df9b4fd35d55ec3fc7f66`: GitHub Regression Suite run `43654922143`, job `132631234717`, explicitly checked out that head and passed 153/153 regression plus 38/38 operability tests on Ubuntu / Node 20.20.2.
+- DiffWall run `43654922200`, job `132631234878`, returned HALT, score 100: protected files +20, package manifest +20, process execution in the test runner/tests +30, and large diff +30. This is retained review evidence; no gate override or merge was performed.
+- CI's dependency installation reported a moderate advisory. A direct npm registry advisory check identified the existing `fast-uri@3.1.7` resolution, including GHSA-hrr3-gc8f-f4qj, GHSA-w74x-v6f9-j3xg and GHSA-wjr9-j795-jxcr. The smallest version outside all returned vulnerable ranges was `3.1.9`.
+- Follow-up changes only the fast-uri lock entry (version, registry tarball and integrity) within Ajv's existing compatible range. Exact published tarball SHA-512 verified. The complete locked package set returned no advisories in the follow-up npm registry query on November 14. This is a point-in-time registry result, not a guarantee of future vulnerability absence.
+- The initial no-dependency-change statement above describes the initial PR head. This follow-up deliberately changes the transitive lock resolution; direct dependency constraints and host permissions remain unchanged. Standard pinned installation and complete tests are required again on the updated exact head.
+
 ## Run 022
 
 - Date: 2026-09-14

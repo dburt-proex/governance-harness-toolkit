@@ -4,6 +4,24 @@
 
 ## Regression suite
 
+GHT validates governance records and returns ALLOW, REVIEW or HALT. It does not
+execute business actions or continuously observe work.
+
+**Start here:** [Simple operating instructions](docs/QUICKSTART.md),
+[worked decision-review example](docs/WORKED-EXAMPLE.md), and
+[current implementation status](docs/STATUS.md).
+
+```sh
+npm ci --ignore-scripts
+npm test
+npm run ght -- --help
+npm run ght -- check trust examples/workflow-execution-trust/scoped-staged-write.json
+npm run ght -- check compose examples/directive-execution/bounded-review.json
+```
+
+Examples are illustrative records, not live approvals. Record PASS does not
+mean action ALLOW. The unified command validates input before evaluation.
+
 Install the pinned dependencies and run the complete deterministic regression suite:
 
 ```sh
@@ -16,6 +34,9 @@ For a machine-readable result, run:
 ```sh
 node run-regression.js --json
 ```
+
+The command above is regression-only. `npm run test:ci` runs both regression and
+operability tests and emits one combined JSON report.
 
 ## Workflow execution and input trust
 

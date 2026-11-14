@@ -1,6 +1,6 @@
 'use strict';
 
-function evaluateDecision(record) {
+function evaluateDecisionUnchecked(record) {
   const failures = [];
   const reviews = [];
   const checks = [];
@@ -85,6 +85,8 @@ function evaluateDecision(record) {
     checks
   };
 }
+
+const evaluateDecision = require('../lib/validation').guard(evaluateDecisionUnchecked, [[0, "decision-record"]]);
 
 if (require.main === module) {
   const fs = require('fs');

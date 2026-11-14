@@ -3,7 +3,7 @@
 
 const fs = require('fs');
 
-function evaluate(record) {
+function evaluateUnchecked(record) {
   const counts = { PASS: 0, FAIL: 0, SKIP: 0 };
   for (const item of record.verification.checks) counts[item.status] += 1;
   const violations = [];
@@ -22,6 +22,8 @@ function evaluate(record) {
     violations
   };
 }
+
+const evaluate = require('../lib/validation').guard(evaluateUnchecked, [[0, "build-run"]]);
 
 if (require.main === module) {
   const [recordPath] = process.argv.slice(2);

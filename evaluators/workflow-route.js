@@ -6,7 +6,7 @@ const fs = require('fs');
 const EXTERNAL_WRITE_RANK = {prohibited: 0, review_required: 1, authorized: 2};
 const SENSITIVITY_RANK = {none: 0, internal: 1, confidential: 2, restricted: 3};
 
-function evaluate(workflow, intake) {
+function evaluateUnchecked(workflow, intake) {
   const hardViolations = [];
   const reviewReasons = [];
   if (workflow.status !== 'approved') hardViolations.push('workflow is not approved');
@@ -47,6 +47,8 @@ function evaluate(workflow, intake) {
     review_reasons: reviewReasons
   };
 }
+
+const evaluate = require('../lib/validation').guard(evaluateUnchecked, [[0, "workflow-record"], [1, "intake-record"]]);
 
 if (require.main === module) {
   const [workflowPath, intakePath] = process.argv.slice(2);
