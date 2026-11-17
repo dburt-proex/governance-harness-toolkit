@@ -644,6 +644,7 @@ function runGovernedRagTests(jsonMode) {
   log('=== Governed RAG Registry and GHT Integration Tests ===');
   const testFiles = [
     'research/governed-rag-registry.test.js',
+    'research/governed-rag-registry-adversarial.test.js',
     'research/governed-rag-provenance.test.js',
     'research/governed-rag-preflight.test.js',
     'research/governed-rag-integrated.test.js'
