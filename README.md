@@ -2,6 +2,10 @@
 
 **Portfolio evidence:** [Systems & proof](https://drew-burt-portfolio.daxxer-os.chatgpt.site/systems)
 
+## Operating guide
+
+See the [GHT Operating Guide](docs/GHT-OPERATING-GUIDE.md) for setup, evaluator selection, schema validation, authority boundaries, the RAG path, and the review loop.
+
 ## Regression suite
 
 Install the pinned dependencies and run the complete deterministic regression suite:

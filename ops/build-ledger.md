@@ -1,5 +1,48 @@
 # Toolkit Build Ledger
 
+## Run 024
+
+- Date: 2026-11-14
+- Scope: Make the operating guide's clean-checkout instructions select the review branch it documents.
+- Authorization: Direct user request for the GHT operating guide.
+- Repository: dburt-proex/governance-harness-toolkit
+- Branch: research/governed-rag-preflight-20261105
+- Starting head: 0f5eeda7c2a41ee1d1b3767b76976ccb8a44ffd5
+- Files: docs/GHT-OPERATING-GUIDE.md; ops/build-ledger.md.
+- Verification: Documentation-only correction. Confirmed the clone sequence checks out research/governed-rag-preflight-20261105 before running setup. No additional tests were run; the focused 76/76 RAG result from Run 023 remains the post-fix code evidence.
+- Result: Guide setup now targets the branch containing the guide and RAG integration changes.
+- Recovery: Revert the documentation correction commit with git revert <commit-sha>.
+- Next gate: Run npm test and npm run test:ci on the exact resulting branch head and complete independent review before merge. No merge or deployment is authorized by this work.
+
+## Run 023
+
+- Date: 2026-11-14
+- Scope: Close the reviewed RAG policy-override finding and document practical GHT operation on the existing research review branch. This bounded change fixes the policy selection path, adds an adversarial regression, and adds a repository operating guide with workflow, gate, and RAG visuals.
+- Authorization: Direct user request in this conversation. No additional delegation ID or approval was asserted.
+- Repository: dburt-proex/governance-harness-toolkit
+- Branch: research/governed-rag-preflight-20261105
+- Starting head: ae881f1e9514dc9c76100486bf802d52b61152b7
+- Files: research/governed-rag-integrated.js; research/governed-rag-integrated.test.js; docs/GHT-OPERATING-GUIDE.md; README.md; ops/build-ledger.md.
+- Changes:
+  - Removed per-call canonical workflow-policy substitution. Supplying workflowPolicy now returns a canonical HALT finding; the integration always evaluates the repository policy.
+  - Added an adversarial case that supplies a weaker policy with an empty protected-path list while requesting a staged edit to a protected policy file; the override must HALT.
+  - Added the operator guide and README entry point. It documents evaluator selection, schema validation, gate meaning, authority boundaries, evidence limits, synthetic RAG trust assumptions, operating cycle, and rollback.
+- Verification:
+  - Runtime: Node.js 24.16.0; npm 11.13.0.
+  - Signed-registry tests: 21/21 passed.
+  - Provenance tests: 19/19 passed.
+  - Preflight tests: 15/15 passed.
+  - Integrated GHT tests: 21/21 passed, including the weakened-policy override case.
+  - Focused RAG total: 76/76 passed.
+  - The post-fix full repository regression suite was not run. The attached local checkout is on a different branch; validation used an isolated copy of the exact target-branch RAG sources, tests, and matching canonical policy/evaluator/schema files. The earlier engineering receipt's 151/151 result is pre-fix evidence and is not claimed as a post-fix full-suite result.
+- Limits and risks:
+  - The per-call policy override path is closed, but actor identity, human approval, DiffWall references, trusted registry key provisioning, rollback floor, and retrieval clock still require trusted application-level configuration and verification.
+  - The RAG fixtures and thresholds remain synthetic; no live retriever, customer workflow, or production behavior was tested.
+  - GitHub may report the resulting commit as unsigned; the change does not add a signing key.
+- Result: Focused post-fix RAG regression passed; full-suite and independent review remain pending.
+- Recovery: Revert the resulting commit with git revert <commit-sha>; do not force-reset the shared review branch.
+- Next gate: Run npm test and npm run test:ci on an exact checkout of the resulting branch head, then complete independent review. Merge, release, and deployment remain separate decisions and were not performed.
+
 ## Run 022
 
 - Date: 2026-09-14
