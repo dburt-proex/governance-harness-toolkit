@@ -648,7 +648,8 @@ function runGovernedRagTests(jsonMode) {
     'research/governed-rag-provenance.test.js',
     'research/governed-rag-preflight.test.js',
     'research/governed-rag-integrated.test.js',
-    'research/governed-rag-outcome-metrics.test.js'
+    'research/governed-rag-outcome-metrics.test.js',
+    'research/governed-rag-outcome-receipts.test.js'
   ];
 
   for (const testFile of testFiles) {
